@@ -1,5 +1,5 @@
 plugins {
-    id 'java'
+    id 'application'
     id 'org.openjfx.javafxplugin' version '0.0.8'
 }
 
@@ -13,6 +13,10 @@ repositories {
     maven {
         url "https://dl.bintray.com/speljohan/rxjavafx-mirror"
     }
+}
+
+application {
+    mainClassName = 'DiskStalker'
 }
 
 java {
