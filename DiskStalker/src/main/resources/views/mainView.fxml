@@ -98,8 +98,8 @@
             </Tab>
         </tabs>
       </TabPane>
-      <Button fx:id="addButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="124.0" text="Add" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-      <Button fx:id="deleteButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="124.0" text="Delete" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+      <Button fx:id="addButton" onAction="#addButtonClicked" mnemonicParsing="false" prefHeight="25.0" prefWidth="124.0" text="Add" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+      <Button fx:id="deleteButton" onAction="#deleteButtonClicked" mnemonicParsing="false" prefHeight="25.0" prefWidth="124.0" text="Delete" GridPane.columnIndex="1" GridPane.rowIndex="2" />
       <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Observed directories" textAlignment="CENTER" wrappingWidth="467.0">
          <font>
             <Font name="Javanese Text" size="25.0" />

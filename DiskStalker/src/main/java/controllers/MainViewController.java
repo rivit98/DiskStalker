@@ -1,5 +1,6 @@
 package controllers;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -25,5 +26,11 @@ public class MainViewController {
             directoryChooser.setTitle("Choose directory");
             directoryChooser.showDialog(new Stage());
         });
+    }
+
+    public void addButtonClicked(ActionEvent actionEvent) {
+    }
+
+    public void deleteButtonClicked(ActionEvent actionEvent) {
     }
 }
