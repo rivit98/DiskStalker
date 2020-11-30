@@ -10,9 +10,6 @@ public class DiskStalker extends Application {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("views/mainView.fxml"));
         GridPane layout = loader.load();
-
-        //MainViewController controller = loader.getController();
-
         configureStage(primaryStage, layout);
         primaryStage.show();
     }
