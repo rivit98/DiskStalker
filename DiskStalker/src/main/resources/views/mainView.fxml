@@ -33,22 +33,22 @@
           <Tab text="Space">
                <content>
                   <GridPane>
-                    <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="468.0" minWidth="10.0" prefWidth="467.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="295.0" minWidth="10.0" prefWidth="133.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints maxHeight="118.0" minHeight="10.0" prefHeight="60.0" vgrow="SOMETIMES" />
-                      <RowConstraints maxHeight="298.0" minHeight="10.0" prefHeight="296.0" vgrow="SOMETIMES" />
-                      <RowConstraints maxHeight="73.0" minHeight="10.0" prefHeight="14.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
-                     <children>
-                        <TreeView prefHeight="254.0" prefWidth="412.0" GridPane.rowIndex="1">
-                           <GridPane.margin>
-                              <Insets left="50.0" right="50.0" />
-                           </GridPane.margin>
-                        </TreeView>
-                     </children>
+                      <columnConstraints>
+                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="468.0" minWidth="10.0" prefWidth="467.0" />
+                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="295.0" minWidth="10.0" prefWidth="133.0" />
+                      </columnConstraints>
+                      <rowConstraints>
+                          <RowConstraints maxHeight="118.0" minHeight="10.0" prefHeight="60.0" vgrow="SOMETIMES" />
+                          <RowConstraints maxHeight="298.0" minHeight="10.0" prefHeight="296.0" vgrow="SOMETIMES" />
+                          <RowConstraints maxHeight="73.0" minHeight="10.0" prefHeight="14.0" vgrow="SOMETIMES" />
+                      </rowConstraints>
+                      <children>
+                          <TreeView fx:id="locationTreeView" prefHeight="254.0" prefWidth="412.0" GridPane.rowIndex="1">
+                              <GridPane.margin>
+                                  <Insets left="50.0" right="50.0" />
+                              </GridPane.margin>
+                          </TreeView>
+                      </children>
                   </GridPane>
                </content>
           </Tab>

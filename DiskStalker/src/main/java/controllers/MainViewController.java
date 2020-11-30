@@ -1,13 +1,22 @@
 package controllers;
 
+import filesystemWatcher.SimpleFileTreeItem;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
+import java.io.File;
+
 public class MainViewController {
+
+    @FXML
+    private TreeView<File> locationTreeView;
+
     @FXML
     private Button addButton;
     @FXML
@@ -17,14 +26,20 @@ public class MainViewController {
 
     @FXML
     public void initialize(){
+        var treeItem = new TreeItem<File>();
+        locationTreeView.setRoot(treeItem);
+        locationTreeView.setShowRoot(false);
+        locationTreeView.getRoot().setExpanded(true);
         initializeAddButton();
     }
 
     private void initializeAddButton(){
         addButton.setOnAction(e -> {
-            DirectoryChooser directoryChooser = new DirectoryChooser();
-            directoryChooser.setTitle("Choose directory");
-            directoryChooser.showDialog(new Stage());
+            var directoryChooser = new DirectoryChooser();
+            directoryChooser.setInitialDirectory(new File("."));
+            directoryChooser.setTitle("Choose directory to watch");
+            var selectedFolder = directoryChooser.showDialog(new Stage());
+            locationTreeView.getRoot().getChildren().add(new SimpleFileTreeItem(selectedFolder));
         });
     }
 
