@@ -34,4 +34,6 @@ dependencies {
     implementation group: 'io.reactivex.rxjava3', name: 'rxjava', version: '3.0.6'
     implementation group: 'io.reactivex.rxjava3', name: 'rxjavafx', version: '3.0.1'
     implementation group: 'org.apache.tika', name: 'tika-core', version: '1.4'
+    compile group: 'org.springframework', name: 'spring-context', version: '5.2.11.RELEASE'
+    compile group: 'org.springframework', name: 'spring-beans', version: '5.2.11.RELEASE'
 }
