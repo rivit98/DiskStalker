@@ -5,9 +5,9 @@ import java.io.File;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
-public class SimpleFileTreeItem extends TreeItem<File> {
+public class RecursiveTreeBuilder extends TreeItem<File> {
 
-    public SimpleFileTreeItem(File f) {
+    public RecursiveTreeBuilder(File f) {
         super(f);
     }
 
@@ -40,7 +40,7 @@ public class SimpleFileTreeItem extends TreeItem<File> {
                         .observableArrayList();
 
                 for (File childFile : files) {
-                    children.add(new SimpleFileTreeItem(childFile));
+                    children.add(new RecursiveTreeBuilder(childFile));
                 }
 
                 return children;

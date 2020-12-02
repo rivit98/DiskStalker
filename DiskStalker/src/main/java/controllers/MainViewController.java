@@ -1,6 +1,6 @@
 package controllers;
 
-import filesystemWatcher.SimpleFileTreeItem;
+import filesystemWatcher.RecursiveTreeBuilder;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -39,7 +39,7 @@ public class MainViewController {
             directoryChooser.setInitialDirectory(new File("."));
             directoryChooser.setTitle("Choose directory to watch");
             var selectedFolder = directoryChooser.showDialog(new Stage());
-            locationTreeView.getRoot().getChildren().add(new SimpleFileTreeItem(selectedFolder));
+            locationTreeView.getRoot().getChildren().add(new RecursiveTreeBuilder(selectedFolder));
         });
     }
 
