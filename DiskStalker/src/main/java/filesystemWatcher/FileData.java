@@ -1,7 +1,6 @@
 package filesystemWatcher;
 
 import java.io.File;
-import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 
 public class FileData {

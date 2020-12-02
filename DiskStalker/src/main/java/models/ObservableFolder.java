@@ -20,7 +20,8 @@ public class ObservableFolder {
     private final ObservableList<File> files = FXCollections.observableArrayList();
     private final ObservableList<WatchKey> keys = FXCollections.observableArrayList();
     private final HashMap<WatchKey, File> directoryMap = new HashMap<>();
-    private final WatchService watchService;
+    private final WatchService watchService; //TODO: remember to close this after deleting node
+    //TODO: map File - TreeItem
     private final Path directoryPath;
     private final TreeBuilder<File> treeBuilder;
 
@@ -34,11 +35,11 @@ public class ObservableFolder {
 
     public void scanDirectory() {
         var scanner = new FileTreeScanner(watchService);
-//        scanner
-//                .scanDirectory(directoryPath)
-//                .zipWith(Observable.interval(2, TimeUnit.SECONDS), (item, notUsed) -> item)
         scanner
                 .scanDirectory(directoryPath)
+                .zipWith(Observable.interval(2, TimeUnit.SECONDS), (item, notUsed) -> item)
+//        scanner
+//                .scanDirectory(directoryPath)
                 .subscribeOn(Schedulers.io())
                 .subscribe(
                         (FileData fd) -> {
@@ -49,13 +50,9 @@ public class ObservableFolder {
                             files.add(f);
                             keys.add(wk);
                             System.out.println(f);
-
-//                            System.out.println(f);
-                            // add to three view, take size?
-                            // watch file here, maybe add to watcher in model
-                            // ?
                         },
-                        (Throwable e) -> System.out.println(e)
+                        (Throwable e) -> System.out.println(e),
+                        () -> System.out.println("Scanning finished")
                 );
 
         // TODO: implement watching system

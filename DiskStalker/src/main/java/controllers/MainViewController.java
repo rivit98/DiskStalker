@@ -41,7 +41,6 @@ public class MainViewController {
     public void loadTreeItems(File dirToWatch) {
         try{
             var folder = new ObservableFolder(dirToWatch.toPath());
-
             locationTreeView.getRoot().getChildren().add(folder.getTree());
         }catch (IOException exception){
             exception.printStackTrace();
@@ -54,6 +53,7 @@ public class MainViewController {
             directoryChooser.setInitialDirectory(new File("."));
             directoryChooser.setTitle("Choose directory to watch");
             var selectedFolder = directoryChooser.showDialog(new Stage());
+            //TODO: check for null here
             loadTreeItems(selectedFolder);
         });
     }
