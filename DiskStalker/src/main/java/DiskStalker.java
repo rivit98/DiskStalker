@@ -1,8 +1,11 @@
+import controllers.MainViewController;
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 public class DiskStalker extends Application {
     @Override
@@ -10,6 +13,12 @@ public class DiskStalker extends Application {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("views/mainView.fxml"));
         GridPane layout = loader.load();
+
+        primaryStage.setOnCloseRequest(event -> {
+            var mainController = (MainViewController) loader.getController();
+            mainController.onExit();
+        });
+
         configureStage(primaryStage, layout);
         primaryStage.show();
     }

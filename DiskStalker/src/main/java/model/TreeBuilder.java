@@ -1,5 +1,7 @@
 package model;
 
+import com.sun.source.tree.Tree;
+
 import java.nio.file.Path;
 
 
@@ -10,14 +12,15 @@ public class TreeBuilder {
         this.root = new TreeFileNode(new FileData(root.toFile()));
     }
 
-    public void addItem(FileData item) {
+    public TreeFileNode addItem(FileData item) {
         // update 'fake root'
-        if (item.getPath().equals(root.getValue().getPath())) {
+        if (item.getPath().equals(root.getValue().getPath())) { //TODO: think about reducing this check
             root.setValueEx(item);
-            return;
+            return root;
         }
         var node = new TreeFileNode(item);
         root.addNode(node);
+        return node;
     }
 
     public TreeFileNode getRoot() {
