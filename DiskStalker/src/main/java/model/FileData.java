@@ -46,6 +46,10 @@ public class FileData {
         return file.length();
     }
 
+    public long getSize() {
+        return 0;
+    }
+
     @Override
     public String toString() {
         return file.getName() + " " + size();
