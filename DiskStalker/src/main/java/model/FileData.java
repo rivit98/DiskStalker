@@ -3,6 +3,7 @@ package model;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.WatchKey;
+import java.util.Optional;
 
 //TODO: figure out if deriving from File is better idea
 public class FileData {
@@ -18,8 +19,12 @@ public class FileData {
         this(file, null);
     }
 
-    public WatchKey getEvent() {
-        return event;
+    public FileData(Path path) {
+        this(path.toFile(), null);
+    }
+
+    public Optional<WatchKey> getEvent() {
+        return Optional.ofNullable(event);
     }
 
     public void setEventKey(WatchKey event) {

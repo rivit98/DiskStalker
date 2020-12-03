@@ -89,4 +89,8 @@ public class TreeFileNode extends TreeItem<FileData> {
 
         return absoluteChildPath.startsWith(absoluteParentPath);
     }
+
+    public long getSize() {
+        return size;
+    }
 }
