@@ -9,7 +9,7 @@ public class TreeFileNode extends TreeItem<FileData> {
     private long size = 0;
 
     public TreeFileNode(FileData fileData) {
-        super(fileData);//, GraphicsFactory.getGraphic(fileData.isDirectory()));
+        super(fileData);
     }
 
     public void setValueEx(FileData value) {
@@ -22,7 +22,8 @@ public class TreeFileNode extends TreeItem<FileData> {
         var isDir = node.getValue().isDirectory();
         var targetName = node.getValue().getFile().getName();
         int index = 0;
-        for (var ch : getChildren()) { //TODO: is it better than sorting?
+        var cachedList = getChildren();
+        for (var ch : cachedList) { //TODO: is it better than sorting?
             var tnode = (TreeFileNode) ch; //TODO: is it possible to do this without cast?
             var tnodeIsDir = tnode.getValue().isDirectory();
 
@@ -45,7 +46,8 @@ public class TreeFileNode extends TreeItem<FileData> {
             break;
         }
 
-        getChildren().add(index, node);
+//        getChildren().add(index, node);
+        cachedList.add(index, node);
         size = node.getValue().size();
     }
 
@@ -53,14 +55,9 @@ public class TreeFileNode extends TreeItem<FileData> {
         var relativizedPath = this.getValue().getPath().relativize(node.getValue().getPath()); // strip common part
         int relativePathDepth = relativizedPath.getNameCount();
 
-//        System.out.println(relativizedPath + " " + relativePathDepth);
-
         if (relativePathDepth == 1) { // we are adding new node to current node (folder or file)
-//            System.out.println("inserting " + node.getValue().getPath());
             insertNode(node);
         } else {
-//            System.out.println("searching folder for " + node.getValue().getPath());
-
             // loop over childs, find the proper one and enter
             for (var ch : getChildren()) {
                 var tnode = (TreeFileNode) ch; //TODO: is it possible to do this without cast?
@@ -68,15 +65,11 @@ public class TreeFileNode extends TreeItem<FileData> {
                     continue;
                 }
 
-//                System.out.println("compare with: " + tnode.getValue().getPath());
                 if (TreeFileNode.isChild(tnode.getValue().getPath(), node.getValue().getPath())) {
-//                    System.out.println("accept");
                     size += node.getValue().size();
                     tnode.addNode(node);
                     return;
                 }
-
-//                System.out.println("reject");
             }
 
             throw new IllegalStateException("Cos sie popsulo i nie dodalo mnie :(");
