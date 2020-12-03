@@ -37,7 +37,6 @@ public class MainViewController {
 
     @FXML
     public void initialize() {
-
         createRoot();
         TreeTableColumn<FileData, File> pathColumn = new TreeTableColumn<>("Name");
         TreeTableColumn<FileData, Long> sizeColumn = new TreeTableColumn<>("Size");
