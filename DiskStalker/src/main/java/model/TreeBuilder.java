@@ -1,7 +1,5 @@
 package model;
 
-import filesystemWatcher.FileData;
-
 import java.nio.file.Path;
 
 

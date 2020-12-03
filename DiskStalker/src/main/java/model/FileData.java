@@ -1,4 +1,4 @@
-package filesystemWatcher;
+package model;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -39,7 +39,7 @@ public class FileData {
     }
 
     public boolean isFile(){
-        return file.isFile();
+        return !isDirectory();
     }
 
     public long size(){
@@ -48,6 +48,6 @@ public class FileData {
 
     @Override
     public String toString() {
-        return "[" + (isDirectory() ? "DIR" : "FILE") + "] " + file.getName() + " " + size();
+        return file.getName() + " " + size();
     }
 }

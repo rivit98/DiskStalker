@@ -1,6 +1,5 @@
 package model;
 
-import filesystemWatcher.FileData;
 import javafx.scene.control.TreeItem;
 
 import java.nio.file.Path;
@@ -10,7 +9,7 @@ public class TreeFileNode extends TreeItem<FileData> {
     private long size = 0;
 
     public TreeFileNode(FileData fileData) {
-        super(fileData);
+        super(fileData, GraphicsFactory.getGraphic(fileData.isDirectory()));
     }
 
     public void setValueEx(FileData value) {
@@ -19,22 +18,20 @@ public class TreeFileNode extends TreeItem<FileData> {
     }
 
     // inserts node and keeps proper ordering
-    public void insertNode(TreeFileNode node) {
+    public void insertNode(TreeFileNode node) { //TODO: rewrite this
         var isDir = node.getValue().isDirectory();
-        var isFile = node.getValue().isFile();
         var targetName = node.getValue().getFile().getName();
         int index = 0;
         for (var ch : getChildren()) { //TODO: is it better than sorting?
             var tnode = (TreeFileNode) ch; //TODO: is it possible to do this without cast?
             var tnodeIsDir = tnode.getValue().isDirectory();
-            var tnodeIsFile = tnode.getValue().isFile();
 
-            if (isFile && tnodeIsDir) { // we want to put file, so skip all dirs
+            if (!isDir && tnodeIsDir) { // we want to put file, so skip all dirs
                 index++;
                 continue;
             }
 
-            if (isDir && tnodeIsFile) { // no more dirs, so our is last
+            if (isDir && !tnodeIsDir) { // no more dirs, so our is last
                 break;
             }
 

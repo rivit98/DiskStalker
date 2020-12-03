@@ -1,6 +1,7 @@
-package filesystemWatcher;
+package filesystem;
 
 import io.reactivex.rxjava3.core.ObservableEmitter;
+import model.FileData;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -22,22 +23,21 @@ public class FileVisitorEmitter extends SimpleFileVisitor<Path> {
         this.watchService = watchService;
     }
 
-    public void emitPath(Path value) {
+    public void emitPath(Path path) {
         if (observer.isDisposed()) {
             return;
         }
 
-        var f = value.toFile();
-        var fdata = new FileData(f);
-        if (f.isDirectory()) {
+        var fileData = new FileData(path.toFile());
+        if (fileData.isDirectory()) {
             try {
-                var e = value.register(watchService, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
-                fdata.setEventKey(e);
+                var e = path.register(watchService, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+                fileData.setEventKey(e);
             } catch (IOException exception) {
                 exception.printStackTrace();
             }
         }
-        observer.onNext(fdata);
+        observer.onNext(fileData);
     }
 
     @Override

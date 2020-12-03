@@ -1,7 +1,7 @@
 package model;
 
-import filesystemWatcher.FileData;
-import filesystemWatcher.FileTreeScanner;
+import filesystem.DirWatcher;
+import filesystem.FileTreeScanner;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import javafx.collections.FXCollections;
@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class ObservableFolder {
@@ -23,11 +24,13 @@ public class ObservableFolder {
     //TODO: map File - TreeItem
     private final Path directoryPath;
     private final TreeBuilder treeBuilder;
+    private final DirWatcher watcher;
 
     public ObservableFolder(Path dirToWatch) throws IOException {
         directoryPath = dirToWatch;
         watchService = dirToWatch.getFileSystem().newWatchService();
         treeBuilder = new TreeBuilder(dirToWatch);
+        watcher = new DirWatcher(watchService);
 
         scanDirectory();
     }
@@ -36,23 +39,27 @@ public class ObservableFolder {
         var scanner = new FileTreeScanner(watchService);
         scanner
                 .scanDirectory(directoryPath)
-                .zipWith(Observable.interval(300, TimeUnit.MILLISECONDS), (item, notUsed) -> item)
+//                .zipWith(Observable.interval(300, TimeUnit.MILLISECONDS), (item, notUsed) -> item)
                 .subscribeOn(Schedulers.io())
                 .subscribe(
                         (FileData fd) -> {
                             directoryMap.put(fd.getEvent(), fd.getFile());
                             treeBuilder.addItem(fd);
 //                            files.add(f);
-//                            keys.add(wk);
+                            keys.add(fd.getEvent());
 //                            System.out.println(f);
                         },
                         (Throwable e) -> System.out.println(e),
-                        () -> System.out.println("Scanning finished")
+                        () -> {
+                            // TODO: implement watching system
+                            // TODO: add new watch item for newly created directories
+                            System.out.println("Scanning finished");
+                            for(var k : keys.filtered(Objects::nonNull)){
+                                System.out.println(k);
+                            }
+                            watcher.startMonitoring();
+                        }
                 );
-
-
-        // TODO: implement watching system
-        // TODO: add new watch item for newly created directories
     }
 
     public TreeFileNode getTree() {

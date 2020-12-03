@@ -1,6 +1,7 @@
-package filesystemWatcher;
+package filesystem;
 
 import io.reactivex.rxjava3.core.Observable;
+import model.FileData;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
