@@ -1,15 +1,17 @@
 package controllers;
 
+
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.TreeItemPropertyValueFactory;
+
 import model.FileData;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import model.ObservedFolder;
+import model.GraphicsFactory;
 import model.TreeFileNode;
 
 import java.io.File;
@@ -22,7 +24,7 @@ import java.util.List;
 public class MainViewController {
 
     @FXML
-    private TreeView<FileData> locationTreeView;
+    private TreeTableView<FileData> locationTreeView;
 
     @FXML
     private Button addButton;
@@ -35,7 +37,33 @@ public class MainViewController {
 
     @FXML
     public void initialize() {
+
         createRoot();
+        TreeTableColumn<FileData, File> pathColumn = new TreeTableColumn<>("Name");
+        TreeTableColumn<FileData, Long> sizeColumn = new TreeTableColumn<>("Size");
+        pathColumn.setPrefWidth(200); //todo: set proper width
+        pathColumn.setCellValueFactory(new TreeItemPropertyValueFactory<>("file"));//node -> {
+        //    //node.getValue().setGraphic(GraphicsFactory.getGraphic(node.getValue().getValue().isDirectory()));
+        //    return new SimpleStringProperty(node.getValue().getValue().getFile().getName());
+        //});
+
+        pathColumn.setCellFactory(ttc -> new TreeTableCell<>() {
+            @Override
+            protected void updateItem(File item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty ? null : item.getName());
+                setGraphic(empty ? null : GraphicsFactory.getGraphic(item.isDirectory()));
+            }
+        });
+
+        //todo: setCellFactory for sizeColumn (status bar?)
+        sizeColumn.setCellValueFactory(node -> {
+            TreeFileNode n = (TreeFileNode) node.getValue();
+            return new ReadOnlyObjectWrapper<>(n.getSize());
+        });
+
+        locationTreeView.getColumns().add(pathColumn);
+        locationTreeView.getColumns().add(sizeColumn);
         initializeAddButton();
     }
 

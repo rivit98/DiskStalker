@@ -9,7 +9,7 @@ public class TreeFileNode extends TreeItem<FileData> {
     private long size = 0;
 
     public TreeFileNode(FileData fileData) {
-        super(fileData, GraphicsFactory.getGraphic(fileData.isDirectory()));
+        super(fileData);//, GraphicsFactory.getGraphic(fileData.isDirectory()));
     }
 
     public void setValueEx(FileData value) {
