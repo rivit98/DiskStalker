@@ -2,7 +2,6 @@ package filesystemWatcher;
 
 import io.reactivex.rxjava3.core.Observable;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.WatchService;
@@ -16,7 +15,7 @@ public class FileTreeScanner {
 
     public Observable<FileData> scanDirectory(Path dirPath) {
         return Observable.create(emitter -> {
-            Files.walkFileTree(dirPath, new FileVisitorEmitter(dirPath, emitter, watchService));
+            Files.walkFileTree(dirPath, new FileVisitorEmitter(emitter, watchService));
             emitter.onComplete();
         });
     }

@@ -1,9 +1,6 @@
 package controllers;
 
 import filesystemWatcher.FileData;
-import filesystemWatcher.FileTreeScanner;
-import filesystemWatcher.SimpleFileTreeItem;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -12,7 +9,8 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
-import models.ObservableFolder;
+import model.ObservableFolder;
+import model.TreeFileNode;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,7 +19,7 @@ import java.nio.file.Path;
 public class MainViewController {
 
     @FXML
-    private TreeView<File> locationTreeView;
+    private TreeView<FileData> locationTreeView;
 
     @FXML
     private Button addButton;
@@ -31,36 +29,41 @@ public class MainViewController {
     private TextField directorySize;
 
     @FXML
-    public void initialize(){
-        locationTreeView.setRoot(new TreeItem<>());
-        locationTreeView.setShowRoot(false);
-        locationTreeView.getRoot().setExpanded(true);
+    public void initialize() {
+        createRoot();
         initializeAddButton();
     }
 
-    public void loadTreeItems(File dirToWatch) {
-        try{
-            var folder = new ObservableFolder(dirToWatch.toPath());
-            locationTreeView.getRoot().getChildren().add(folder.getTree());
-        }catch (IOException exception){
+    public void createRoot() {
+        locationTreeView.setRoot(new TreeItem<>());
+        locationTreeView.setShowRoot(false);
+        locationTreeView.getRoot().setExpanded(true);
+    }
+
+    public void addToMainTree(TreeFileNode node) {
+        locationTreeView.getRoot().getChildren().add(node);
+    }
+
+    public void loadTreeItems(Path pathToWatch) {
+        try {
+            var folder = new ObservableFolder(pathToWatch);
+            addToMainTree(folder.getTree());
+        } catch (IOException exception) {
             exception.printStackTrace();
         }
     }
 
-    private void initializeAddButton(){
-        addButton.setOnAction(e -> {
-            var directoryChooser = new DirectoryChooser();
-            directoryChooser.setInitialDirectory(new File("."));
-            directoryChooser.setTitle("Choose directory to watch");
-            var selectedFolder = directoryChooser.showDialog(new Stage());
-            //TODO: check for null here
-            loadTreeItems(selectedFolder);
-        });
+    private void initializeAddButton() {
+        addButton.setOnAction(this::addButtonClicked);
+//        loadTreeItems(new File("./testDirs").toPath());
     }
 
     public void addButtonClicked(ActionEvent actionEvent) {
-    }
-
-    public void deleteButtonClicked(ActionEvent actionEvent) {
+        var directoryChooser = new DirectoryChooser();
+        directoryChooser.setInitialDirectory(new File("."));
+        directoryChooser.setTitle("Choose directory to watch");
+        var selectedFolder = directoryChooser.showDialog(new Stage());
+        //TODO: check for null here
+        loadTreeItems(selectedFolder.toPath());
     }
 }

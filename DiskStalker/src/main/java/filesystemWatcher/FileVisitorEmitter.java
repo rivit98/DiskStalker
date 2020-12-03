@@ -17,7 +17,7 @@ public class FileVisitorEmitter extends SimpleFileVisitor<Path> {
     private final WatchService watchService;
 
 
-    public FileVisitorEmitter(Path basePath, ObservableEmitter<FileData> observer, WatchService watchService) {
+    public FileVisitorEmitter(ObservableEmitter<FileData> observer, WatchService watchService) {
         this.observer = observer;
         this.watchService = watchService;
     }
@@ -32,7 +32,7 @@ public class FileVisitorEmitter extends SimpleFileVisitor<Path> {
         if (f.isDirectory()) {
             try {
                 var e = value.register(watchService, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
-                fdata.setEvent(e);
+                fdata.setEventKey(e);
             } catch (IOException exception) {
                 exception.printStackTrace();
             }
@@ -47,7 +47,7 @@ public class FileVisitorEmitter extends SimpleFileVisitor<Path> {
     }
 
     @Override
-    public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
+    public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
         emitPath(dir);
         return CONTINUE;
     }
