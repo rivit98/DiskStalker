@@ -23,8 +23,8 @@ public class TreeFileNode extends TreeItem<FileData> {
         var targetName = node.getValue().getFile().getName();
         int index = 0;
         var cachedList = getChildren();
-        for (var ch : cachedList) { //TODO: is it better than sorting?
-            var tnode = (TreeFileNode) ch; //TODO: is it possible to do this without cast?
+        for (var ch : cachedList) {
+            var tnode = (TreeFileNode) ch;
             var tnodeIsDir = tnode.getValue().isDirectory();
 
             if (!isDir && tnodeIsDir) { // we want to put file, so skip all dirs
@@ -46,7 +46,6 @@ public class TreeFileNode extends TreeItem<FileData> {
             break;
         }
 
-//        getChildren().add(index, node);
         cachedList.add(index, node);
         size = node.getValue().size();
     }
@@ -60,7 +59,7 @@ public class TreeFileNode extends TreeItem<FileData> {
         } else {
             // loop over childs, find the proper one and enter
             for (var ch : getChildren()) {
-                var tnode = (TreeFileNode) ch; //TODO: is it possible to do this without cast?
+                var tnode = (TreeFileNode) ch;
                 if (tnode.getValue().isFile()) {
                     continue;
                 }

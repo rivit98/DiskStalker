@@ -1,27 +1,29 @@
 package model;
-import static java.nio.file.StandardWatchEventKinds.*;
-
 
 import filesystem.DirWatcher;
 import filesystem.FileTreeScanner;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.Path;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import static java.nio.file.StandardWatchEventKinds.*;
 
 // TODO: CLOSE WATCHSERVICE (OBSERVABLE FOLDER) WHEN DELETING ITEM FROM TREEVIEW OR ****CLOSING APP****
 
 public class ObservedFolder {
-    private final ObservableList<WatchKey> keys = FXCollections.observableArrayList();
     private final HashMap<WatchKey, File> directoryMap = new HashMap<>(); //TODO: remove proper key after deleting node
     private final HashMap<Path, TreeFileNode> nodeMap = new HashMap<>();
-    private WatchService watchService;
     private final Path dirToWatch;
+    private WatchService watchService;
     private TreeBuilder treeBuilder;
     private DirWatcher dirWatcher;
 
@@ -40,7 +42,9 @@ public class ObservedFolder {
                 .scanDirectory(dirToWatch)
 //                .zipWith(Observable.interval(300, TimeUnit.MILLISECONDS), (item, notUsed) -> item)
                 .subscribeOn(Schedulers.io())
-                .subscribe(this::processFileData,
+//                .observeOn(JavaFxScheduler.platform())
+                .buffer(300, TimeUnit.MILLISECONDS)
+                .subscribe(list -> list.forEach(this::processFileData),
                         System.out::println,
                         this::startMonitoring
                 );
@@ -51,21 +55,22 @@ public class ObservedFolder {
         nodeMap.put(fileData.getFile().toPath(), insertedNode);
 
         fileData.getEvent().ifPresent(watchKey -> {
-            keys.add(watchKey);
             directoryMap.put(watchKey, fileData.getFile());
         });
     }
 
-    public void startMonitoring(){
+    public void startMonitoring() {
         // TODO: implement watching system
-        // TODO: add new watch key for newly created directories
         System.out.println("Start monitoring");
-        dirWatcher.watchForChanges().subscribe(this::processKey);
+        dirWatcher.watchForChanges()
+                .subscribeOn(Schedulers.io())
+//                .observeOn(JavaFxScheduler.platform())
+                .subscribe(this::processKey);
     }
 
-    public boolean validateEvents(List<WatchEvent<?>> events){
-        for(var event : events){
-            if(event.kind() == OVERFLOW){ //events may be corrupted
+    public boolean validateEvents(List<WatchEvent<?>> events) {
+        for (var event : events) {
+            if (event.kind() == OVERFLOW) { //events may be corrupted
                 return false;
             }
         }
@@ -73,8 +78,8 @@ public class ObservedFolder {
         return true;
     }
 
-    public void processKey(WatchKey key){
-        if(!directoryMap.containsKey(key)){
+    public void processKey(WatchKey key) {
+        if (!directoryMap.containsKey(key)) {
             key.cancel();
             return;
         }
@@ -82,7 +87,7 @@ public class ObservedFolder {
         var triggeredDir = (Path) key.watchable();
         var events = key.pollEvents();
         var eventsValid = validateEvents(events);
-        if(eventsValid){
+        if (eventsValid) {
             for (final WatchEvent<?> event : events) {
                 System.out.println(event.kind().name() + " | " + event.context());
                 processEvent(triggeredDir, event);
@@ -90,7 +95,7 @@ public class ObservedFolder {
         }
 
         var valid = key.reset();
-        if(!valid){
+        if (!valid) {
             // processEvent should remove this node automatically, because event fires for parent folder
             directoryMap.remove(key);
         }
@@ -99,15 +104,15 @@ public class ObservedFolder {
         //TODO: when updating branch, update parents size!
     }
 
-    public void processEvent(Path from, WatchEvent<?> watchEvent){
+    public void processEvent(Path from, WatchEvent<?> watchEvent) {
         var eventType = watchEvent.kind();
         var path = ((WatchEvent<Path>) watchEvent).context();
         var resolvedPath = from.resolve(path);
 
-        if(eventType.equals(ENTRY_CREATE)){
+        if (eventType.equals(ENTRY_CREATE)) {
             var newNode = treeBuilder.addItem(new FileData(resolvedPath));
             nodeMap.put(newNode.getValue().getPath(), newNode);
-            if(newNode.getValue().isDirectory()){ //new dir created, we have to register watcher for it
+            if (newNode.getValue().isDirectory()) { //new dir created, we have to register watcher for it
                 //TODO: refactor this
                 //TODO: TreeFileNode - add proxy method for getting path
                 try {
@@ -117,12 +122,12 @@ public class ObservedFolder {
                     exception.printStackTrace();
                 }
             }
-        }else if(eventType.equals(ENTRY_DELETE)){
+        } else if (eventType.equals(ENTRY_DELETE)) {
             var node = nodeMap.remove(resolvedPath); // this is the folder where something has changed
             node.getParent().getChildren().remove(node);
             //TODO: updateSize!
             //TODO: remove from directoryMap?
-        }else if(eventType.equals(ENTRY_MODIFY)){
+        } else if (eventType.equals(ENTRY_MODIFY)) {
             //TODO: update sizes
         }
     }
@@ -148,7 +153,6 @@ public class ObservedFolder {
         try {
             dirWatcher.stop();
             watchService.close();
-            keys.clear();
             directoryMap.clear();
         } catch (IOException exception) {
             exception.printStackTrace(); //TODO: what should we do here? :/

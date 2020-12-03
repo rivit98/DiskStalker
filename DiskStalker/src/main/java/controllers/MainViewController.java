@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 public class MainViewController {
 
@@ -93,9 +94,10 @@ public class MainViewController {
         var directoryChooser = new DirectoryChooser();
         directoryChooser.setInitialDirectory(new File("."));
         directoryChooser.setTitle("Choose directory to watch");
-        var selectedFolder = directoryChooser.showDialog(new Stage());
-        //TODO: check for null here
-        loadTreeItems(selectedFolder.toPath());
+        var selectedFolderOptional = Optional.ofNullable(directoryChooser.showDialog(new Stage()));
+        selectedFolderOptional.ifPresent(selectedFolder -> {
+            loadTreeItems(selectedFolder.toPath());
+        });
     }
 
     public void onExit(){
