@@ -51,10 +51,10 @@ public class ObservedFolder {
 
     public void processFileData(FileData fileData) {
         var insertedNode = treeBuilder.addItem(fileData);
-        pathToTreeMap.put(fileData.getFile().toPath(), insertedNode);
+        pathToTreeMap.put(fileData.getPath(), insertedNode);
 
         fileData.getEventKey().ifPresent(watchKey -> {
-            eventProcessor.addTrackedDirectory(watchKey, fileData.getFile());
+            eventProcessor.addTrackedDirectory(watchKey, fileData.getPath());
         });
     }
 
@@ -140,7 +140,7 @@ public class ObservedFolder {
             // new dir created, we have to register watcher for it
             // no need to register this for files
             dirWatcher.registerWatchedDirectory(fileData.getPath()).ifPresent(watchKey -> {
-                eventProcessor.addTrackedDirectory(watchKey, fileData.getFile());
+                eventProcessor.addTrackedDirectory(watchKey, fileData.getPath());
             });
         }
     }
@@ -178,8 +178,8 @@ public class ObservedFolder {
     }
 
     public void removeMappedDirsRecursively(TreeItem<FileData> node) {
-        System.out.println("pathMap remove: " + node.getValue().getFile().toPath());
-        pathToTreeMap.remove(node.getValue().getFile().toPath());
+        System.out.println("pathMap remove: " + node.getValue().getPath());
+        pathToTreeMap.remove(node.getValue().getPath());
         node.getChildren().forEach(this::removeMappedDirsRecursively);
     }
 }

@@ -19,7 +19,7 @@ public class TreeFileNode extends TreeItem<FileData> {
     // inserts node and keeps proper ordering
     public void insertNode(TreeFileNode node) { //TODO: rewrite this
         var isDir = node.getValue().isDirectory();
-        var targetName = node.getValue().getFile().getName();
+        var targetName = node.getValue().getPath();
         int index = 0;
         var cachedList = getChildren();
         for (var ch : cachedList) {
@@ -35,7 +35,7 @@ public class TreeFileNode extends TreeItem<FileData> {
                 break;
             }
 
-            var tnodeName = tnode.getValue().getFile().getName();
+            var tnodeName = tnode.getValue().getPath();
             if (targetName.compareTo(tnodeName) > 0) { //compare names to determine order
                 index++;
                 continue;
@@ -70,7 +70,7 @@ public class TreeFileNode extends TreeItem<FileData> {
                 }
             }
 
-            throw new IllegalStateException("addNode failed! | " + node.getValue().getFile().getName());
+            throw new IllegalStateException("addNode failed! | " + node.getValue().getPath());
         }
     }
 

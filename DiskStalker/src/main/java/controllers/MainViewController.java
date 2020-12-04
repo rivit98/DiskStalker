@@ -1,6 +1,9 @@
 package controllers;
 
 
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -37,20 +40,17 @@ public class MainViewController {
     public void initialize() {
         createRoot();
         //todo: refactor this
-        TreeTableColumn<FileData, File> pathColumn = new TreeTableColumn<>("Name");
+        TreeTableColumn<FileData, Path> pathColumn = new TreeTableColumn<>("Name");
         TreeTableColumn<FileData, Number> sizeColumn = new TreeTableColumn<>("Size");
         pathColumn.setPrefWidth(200); //todo: set proper width
-        pathColumn.setCellValueFactory(new TreeItemPropertyValueFactory<>("file"));//node -> {
-        //    //node.getValue().setGraphic(GraphicsFactory.getGraphic(node.getValue().getValue().isDirectory()));
-        //    return new SimpleStringProperty(node.getValue().getValue().getFile().getName());
-        //});
+        pathColumn.setCellValueFactory(node -> new SimpleObjectProperty<>(node.getValue().getValue().getPath()));
 
         pathColumn.setCellFactory(ttc -> new TreeTableCell<>() {
             @Override
-            protected void updateItem(File item, boolean empty) {
+            protected void updateItem(Path item, boolean empty) {
                 super.updateItem(item, empty);
-                setText(empty ? null : item.getName());
-                setGraphic(empty ? null : GraphicsFactory.getGraphic(item.isDirectory()));
+                setText(empty ? null : item.getFileName().toString());
+                setGraphic(empty ? null : GraphicsFactory.getGraphic(item.toFile().isDirectory()));
             }
         });
 
@@ -123,7 +123,7 @@ public class MainViewController {
                             .filter(observedFolder -> observedFolder.checkIfNodeIsChild(item.getValue().getPath()))
                             .findAny();
 
-            //FIXME: 
+            //FIXME:
 //            folder.ifPresent(folderWithNode -> folderWithNode.deleteNodes(item));
             item.getParent().getChildren().remove(item);
         });
