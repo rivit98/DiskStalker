@@ -9,10 +9,16 @@ import java.util.Optional;
 public class FileData {
     private final File file;
     private WatchKey event;
+    private boolean isDirectory;
+    private long size;
 
     public FileData(File file, WatchKey event) {
         this.event = event;
         this.file = file;
+        this.isDirectory = file.isDirectory();
+        if(isFile()){
+            size = file.length();
+        }
     }
 
     public FileData(File file) {
@@ -40,15 +46,23 @@ public class FileData {
     }
 
     public boolean isDirectory(){
-        return file.isDirectory();
+        return isDirectory;
     }
 
     public boolean isFile(){
-        return !isDirectory();
+        return !isDirectory;
     }
 
     public long size(){
-        return file.length();
+        return size;
+    }
+
+    public void setSize(long size){
+        this.size = size;
+    }
+
+    public void modifySize(long size) {
+        this.size += size;
     }
 
     @Override
