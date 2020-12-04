@@ -39,6 +39,8 @@ public class MainViewController {
     @FXML
     public void initialize() {
         createRoot();
+        locationTreeView.getSelectionModel().setSelectionMode(
+                SelectionMode.SINGLE);
         //todo: refactor this
         TreeTableColumn<FileData, File> pathColumn = new TreeTableColumn<>("Name");
         TreeTableColumn<FileData, Number> sizeColumn = new TreeTableColumn<>("Size");
@@ -78,6 +80,9 @@ public class MainViewController {
         locationTreeView.getColumns().add(sizeColumn);
         initializeButtons();
         initializeSizeField();
+        //TODO: repair buttons bindings
+        setSizeButton.disableProperty().bind(Bindings.isEmpty(locationTreeView.getSelectionModel().getSelectedItems()));
+        deleteButton.disableProperty().bind(Bindings.isEmpty(locationTreeView.getSelectionModel().getSelectedItems()));
     }
 
     public void createRoot() {
@@ -109,17 +114,13 @@ public class MainViewController {
 //        loadTreeItems(new File("./testDirs").toPath());
     }
 
-    public void initializeSizeField(){
+    public void initializeSizeField() {
         locationTreeView.getSelectionModel().selectedItemProperty().addListener((observable, oldTreeItem, newTreeItem) -> {
             if(oldTreeItem!=null){
                 directorySize.textProperty().unbind();
             }
-            bindSize(newTreeItem);
+            directorySize.textProperty().bind(newTreeItem.getValue().getMaximumSizePropertyAsStringProperty());
         });
-    }
-
-    public void bindSize(TreeItem<FileData> treeItem){
-        directorySize.textProperty().bind(treeItem.getValue().getMaximumSizePropertyAsStringProperty());
     }
 
     public void addButtonClicked(ActionEvent actionEvent) {
@@ -156,13 +157,11 @@ public class MainViewController {
         });
     }
 
-    private void setSizeButtonClicked(ActionEvent actionEvent){
-        
+    private void setSizeButtonClicked(ActionEvent actionEvent) {
+        //TODO: set max dir size
     }
 
-
-
-    private Alert createAlert(String headerText, String information){
+    private Alert createAlert(String headerText, String information) {
         var alert = new Alert(Alert.AlertType.WARNING);
         alert.setHeaderText(headerText);
         alert.setContentText(information);
@@ -172,4 +171,6 @@ public class MainViewController {
     public void onExit() {
         folderList.forEach(ObservedFolder::destroy);
     }
+
+
 }
