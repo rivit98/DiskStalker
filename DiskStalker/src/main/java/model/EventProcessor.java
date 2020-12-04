@@ -43,6 +43,7 @@ public class EventProcessor {
     private boolean validateEvents(List<WatchEvent<?>> events) {
         for (var event : events) {
             if (event.kind() == OVERFLOW) { //events may be corrupted
+                System.out.println("invalid event");
                 return false;
             }
         }
@@ -59,6 +60,7 @@ public class EventProcessor {
     }
 
     public File removeTrackedDirectory(WatchKey key){
+        key.cancel();
         return keyToFileMap.remove(key);
     }
 
