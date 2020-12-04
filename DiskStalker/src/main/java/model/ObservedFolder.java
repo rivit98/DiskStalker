@@ -102,7 +102,7 @@ public class ObservedFolder {
 
     private void handleModifyEvent(Path resolvedPath) {
         var modifiedNode = pathToTreeMap.get(resolvedPath);
-        var fileData = modifiedNode.getValue();
+        var fileData = modifiedNode.getValue(); //TODO: nullptr when copying data into observed folder
         if(fileData.isFile()){
             modifiedNode.updateMe();
         } else {
@@ -120,15 +120,9 @@ public class ObservedFolder {
             });
             affectedNode.deleteMe();
         } else {
-            //TODO: if directory
-            //TODO: remove from eventprocessor
-            //TODO: remove childs from pathToTreeMap
-            //TODO: remove childs from eventprocessor
             eventProcessor.removeTrackedDirectoriesRecursively(affectedNode);
             removeMappedDirsRecursively(affectedNode);
             affectedNode.deleteMe();
-
-            System.out.println("handleDeleteEvent directory - NOT IMPLEMENTED");
         }
     }
 
@@ -163,7 +157,7 @@ public class ObservedFolder {
         try {
             dirWatcher.stop();
             watchService.close();
-            eventProcessor.getDirectoryMap().clear();
+            eventProcessor.clearTrackedDirectories();
         } catch (IOException exception) {
             exception.printStackTrace(); //TODO: what should we do here? :/
         }

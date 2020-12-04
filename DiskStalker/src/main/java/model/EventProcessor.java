@@ -51,8 +51,8 @@ public class EventProcessor {
         return true;
     }
 
-    public HashMap<WatchKey, Path> getDirectoryMap() {
-        return keyToFileMap;
+    public void clearTrackedDirectories(){
+        keyToFileMap.clear();
     }
 
     public void addTrackedDirectory(WatchKey key, Path f){
