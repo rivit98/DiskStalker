@@ -74,9 +74,8 @@ public class ObservedFolder {
     //TODO: if not valid, remove treeitem, remove watchkey from map - is it necessary?
     //TODO: case when user removes root folder!
     //TODO: when updating branch, update parents size!
-    //TODO: better idea - use nodemap for inserting
+    //TODO: better idea - use nodemap for inserting - requries updating size in reverse order (bottom-up)
     //TODO: refactor this
-    //TODO: TreeFileNode - add proxy method for getting path
 
     public void processEvent(EventObject eventObject) {
         Path from = eventObject.getTargetDir();
@@ -167,8 +166,8 @@ public class ObservedFolder {
         return treeBuilder.getRoot();
     }
 
-    public boolean checkIfNodeIsChild(Path path){
-        return pathToTreeMap.get(path) != null;
+    public boolean containsNode(Path path){
+        return pathToTreeMap.containsKey(path);
     }
 
     public void removeMappedDirsRecursively(TreeItem<FileData> node) {

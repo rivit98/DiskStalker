@@ -55,8 +55,7 @@ public class MainViewController {
         });
 
         //todo: setCellFactory for sizeColumn (status bar?)
-        sizeColumn.setCellValueFactory(node ->
-                node.getValue().getValue().sizePropertyProperty());
+        sizeColumn.setCellValueFactory(node -> node.getValue().getValue().sizePropertyProperty());
 
         sizeColumn.setCellFactory(ttc -> {
             TreeTableCell<FileData, Number> cell = new TreeTableCell<>() {
@@ -101,7 +100,6 @@ public class MainViewController {
     private void initializeButtons() {
         addButton.setOnAction(this::addButtonClicked);
         deleteButton.setOnAction(this::deleteButtonClicked);
-//        loadTreeItems(new File("./testDirs").toPath());
     }
 
     public void addButtonClicked(ActionEvent actionEvent) {
@@ -116,17 +114,28 @@ public class MainViewController {
 
     public void deleteButtonClicked(ActionEvent actionEvent) {
         var selectedTreeItem = Optional.ofNullable(locationTreeView.getSelectionModel().getSelectedItem());
-        //TODO: fix nullptr exception
         selectedTreeItem.ifPresent(item -> {
-            var folder =
+            var searchedPath = item.getValue().getPath();
+            var rootFolder =
                     folderList.stream()
-                            .filter(observedFolder -> observedFolder.checkIfNodeIsChild(item.getValue().getPath()))
-                            .findAny();
+                            .filter(observedFolder -> observedFolder.containsNode(searchedPath))
+                            .findFirst();
 
-            //FIXME:
-//            folder.ifPresent(folderWithNode -> folderWithNode.deleteNodes(item));
-            item.getParent().getChildren().remove(item);
+            rootFolder.ifPresent(observedFolder -> { //should always be present
+                removeFolder(observedFolder, item);
+            });
         });
+    }
+
+    public void removeFolder(ObservedFolder folder, TreeItem<FileData> nodeToRemove){
+        var c = (TreeFileNode) nodeToRemove;
+        if(locationTreeView.getRoot().getChildren().contains(c)){ //we are removing main folder
+            folder.destroy();
+            locationTreeView.getRoot().getChildren().remove(c);
+            folderList.remove(folder);
+        }else{
+            c.deleteMe();
+        }
     }
 
     public void onExit() {
