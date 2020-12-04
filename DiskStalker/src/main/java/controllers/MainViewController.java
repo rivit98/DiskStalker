@@ -108,9 +108,19 @@ public class MainViewController {
         var directoryChooser = new DirectoryChooser();
         directoryChooser.setInitialDirectory(new File("."));
         directoryChooser.setTitle("Choose directory to watch");
+
         var selectedFolderOptional = Optional.ofNullable(directoryChooser.showDialog(new Stage()));
         selectedFolderOptional.ifPresent(selectedFolder -> {
-            loadTreeItems(selectedFolder.toPath());
+            var rootChildrens = locationTreeView.getRoot().getChildren().stream()
+                    .filter(rootChildren -> rootChildren.getValue().getPath().equals(selectedFolder.toPath()))
+                    .findAny();
+            if(rootChildrens.isPresent()){
+                var alert = createAlert("Warning", "You already observe this directory!");
+                alert.showAndWait()
+                        .filter(response -> response == ButtonType.OK);
+            } else {
+                loadTreeItems(selectedFolder.toPath());
+            }
         });
     }
 
@@ -126,6 +136,13 @@ public class MainViewController {
             folder.ifPresent(folderWithNode -> folderWithNode.deleteNodes(item));
             item.getParent().getChildren().remove(item);
         });
+    }
+
+    private Alert createAlert(String headerText, String information){
+        var alert = new Alert(Alert.AlertType.WARNING);
+        alert.setHeaderText(headerText);
+        alert.setContentText(information);
+        return alert;
     }
 
     public void onExit() {
