@@ -1,7 +1,7 @@
 package controllers;
 
-
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -42,26 +42,22 @@ public class MainViewController {
         locationTreeView.getSelectionModel().setSelectionMode(
                 SelectionMode.SINGLE);
         //todo: refactor this
-        TreeTableColumn<FileData, File> pathColumn = new TreeTableColumn<>("Name");
+        TreeTableColumn<FileData, Path> pathColumn = new TreeTableColumn<>("Name");
         TreeTableColumn<FileData, Number> sizeColumn = new TreeTableColumn<>("Size");
         pathColumn.setPrefWidth(200); //todo: set proper width
-        pathColumn.setCellValueFactory(new TreeItemPropertyValueFactory<>("file"));//node -> {
-        //    //node.getValue().setGraphic(GraphicsFactory.getGraphic(node.getValue().getValue().isDirectory()));
-        //    return new SimpleStringProperty(node.getValue().getValue().getFile().getName());
-        //});
+        pathColumn.setCellValueFactory(node -> new SimpleObjectProperty<>(node.getValue().getValue().getPath()));
 
         pathColumn.setCellFactory(ttc -> new TreeTableCell<>() {
             @Override
-            protected void updateItem(File item, boolean empty) {
+            protected void updateItem(Path item, boolean empty) {
                 super.updateItem(item, empty);
-                setText(empty ? null : item.getName());
-                setGraphic(empty ? null : GraphicsFactory.getGraphic(item.isDirectory()));
+                setText(empty ? null : item.getFileName().toString());
+                setGraphic(empty ? null : GraphicsFactory.getGraphic(item.toFile().isDirectory()));
             }
         });
 
         //todo: setCellFactory for sizeColumn (status bar?)
-        sizeColumn.setCellValueFactory(node ->
-                node.getValue().getValue().sizePropertyProperty());
+        sizeColumn.setCellValueFactory(node -> node.getValue().getValue().sizePropertyProperty());
 
         sizeColumn.setCellFactory(ttc -> {
             TreeTableCell<FileData, Number> cell = new TreeTableCell<>() {
@@ -111,7 +107,6 @@ public class MainViewController {
         addButton.setOnAction(this::addButtonClicked);
         deleteButton.setOnAction(this::deleteButtonClicked);
         setSizeButton.setOnAction(this::setSizeButtonClicked);
-//        loadTreeItems(new File("./testDirs").toPath());
     }
 
     public void initializeSizeField() {
@@ -145,15 +140,16 @@ public class MainViewController {
 
     public void deleteButtonClicked(ActionEvent actionEvent) {
         var selectedTreeItem = Optional.ofNullable(locationTreeView.getSelectionModel().getSelectedItem());
-        //TODO: fix nullptr exception
         selectedTreeItem.ifPresent(item -> {
-            var folder =
+            var searchedPath = item.getValue().getPath();
+            var rootFolder =
                     folderList.stream()
-                            .filter(observedFolder -> observedFolder.checkIfNodeIsChild(item.getValue().getPath()))
-                            .findAny();
+                            .filter(observedFolder -> observedFolder.containsNode(searchedPath))
+                            .findFirst();
 
-            folder.ifPresent(folderWithNode -> folderWithNode.deleteNodes(item));
-            item.getParent().getChildren().remove(item);
+            rootFolder.ifPresent(observedFolder -> { //should always be present
+                removeFolder(observedFolder, item);
+            });
         });
     }
 
@@ -168,9 +164,18 @@ public class MainViewController {
         return alert;
     }
 
+    public void removeFolder(ObservedFolder folder, TreeItem<FileData> nodeToRemove){
+        var c = (TreeFileNode) nodeToRemove;
+        if(locationTreeView.getRoot().getChildren().contains(c)){ //we are removing main folder
+            folder.destroy();
+            locationTreeView.getRoot().getChildren().remove(c);
+            folderList.remove(folder);
+        }else{
+            c.deleteMe();
+        }
+    }
+
     public void onExit() {
         folderList.forEach(ObservedFolder::destroy);
     }
-
-
 }

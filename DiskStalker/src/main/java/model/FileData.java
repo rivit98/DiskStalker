@@ -10,7 +10,7 @@ import java.nio.file.WatchKey;
 import java.util.Optional;
 
 public class FileData {
-    private final File file;
+    private final Path file;
     private final boolean isDirectory;
     private final SimpleLongProperty sizeProperty;
     private WatchKey event;
@@ -18,21 +18,18 @@ public class FileData {
     private boolean maximumSizeSet;
 
 
-    public FileData(File file, WatchKey event) {
+    public FileData(Path file, WatchKey event) {
         this.event = event;
         this.file = file;
-        this.isDirectory = file.isDirectory();
-        this.sizeProperty = new SimpleLongProperty(isFile() ? file.length() : 0);
+        var f = file.toFile();
+        this.isDirectory = f.isDirectory();
+        this.sizeProperty = new SimpleLongProperty(isFile() ? f.length() : 0);
         this.maximumSizeProperty = new SimpleLongProperty(sizeProperty.longValue());
         this.maximumSizeSet = false;
     }
 
-    public FileData(File file) {
-        this(file, null);
-    }
-
     public FileData(Path path) {
-        this(path.toFile(), null);
+        this(path, null);
     }
 
     public Optional<WatchKey> getEventKey() {
@@ -43,12 +40,8 @@ public class FileData {
         this.event = event;
     }
 
-    public File getFile() {
-        return file;
-    }
-
     public Path getPath() {
-        return file.toPath();
+        return file;
     }
 
     public boolean isDirectory() {
@@ -68,7 +61,7 @@ public class FileData {
     }
 
     public long getActualSize(){
-        return file.length();
+        return file.toFile().length();
     }
 
     public long updateFileSize() { // update size and return the old one

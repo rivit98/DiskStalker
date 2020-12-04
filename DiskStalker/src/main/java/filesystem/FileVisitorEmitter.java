@@ -28,7 +28,7 @@ public class FileVisitorEmitter extends SimpleFileVisitor<Path> {
             return;
         }
 
-        var fileData = new FileData(path.toFile());
+        var fileData = new FileData(path);
         if (fileData.isDirectory()) {
             dirWatcher.registerWatchedDirectory(path).ifPresent(fileData::setEventKey);
         }
