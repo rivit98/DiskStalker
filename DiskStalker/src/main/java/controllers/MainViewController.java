@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 public class MainViewController {
 
@@ -61,7 +62,7 @@ public class MainViewController {
 
         locationTreeView.getColumns().add(pathColumn);
         locationTreeView.getColumns().add(sizeColumn);
-        initializeAddButton();
+        initializeButtons();
     }
 
     public void createRoot() {
@@ -84,8 +85,9 @@ public class MainViewController {
         }
     }
 
-    private void initializeAddButton() {
+    private void initializeButtons() {
         addButton.setOnAction(this::addButtonClicked);
+        deleteButton.setOnAction(this::deleteButtonClicked);
 //        loadTreeItems(new File("./testDirs").toPath());
     }
 
@@ -93,9 +95,22 @@ public class MainViewController {
         var directoryChooser = new DirectoryChooser();
         directoryChooser.setInitialDirectory(new File("."));
         directoryChooser.setTitle("Choose directory to watch");
-        var selectedFolder = directoryChooser.showDialog(new Stage());
-        //TODO: check for null here
-        loadTreeItems(selectedFolder.toPath());
+        try {
+            Optional<File> directory = Optional.of(directoryChooser.showDialog(new Stage()));
+            directory.ifPresent(dir -> loadTreeItems(dir.toPath()));
+        } catch (NullPointerException e) {
+            System.out.println("JavaFX bug");
+        }
+    }
+
+    public void deleteButtonClicked(ActionEvent actionEvent){
+        var selectedTreeItem = locationTreeView.getSelectionModel().getSelectedItem();
+
+        folderList.stream()
+                .filter(observedFolder -> observedFolder.getPath().equals(selectedTreeItem.getValue().getPath()))
+                .forEach(ObservedFolder::destroy);
+
+        selectedTreeItem.getParent().getChildren().remove(selectedTreeItem);
     }
 
     public void onExit(){

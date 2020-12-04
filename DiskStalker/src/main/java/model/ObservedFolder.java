@@ -158,4 +158,8 @@ public class ObservedFolder {
     public TreeFileNode getTree() {
         return treeBuilder.getRoot(); //TODO: after refreshing tree we have to notify main view about change, maybe binding?
     }
+
+    public Path getPath(){
+        return dirToWatch;
+    }
 }
