@@ -91,8 +91,10 @@ public class MainViewController {
     public void loadTreeItems(Path pathToWatch) {
         try {
             var folder = new ObservedFolder(pathToWatch);
-            addToMainTree(folder.getTree());
-            folderList.add(folder);
+            folder.getTree().subscribe(treeFileNode -> {
+                addToMainTree(treeFileNode);
+                folderList.add(folder);
+            });
         } catch (IOException exception) {
             exception.printStackTrace();
         }

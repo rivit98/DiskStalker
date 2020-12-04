@@ -1,28 +1,29 @@
 package model;
 
+import io.reactivex.rxjava3.core.SingleObserver;
+import io.reactivex.rxjava3.internal.operators.single.SingleToObservable;
+import io.reactivex.rxjava3.subjects.SingleSubject;
+
 import java.nio.file.Path;
 
 
 public class TreeBuilder {
-    private final TreeFileNode root;
-
-    public TreeBuilder(Path root) {
-        this.root = new TreeFileNode(new FileData(root.toFile()));
-    }
+    private final SingleSubject<TreeFileNode> rootSubject = SingleSubject.create();
+    private TreeFileNode root;
 
     public TreeFileNode addItem(FileData item) {
-        // update 'fake root'
-        if (item.getPath().equals(root.getValue().getPath())) { //TODO: think about reducing this check, switch to future?
-            root.setValueEx(item);
-            return root;
-        }
         var node = new TreeFileNode(item);
-        root.addNode(node);
+        if (root == null) {
+            root = node;
+            rootSubject.onSuccess(root);
+        }else{
+            root.addNode(node);
+        }
         return node;
     }
 
-    public TreeFileNode getRoot() {
-        return root;
+    public SingleSubject<TreeFileNode> getRoot() {
+        return rootSubject;
     }
 }
 

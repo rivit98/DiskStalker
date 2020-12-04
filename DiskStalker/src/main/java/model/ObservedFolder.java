@@ -2,7 +2,10 @@ package model;
 
 import filesystem.DirWatcher;
 import filesystem.FileTreeScanner;
+import io.reactivex.rxjava3.core.SingleObserver;
+import io.reactivex.rxjava3.core.SingleSource;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import io.reactivex.rxjava3.subjects.SingleSubject;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
@@ -180,7 +183,7 @@ public class ObservedFolder {
         }
     }
 
-    public TreeFileNode getTree() {
+    public SingleSubject<TreeFileNode> getTree() {
         return treeBuilder.getRoot(); //TODO: after refreshing tree we have to notify main view about change, maybe binding?
     }
 
