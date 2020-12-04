@@ -67,9 +67,4 @@ public class FileData {
     public void modifySize(long size) {
         this.size += size;
     }
-
-    @Override
-    public String toString() {
-        return file.getName() + " " + size();
-    }
 }

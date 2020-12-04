@@ -41,4 +41,6 @@ dependencies {
     implementation group: 'org.apache.tika', name: 'tika-core', version: '1.4'
     implementation group: 'org.springframework', name: 'spring-context', version: '5.2.11.RELEASE'
     implementation group: 'org.springframework', name: 'spring-beans', version: '5.2.11.RELEASE'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.6'
+
 }

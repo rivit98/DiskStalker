@@ -12,7 +12,7 @@ public class TreeBuilder {
 
     public TreeFileNode addItem(FileData item) {
         // update 'fake root'
-        if (item.getPath().equals(root.getValue().getPath())) { //TODO: think about reducing this check
+        if (item.getPath().equals(root.getValue().getPath())) { //TODO: think about reducing this check, switch to future?
             root.setValueEx(item);
             return root;
         }

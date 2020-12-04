@@ -122,6 +122,7 @@ public class MainViewController {
                 .forEach(ObservedFolder::destroy)
         );
         selectedTreeItem.ifPresent(item -> item.getParent().getChildren().remove(item));
+        //TODO: where is removing watchers, updating maps when removing folder inside ObservedFolder?
     }
 
     public void onExit(){

@@ -6,6 +6,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
+import static java.nio.file.StandardWatchEventKinds.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,7 +19,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import static java.nio.file.StandardWatchEventKinds.*;
 
 // TODO: CLOSE WATCHSERVICE (OBSERVABLE FOLDER) WHEN DELETING ITEM FROM TREEVIEW OR ****CLOSING APP****
 
@@ -43,11 +43,9 @@ public class ObservedFolder {
         var scanner = new FileTreeScanner(watchService);
         scanner
                 .scanDirectory(dirToWatch)
-//                .zipWith(Observable.interval(300, TimeUnit.MILLISECONDS), (item, notUsed) -> item)
                 .subscribeOn(Schedulers.io())
 //                .observeOn(JavaFxScheduler.platform())
-                .buffer(300, TimeUnit.MILLISECONDS)
-                .subscribe(list -> list.forEach(this::processFileData),
+                .subscribe(this::processFileData,
                         System.out::println,
                         this::startMonitoring
                 );
@@ -99,7 +97,7 @@ public class ObservedFolder {
 
         var valid = key.reset();
         if (!valid) {
-            // processEvent should remove this node automatically, because event fires for parent folder
+            // processEvent should remove this node automatically, because event fires also for parent folder
             directoryMap.remove(key);
         }
         //TODO: if not valid, remove treeitem, remove watchkey from map - is it necessary?
@@ -108,6 +106,7 @@ public class ObservedFolder {
     }
 
     public void processEvent(Path from, WatchEvent<?> watchEvent) {
+        //TODO: better idea - use nodemap for inserting
         var eventType = watchEvent.kind();
         var path = ((WatchEvent<Path>) watchEvent).context();
         var resolvedPath = from.resolve(path);
@@ -127,7 +126,7 @@ public class ObservedFolder {
             }
         } else if (eventType.equals(ENTRY_DELETE)) {
             var node = nodeMap.remove(resolvedPath); // this is the folder where something has changed
-            node.getParent().getChildren().remove(node);
+            node.getParent().getChildren().remove(node); //TODO: nullptr exception here!
             //TODO: updateSize!
             //TODO: remove from directoryMap?
         }else if(eventType.equals(ENTRY_MODIFY)){
@@ -139,6 +138,7 @@ public class ObservedFolder {
                     //TODO:if directory
                 }
             });
+            System.out.println(modifiedNode);
         }
     }
 
@@ -150,9 +150,8 @@ public class ObservedFolder {
             System.out.println(parent.getValue().getPath());
         }
         });
-        //TODO:don't know why parent.getValue() can be null ;(
+        //TODO: don't know why parent.getValue() can be null ;(
     }
-
 
     public void refresh() throws IOException { //TODO: test this!
         cleanup();
