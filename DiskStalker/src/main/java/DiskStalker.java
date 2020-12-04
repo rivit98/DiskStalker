@@ -23,6 +23,7 @@ public class DiskStalker extends Application {
 
     private void configureStage(Stage primaryStage, GridPane layout) {
         Scene scene = new Scene(layout);
+        scene.getStylesheets().add("styles/style.css");
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.setTitle("Disk Stalker");
