@@ -56,8 +56,8 @@ public class MainViewController {
 
         //todo: setCellFactory for sizeColumn (status bar?)
         sizeColumn.setCellValueFactory(node -> {
-            TreeFileNode n = (TreeFileNode) node.getValue();
-            return new ReadOnlyObjectWrapper<>(n.getSize());
+            TreeItem<FileData> n = node.getValue();
+            return new ReadOnlyObjectWrapper<>(n.getValue().size());
         });
 
         locationTreeView.getColumns().add(pathColumn);
@@ -95,22 +95,20 @@ public class MainViewController {
         var directoryChooser = new DirectoryChooser();
         directoryChooser.setInitialDirectory(new File("."));
         directoryChooser.setTitle("Choose directory to watch");
-        try {
-            Optional<File> directory = Optional.of(directoryChooser.showDialog(new Stage()));
-            directory.ifPresent(dir -> loadTreeItems(dir.toPath()));
-        } catch (NullPointerException e) {
-            System.out.println("JavaFX bug");
-        }
+        var selectedFolderOptional = Optional.ofNullable(directoryChooser.showDialog(new Stage()));
+        selectedFolderOptional.ifPresent(selectedFolder -> {
+            loadTreeItems(selectedFolder.toPath());
+        });
     }
 
     public void deleteButtonClicked(ActionEvent actionEvent){
-        var selectedTreeItem = locationTreeView.getSelectionModel().getSelectedItem();
+        var selectedTreeItem = Optional.ofNullable(locationTreeView.getSelectionModel().getSelectedItem());
 
-        folderList.stream()
-                .filter(observedFolder -> observedFolder.getPath().equals(selectedTreeItem.getValue().getPath()))
-                .forEach(ObservedFolder::destroy);
-
-        selectedTreeItem.getParent().getChildren().remove(selectedTreeItem);
+        selectedTreeItem.ifPresent(item -> folderList.stream()
+                .filter(observedFolder -> observedFolder.getPath().equals(item.getValue().getPath()))
+                .forEach(ObservedFolder::destroy)
+        );
+        selectedTreeItem.ifPresent(item -> item.getParent().getChildren().remove(item));
     }
 
     public void onExit(){
