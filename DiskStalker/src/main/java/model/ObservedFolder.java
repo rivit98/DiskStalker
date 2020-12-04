@@ -35,9 +35,6 @@ public class ObservedFolder {
 
     public ObservedFolder(Path dirToWatch) throws IOException {
         this.dirToWatch = dirToWatch;
-        this.watchService = dirToWatch.getFileSystem().newWatchService();
-        this.treeBuilder = new TreeBuilder(dirToWatch);
-        this.dirWatcher = new DirWatcher(watchService);
 
         scan();
     }
@@ -163,7 +160,7 @@ public class ObservedFolder {
 
     public void scan() throws IOException {
         watchService = dirToWatch.getFileSystem().newWatchService();
-        treeBuilder = new TreeBuilder(dirToWatch);
+        treeBuilder = new TreeBuilder();
         dirWatcher = new DirWatcher(watchService);
 
         scanDirectory();
