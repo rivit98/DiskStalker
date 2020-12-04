@@ -82,7 +82,7 @@ public class TreeFileNode extends TreeItem<FileData> {
     }
 
     public void deleteMe() {
-        updateParentSize(getParent(), -getValue().getSize());
+        updateParentSize(this, -getValue().getSize());
         this.getParent().getChildren().remove(this);
     }
 

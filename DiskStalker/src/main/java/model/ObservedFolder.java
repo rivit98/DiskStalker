@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.WatchService;
 import java.util.HashMap;
-import java.util.Optional;
 
 
 // TODO: CLOSE WATCHSERVICE (OBSERVABLE FOLDER) WHEN DELETING ITEM FROM TREEVIEW OR ****CLOSING APP****
@@ -125,6 +124,10 @@ public class ObservedFolder {
             //TODO: remove from eventprocessor
             //TODO: remove childs from pathToTreeMap
             //TODO: remove childs from eventprocessor
+            eventProcessor.removeTrackedDirectoriesRecursively(affectedNode);
+            removeMappedDirsRecursively(affectedNode);
+            affectedNode.deleteMe();
+
             System.out.println("handleDeleteEvent directory - NOT IMPLEMENTED");
         }
     }
@@ -140,16 +143,6 @@ public class ObservedFolder {
                 eventProcessor.addTrackedDirectory(watchKey, fileData.getFile());
             });
         }
-    }
-
-    private void updateParentSize(TreeItem<FileData> node, long deltaSize){
-        var parentNode = Optional.ofNullable(node.getParent());
-        parentNode.ifPresent(parent -> {
-            if(parent.getValue()!=null){
-            parent.getValue().modifySize(deltaSize);
-            updateParentSize(parent, deltaSize);
-            }
-        });
     }
 
     public void refresh() throws IOException { //TODO: test this!
@@ -184,11 +177,9 @@ public class ObservedFolder {
         return pathToTreeMap.get(path) != null;
     }
 
-    public void deleteNodes(TreeItem<FileData> treeItem){
-        var itemChildren = treeItem.getChildren().stream();
-        itemChildren.forEach(this::deleteNodes);
-
-        eventProcessor.getDirectoryMap().remove(treeItem.getValue().getEventKey());
-        pathToTreeMap.remove(treeItem.getValue().getPath());
+    public void removeMappedDirsRecursively(TreeItem<FileData> node) {
+        System.out.println("pathMap remove: " + node.getValue().getFile().toPath());
+        pathToTreeMap.remove(node.getValue().getFile().toPath());
+        node.getChildren().forEach(this::removeMappedDirsRecursively);
     }
 }

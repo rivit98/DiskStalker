@@ -123,7 +123,8 @@ public class MainViewController {
                             .filter(observedFolder -> observedFolder.checkIfNodeIsChild(item.getValue().getPath()))
                             .findAny();
 
-            folder.ifPresent(folderWithNode -> folderWithNode.deleteNodes(item));
+            //FIXME: 
+//            folder.ifPresent(folderWithNode -> folderWithNode.deleteNodes(item));
             item.getParent().getChildren().remove(item);
         });
     }

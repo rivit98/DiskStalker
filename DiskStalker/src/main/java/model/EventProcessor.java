@@ -1,5 +1,7 @@
 package model;
 
+import javafx.scene.control.TreeItem;
+
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.WatchEvent;
@@ -58,5 +60,12 @@ public class EventProcessor {
 
     public File removeTrackedDirectory(WatchKey key){
         return keyToFileMap.remove(key);
+    }
+
+    public void removeTrackedDirectoriesRecursively(TreeItem<FileData> node) {
+        System.out.println("eventprocessor remove: " + node.getValue().getFile().getName());
+
+        node.getValue().getEventKey().ifPresent(this::removeTrackedDirectory);
+        node.getChildren().forEach(this::removeTrackedDirectoriesRecursively);
     }
 }
