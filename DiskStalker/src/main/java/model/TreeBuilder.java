@@ -1,10 +1,6 @@
 package model;
 
-import io.reactivex.rxjava3.core.SingleObserver;
-import io.reactivex.rxjava3.internal.operators.single.SingleToObservable;
 import io.reactivex.rxjava3.subjects.SingleSubject;
-
-import java.nio.file.Path;
 
 
 public class TreeBuilder {
@@ -16,7 +12,7 @@ public class TreeBuilder {
         if (root == null) {
             root = node;
             rootSubject.onSuccess(root);
-        }else{
+        } else {
             root.addNode(node);
         }
         return node;

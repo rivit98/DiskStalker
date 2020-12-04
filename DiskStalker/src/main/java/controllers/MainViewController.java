@@ -1,7 +1,6 @@
 package controllers;
 
 
-import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -25,7 +24,6 @@ public class MainViewController {
 
     @FXML
     private TreeTableView<FileData> locationTreeView;
-
     @FXML
     private Button addButton;
     @FXML
@@ -58,7 +56,7 @@ public class MainViewController {
 
         //todo: setCellFactory for sizeColumn (status bar?)
         sizeColumn.setCellValueFactory(node ->
-                node.getValue().getValue().size());
+                node.getValue().getValue().sizePropertyProperty());
 
         sizeColumn.setCellFactory(ttc -> {
             TreeTableCell<FileData, Number> cell = new TreeTableCell<>() {
@@ -68,7 +66,7 @@ public class MainViewController {
                     setText(empty ? null : value.toString());
                 }
             };
-            cell.pseudoClassStateChanged(PseudoClass.getPseudoClass("centered"),true);
+            cell.pseudoClassStateChanged(PseudoClass.getPseudoClass("centered"), true);
 
             return cell;
         });
@@ -116,18 +114,21 @@ public class MainViewController {
         });
     }
 
-    public void deleteButtonClicked(ActionEvent actionEvent){
+    public void deleteButtonClicked(ActionEvent actionEvent) {
         var selectedTreeItem = Optional.ofNullable(locationTreeView.getSelectionModel().getSelectedItem());
+        //TODO: fix nullptr exception
+        selectedTreeItem.ifPresent(item -> {
+            var folder =
+                    folderList.stream()
+                            .filter(observedFolder -> observedFolder.checkIfNodeIsChild(item.getValue().getPath()))
+                            .findAny();
 
-        selectedTreeItem.ifPresent(item -> folderList.stream()
-                .filter(observedFolder -> observedFolder.getPath().equals(item.getValue().getPath()))
-                .forEach(ObservedFolder::destroy)
-        );
-        selectedTreeItem.ifPresent(item -> item.getParent().getChildren().remove(item));
-        //TODO: where is removing watchers, updating maps when removing folder inside ObservedFolder?
+            folder.ifPresent(folderWithNode -> folderWithNode.deleteNodes(item));
+            item.getParent().getChildren().remove(item);
+        });
     }
 
-    public void onExit(){
+    public void onExit() {
         folderList.forEach(ObservedFolder::destroy);
     }
 }

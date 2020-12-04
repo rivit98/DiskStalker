@@ -15,12 +15,12 @@ import static java.nio.file.StandardWatchEventKinds.*;
 
 public class FileVisitorEmitter extends SimpleFileVisitor<Path> {
     private final ObservableEmitter<FileData> observer;
-    private final WatchService watchService;
+    private final DirWatcher dirWatcher;
 
 
-    public FileVisitorEmitter(ObservableEmitter<FileData> observer, WatchService watchService) {
+    public FileVisitorEmitter(ObservableEmitter<FileData> observer, DirWatcher dirWatcher) {
         this.observer = observer;
-        this.watchService = watchService;
+        this.dirWatcher = dirWatcher;
     }
 
     public void emitPath(Path path) {
@@ -30,12 +30,7 @@ public class FileVisitorEmitter extends SimpleFileVisitor<Path> {
 
         var fileData = new FileData(path.toFile());
         if (fileData.isDirectory()) {
-            try {
-                var e = path.register(watchService, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
-                fileData.setEventKey(e);
-            } catch (IOException exception) {
-                exception.printStackTrace();
-            }
+            dirWatcher.registerWatchedDirectory(path).ifPresent(fileData::setEventKey);
         }
         observer.onNext(fileData);
     }
@@ -55,6 +50,7 @@ public class FileVisitorEmitter extends SimpleFileVisitor<Path> {
     @Override
     public FileVisitResult visitFileFailed(Path file, IOException exc) {
         observer.onError(exc);
+        //TODO: AccessDenied handle
         return CONTINUE;
     }
 }
