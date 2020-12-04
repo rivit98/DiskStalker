@@ -91,8 +91,10 @@ public class MainViewController {
     public void loadTreeItems(Path pathToWatch) {
         try {
             var folder = new ObservedFolder(pathToWatch);
-            addToMainTree(folder.getTree());
-            folderList.add(folder);
+            folder.getTree().subscribe(treeFileNode -> {
+                addToMainTree(treeFileNode);
+                folderList.add(folder);
+            });
         } catch (IOException exception) {
             exception.printStackTrace();
         }
@@ -122,6 +124,7 @@ public class MainViewController {
                 .forEach(ObservedFolder::destroy)
         );
         selectedTreeItem.ifPresent(item -> item.getParent().getChildren().remove(item));
+        //TODO: where is removing watchers, updating maps when removing folder inside ObservedFolder?
     }
 
     public void onExit(){
