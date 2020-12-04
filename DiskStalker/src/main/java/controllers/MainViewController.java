@@ -2,6 +2,7 @@ package controllers;
 
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -37,6 +38,7 @@ public class MainViewController {
     @FXML
     public void initialize() {
         createRoot();
+        //todo: refactor this
         TreeTableColumn<FileData, File> pathColumn = new TreeTableColumn<>("Name");
         TreeTableColumn<FileData, Long> sizeColumn = new TreeTableColumn<>("Size");
         pathColumn.setPrefWidth(200); //todo: set proper width
@@ -55,9 +57,20 @@ public class MainViewController {
         });
 
         //todo: setCellFactory for sizeColumn (status bar?)
-        sizeColumn.setCellValueFactory(node -> {
-            TreeItem<FileData> n = node.getValue();
-            return new ReadOnlyObjectWrapper<>(n.getValue().size());
+        sizeColumn.setCellValueFactory(node ->
+                new ReadOnlyObjectWrapper<>(node.getValue().getValue().size()));
+
+        sizeColumn.setCellFactory(ttc -> {
+            TreeTableCell<FileData, Long> cell = new TreeTableCell<>() {
+                @Override
+                protected void updateItem(Long value, boolean empty) {
+                    super.updateItem(value, empty);
+                    setText(empty ? null : value.toString());
+                }
+            };
+            cell.pseudoClassStateChanged(PseudoClass.getPseudoClass("centered"),true);
+
+            return cell;
         });
 
         locationTreeView.getColumns().add(pathColumn);

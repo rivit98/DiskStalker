@@ -44,7 +44,7 @@ public class TreeFileNode extends TreeItem<FileData> {
         }
 
         cachedList.add(index, node);
-        getValue().setSize(node.getValue().size());
+        getValue().modifySize(node.getValue().size());
     }
 
     public void addNode(TreeFileNode node) {

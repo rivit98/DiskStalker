@@ -19,6 +19,9 @@ public class FileData {
         if(isFile()){
             size = file.length();
         }
+        else {
+            size = 0;
+        }
     }
 
     public FileData(File file) {
