@@ -130,15 +130,13 @@ public class ObservedFolder {
             //TODO: updateSize!
             //TODO: remove from directoryMap?
         }else if(eventType.equals(ENTRY_MODIFY)){
-            var modifiedNode = Optional.ofNullable(nodeMap.get(resolvedPath));
-            modifiedNode.ifPresent(node -> {
-                if(node.getValue().isFile()){
-                    updateParentSize(node, node.getValue().getFile().length() - node.getValue().size());
-                } else {
-                    //TODO:if directory
-                }
-            });
-            System.out.println(modifiedNode);
+            var modifiedNode = nodeMap.get(resolvedPath);
+            if(modifiedNode.getValue().isFile()){
+                updateParentSize(modifiedNode, modifiedNode.getValue().getFile().length() - modifiedNode.getValue().size().getValue());
+                modifiedNode.getValue().refreshFileSize();
+            } else {
+                //TODO:if directory
+            }
         }
     }
 
@@ -146,6 +144,9 @@ public class ObservedFolder {
         var parentNode = Optional.ofNullable(node.getParent());
         parentNode.ifPresent(parent -> {if(parent.getValue()!=null){
             parent.getValue().modifySize(deltaSize);
+//            var backup = parent.getValue(); //todo: temporary? workaround
+//            parent.setValue(null);
+//            parent.setValue(backup);
             updateParentSize(parent, deltaSize);
             System.out.println(parent.getValue().getPath());
         }

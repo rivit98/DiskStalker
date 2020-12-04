@@ -1,5 +1,7 @@
 package model;
 
+import javafx.beans.property.SimpleLongProperty;
+
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.WatchKey;
@@ -10,17 +12,16 @@ public class FileData {
     private final File file;
     private WatchKey event;
     private boolean isDirectory;
-    private long size;
-
+    private SimpleLongProperty size;
     public FileData(File file, WatchKey event) {
         this.event = event;
         this.file = file;
         this.isDirectory = file.isDirectory();
         if(isFile()){
-            size = file.length();
+            size = new SimpleLongProperty(file.length());
         }
         else {
-            size = 0;
+            size = new SimpleLongProperty(0);
         }
     }
 
@@ -56,15 +57,15 @@ public class FileData {
         return !isDirectory;
     }
 
-    public long size(){
+    public SimpleLongProperty size(){
         return size;
     }
 
-    public void setSize(long size){
-        this.size = size;
+    public void refreshFileSize() {
+        this.size.set(file.length());
     }
 
     public void modifySize(long size) {
-        this.size += size;
+        this.size.set(this.size.getValue() + size);
     }
 }

@@ -40,7 +40,7 @@ public class MainViewController {
         createRoot();
         //todo: refactor this
         TreeTableColumn<FileData, File> pathColumn = new TreeTableColumn<>("Name");
-        TreeTableColumn<FileData, Long> sizeColumn = new TreeTableColumn<>("Size");
+        TreeTableColumn<FileData, Number> sizeColumn = new TreeTableColumn<>("Size");
         pathColumn.setPrefWidth(200); //todo: set proper width
         pathColumn.setCellValueFactory(new TreeItemPropertyValueFactory<>("file"));//node -> {
         //    //node.getValue().setGraphic(GraphicsFactory.getGraphic(node.getValue().getValue().isDirectory()));
@@ -58,12 +58,12 @@ public class MainViewController {
 
         //todo: setCellFactory for sizeColumn (status bar?)
         sizeColumn.setCellValueFactory(node ->
-                new ReadOnlyObjectWrapper<>(node.getValue().getValue().size()));
+                node.getValue().getValue().size());
 
         sizeColumn.setCellFactory(ttc -> {
-            TreeTableCell<FileData, Long> cell = new TreeTableCell<>() {
+            TreeTableCell<FileData, Number> cell = new TreeTableCell<>() {
                 @Override
-                protected void updateItem(Long value, boolean empty) {
+                protected void updateItem(Number value, boolean empty) {
                     super.updateItem(value, empty);
                     setText(empty ? null : value.toString());
                 }

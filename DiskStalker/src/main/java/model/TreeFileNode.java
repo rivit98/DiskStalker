@@ -44,7 +44,7 @@ public class TreeFileNode extends TreeItem<FileData> {
         }
 
         cachedList.add(index, node);
-        getValue().modifySize(node.getValue().size());
+        getValue().modifySize(node.getValue().size().getValue());
     }
 
     public void addNode(TreeFileNode node) {
@@ -62,7 +62,7 @@ public class TreeFileNode extends TreeItem<FileData> {
                 }
 
                 if (TreeFileNode.isChild(tnode.getValue().getPath(), node.getValue().getPath())) {
-                    getValue().modifySize(node.getValue().size());
+                    getValue().modifySize(node.getValue().size().getValue());
                     tnode.addNode(node);
                     return;
                 }
