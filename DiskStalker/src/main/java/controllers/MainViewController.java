@@ -1,6 +1,7 @@
 package controllers;
 
 
+import javafx.beans.binding.Bindings;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -28,6 +29,8 @@ public class MainViewController {
     private Button addButton;
     @FXML
     private Button deleteButton;
+    @FXML
+    private Button setSizeButton;
     @FXML
     private TextField directorySize; //TODO: bind to field, after change validate conditions, display warning
 
@@ -74,6 +77,7 @@ public class MainViewController {
         locationTreeView.getColumns().add(pathColumn);
         locationTreeView.getColumns().add(sizeColumn);
         initializeButtons();
+        initializeSizeField();
     }
 
     public void createRoot() {
@@ -101,7 +105,21 @@ public class MainViewController {
     private void initializeButtons() {
         addButton.setOnAction(this::addButtonClicked);
         deleteButton.setOnAction(this::deleteButtonClicked);
+        setSizeButton.setOnAction(this::setSizeButtonClicked);
 //        loadTreeItems(new File("./testDirs").toPath());
+    }
+
+    public void initializeSizeField(){
+        locationTreeView.getSelectionModel().selectedItemProperty().addListener((observable, oldTreeItem, newTreeItem) -> {
+            if(oldTreeItem!=null){
+                directorySize.textProperty().unbind();
+            }
+            bindSize(newTreeItem);
+        });
+    }
+
+    public void bindSize(TreeItem<FileData> treeItem){
+        directorySize.textProperty().bind(treeItem.getValue().getMaximumSizePropertyAsStringProperty());
     }
 
     public void addButtonClicked(ActionEvent actionEvent) {
@@ -137,6 +155,12 @@ public class MainViewController {
             item.getParent().getChildren().remove(item);
         });
     }
+
+    private void setSizeButtonClicked(ActionEvent actionEvent){
+        
+    }
+
+
 
     private Alert createAlert(String headerText, String information){
         var alert = new Alert(Alert.AlertType.WARNING);

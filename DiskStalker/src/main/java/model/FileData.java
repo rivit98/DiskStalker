@@ -1,6 +1,8 @@
 package model;
 
 import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -12,6 +14,8 @@ public class FileData {
     private final boolean isDirectory;
     private final SimpleLongProperty sizeProperty;
     private WatchKey event;
+    private SimpleLongProperty maximumSizeProperty;
+    private boolean maximumSizeSet;
 
 
     public FileData(File file, WatchKey event) {
@@ -19,6 +23,8 @@ public class FileData {
         this.file = file;
         this.isDirectory = file.isDirectory();
         this.sizeProperty = new SimpleLongProperty(isFile() ? file.length() : 0);
+        this.maximumSizeProperty = new SimpleLongProperty(sizeProperty.longValue());
+        this.maximumSizeSet = false;
     }
 
     public FileData(File file) {
@@ -72,6 +78,20 @@ public class FileData {
     }
 
     public void modifySize(long size) {
-        sizeProperty.set(getSize() + size);
+        var newSize = getSize() + size;
+        sizeProperty.set(newSize);
+        if(!maximumSizeSet){
+            this.maximumSizeProperty.set(newSize);
+        }
+    }
+
+    public StringProperty getMaximumSizePropertyAsStringProperty(){
+        var longPropertyAsString = Long.toString(maximumSizeProperty.get());
+        return new SimpleStringProperty(longPropertyAsString);
+    }
+
+    public void setMaximumSizeProperty(long maximumSizeProperty) {
+        this.maximumSizeProperty.set(maximumSizeProperty);
+        maximumSizeSet = true;
     }
 }
