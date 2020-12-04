@@ -55,6 +55,7 @@ public class FileVisitorEmitter extends SimpleFileVisitor<Path> {
     @Override
     public FileVisitResult visitFileFailed(Path file, IOException exc) {
         observer.onError(exc);
+        //TODO: AccessDenied handle
         return CONTINUE;
     }
 }
