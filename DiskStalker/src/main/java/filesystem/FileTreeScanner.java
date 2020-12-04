@@ -5,18 +5,17 @@ import model.FileData;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.WatchService;
 
 public class FileTreeScanner {
-    private final WatchService watchService;
+    private final DirWatcher dirWatcher;
 
-    public FileTreeScanner(WatchService watchService) {
-        this.watchService = watchService;
+    public FileTreeScanner(DirWatcher dirWatcher) {
+        this.dirWatcher = dirWatcher;
     }
 
     public Observable<FileData> scanDirectory(Path dirPath) {
         return Observable.create(emitter -> {
-            Files.walkFileTree(dirPath, new FileVisitorEmitter(emitter, watchService));
+            Files.walkFileTree(dirPath, new FileVisitorEmitter(emitter, dirWatcher));
             emitter.onComplete();
         });
     }

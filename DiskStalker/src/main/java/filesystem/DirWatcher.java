@@ -4,8 +4,12 @@ import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.util.Optional;
+
+import static java.nio.file.StandardWatchEventKinds.*;
 
 public class DirWatcher {
     private final WatchService watchService;
@@ -58,4 +62,12 @@ public class DirWatcher {
         }
     }
 
+    public Optional<WatchKey> registerWatchedDirectory(Path watchedPath){
+        try {
+            return Optional.of(watchedPath.register(watchService, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY));
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
+        return Optional.empty();
+    }
 }

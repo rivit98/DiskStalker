@@ -10,8 +10,9 @@ public class TreeFileNode extends TreeItem<FileData> {
         super(fileData);
     }
 
-    public void setValueEx(FileData value) {
-        super.setValue(value);
+    @Override
+    public boolean isLeaf(){
+        return getValue().isFile();
     }
 
     // inserts node and keeps proper ordering

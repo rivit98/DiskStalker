@@ -11,8 +11,8 @@ import java.util.Optional;
 public class FileData {
     private final File file;
     private WatchKey event;
-    private boolean isDirectory;
-    private SimpleLongProperty size;
+    private final boolean isDirectory;
+    private final SimpleLongProperty size;
     public FileData(File file, WatchKey event) {
         this.event = event;
         this.file = file;

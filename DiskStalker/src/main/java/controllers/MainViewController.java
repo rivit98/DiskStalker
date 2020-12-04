@@ -1,7 +1,6 @@
 package controllers;
 
 
-import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -67,7 +66,7 @@ public class MainViewController {
                     setText(empty ? null : value.toString());
                 }
             };
-            cell.pseudoClassStateChanged(PseudoClass.getPseudoClass("centered"),true);
+            cell.pseudoClassStateChanged(PseudoClass.getPseudoClass("centered"), true);
 
             return cell;
         });
@@ -115,21 +114,21 @@ public class MainViewController {
         });
     }
 
-    public void deleteButtonClicked(ActionEvent actionEvent){
+    public void deleteButtonClicked(ActionEvent actionEvent) {
         var selectedTreeItem = Optional.ofNullable(locationTreeView.getSelectionModel().getSelectedItem());
-
+        //TODO: fix nullptr exception
         selectedTreeItem.ifPresent(item -> {
-            var folder = folderList.stream()
-                                                        .filter(observedFolder -> observedFolder.checkIfNodeIsChild(item.getValue().getPath()))
-                                                        .findAny();
-
+            var folder =
+                    folderList.stream()
+                            .filter(observedFolder -> observedFolder.checkIfNodeIsChild(item.getValue().getPath()))
+                            .findAny();
 
             folder.ifPresent(folderWithNode -> folderWithNode.deleteNodes(item));
             item.getParent().getChildren().remove(item);
         });
     }
 
-    public void onExit(){
+    public void onExit() {
         folderList.forEach(ObservedFolder::destroy);
     }
 }
