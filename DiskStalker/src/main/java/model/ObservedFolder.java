@@ -3,7 +3,9 @@ package model;
 import filesystem.DirWatcher;
 import filesystem.FileTreeScanner;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.TreeItem;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,9 +15,7 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import static java.nio.file.StandardWatchEventKinds.*;
+import java.util.Optional;
 
 // TODO: CLOSE WATCHSERVICE (OBSERVABLE FOLDER) WHEN DELETING ITEM FROM TREEVIEW OR ****CLOSING APP****
 
@@ -127,10 +127,29 @@ public class ObservedFolder {
             node.getParent().getChildren().remove(node);
             //TODO: updateSize!
             //TODO: remove from directoryMap?
-        } else if (eventType.equals(ENTRY_MODIFY)) {
-            //TODO: update sizes
+        }else if(eventType.equals(ENTRY_MODIFY)){
+            var modifiedNode = Optional.ofNullable(nodeMap.get(resolvedPath));
+            modifiedNode.ifPresent(node -> {
+                if(node.getValue().isFile()){
+                    updateParentSize(node, node.getValue().getFile().length() - node.getValue().size());
+                } else {
+                    //TODO:if directory
+                }
+            });
         }
     }
+
+    private void updateParentSize(TreeItem<FileData> node, long deltaSize){
+        var parentNode = Optional.ofNullable(node.getParent());
+        parentNode.ifPresent(parent -> {if(parent.getValue()!=null){
+            parent.getValue().modifySize(deltaSize);
+            updateParentSize(parent, deltaSize);
+            System.out.println(parent.getValue().getPath());
+        }
+        });
+        //TODO:don't know why parent.getValue() can be null ;(
+    }
+
 
     public void refresh() throws IOException { //TODO: test this!
         cleanup();
@@ -161,5 +180,9 @@ public class ObservedFolder {
 
     public TreeFileNode getTree() {
         return treeBuilder.getRoot(); //TODO: after refreshing tree we have to notify main view about change, maybe binding?
+    }
+
+    public Path getPath(){
+        return dirToWatch;
     }
 }

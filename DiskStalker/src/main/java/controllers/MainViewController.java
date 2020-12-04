@@ -56,13 +56,13 @@ public class MainViewController {
 
         //todo: setCellFactory for sizeColumn (status bar?)
         sizeColumn.setCellValueFactory(node -> {
-            TreeFileNode n = (TreeFileNode) node.getValue();
-            return new ReadOnlyObjectWrapper<>(n.getSize());
+            TreeItem<FileData> n = node.getValue();
+            return new ReadOnlyObjectWrapper<>(n.getValue().size());
         });
 
         locationTreeView.getColumns().add(pathColumn);
         locationTreeView.getColumns().add(sizeColumn);
-        initializeAddButton();
+        initializeButtons();
     }
 
     public void createRoot() {
@@ -85,8 +85,9 @@ public class MainViewController {
         }
     }
 
-    private void initializeAddButton() {
+    private void initializeButtons() {
         addButton.setOnAction(this::addButtonClicked);
+        deleteButton.setOnAction(this::deleteButtonClicked);
 //        loadTreeItems(new File("./testDirs").toPath());
     }
 
@@ -98,6 +99,16 @@ public class MainViewController {
         selectedFolderOptional.ifPresent(selectedFolder -> {
             loadTreeItems(selectedFolder.toPath());
         });
+    }
+
+    public void deleteButtonClicked(ActionEvent actionEvent){
+        var selectedTreeItem = Optional.ofNullable(locationTreeView.getSelectionModel().getSelectedItem());
+
+        selectedTreeItem.ifPresent(item -> folderList.stream()
+                .filter(observedFolder -> observedFolder.getPath().equals(item.getValue().getPath()))
+                .forEach(ObservedFolder::destroy)
+        );
+        selectedTreeItem.ifPresent(item -> item.getParent().getChildren().remove(item));
     }
 
     public void onExit(){

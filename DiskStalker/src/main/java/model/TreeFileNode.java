@@ -6,15 +6,12 @@ import java.nio.file.Path;
 
 
 public class TreeFileNode extends TreeItem<FileData> {
-    private long size = 0;
-
     public TreeFileNode(FileData fileData) {
         super(fileData);
     }
 
     public void setValueEx(FileData value) {
         super.setValue(value);
-        size = value.size();
     }
 
     // inserts node and keeps proper ordering
@@ -47,7 +44,7 @@ public class TreeFileNode extends TreeItem<FileData> {
         }
 
         cachedList.add(index, node);
-        size = node.getValue().size();
+        getValue().setSize(node.getValue().size());
     }
 
     public void addNode(TreeFileNode node) {
@@ -65,7 +62,7 @@ public class TreeFileNode extends TreeItem<FileData> {
                 }
 
                 if (TreeFileNode.isChild(tnode.getValue().getPath(), node.getValue().getPath())) {
-                    size += node.getValue().size();
+                    getValue().modifySize(node.getValue().size());
                     tnode.addNode(node);
                     return;
                 }
@@ -80,9 +77,5 @@ public class TreeFileNode extends TreeItem<FileData> {
         var absoluteChildPath = child.normalize().toAbsolutePath();
 
         return absoluteChildPath.startsWith(absoluteParentPath);
-    }
-
-    public long getSize() {
-        return size;
     }
 }
