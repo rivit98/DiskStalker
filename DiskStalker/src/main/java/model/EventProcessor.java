@@ -8,28 +8,6 @@ import java.util.*;
 
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
-class EventObject{
-    private final Path targetDir;
-    private final WatchEvent<Path> pathWatchEvent;
-
-    public EventObject(Path targetDir, WatchEvent<Path> pathWatchEvent) {
-        this.targetDir = targetDir;
-        this.pathWatchEvent = pathWatchEvent;
-    }
-
-    public Path getTargetDir() {
-        return targetDir;
-    }
-
-    public WatchEvent<Path> getPathWatchEvent() {
-        return pathWatchEvent;
-    }
-
-    public WatchEvent.Kind<Path> getEventType(){
-        return pathWatchEvent.kind();
-    }
-}
-
 public class EventProcessor {
     private final HashMap<WatchKey, File> keyToFileMap = new HashMap<>(); //TODO: remove proper key after deleting node
 
@@ -78,4 +56,7 @@ public class EventProcessor {
         keyToFileMap.put(key, f);
     }
 
+    public File removeTrackedDirectory(WatchKey key){
+        return keyToFileMap.remove(key);
+    }
 }

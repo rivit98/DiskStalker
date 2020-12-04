@@ -7,22 +7,18 @@ import java.nio.file.Path;
 import java.nio.file.WatchKey;
 import java.util.Optional;
 
-//TODO: figure out if deriving from File is better idea
 public class FileData {
     private final File file;
-    private WatchKey event;
     private final boolean isDirectory;
-    private final SimpleLongProperty size;
+    private final SimpleLongProperty sizeProperty;
+    private WatchKey event;
+
+
     public FileData(File file, WatchKey event) {
         this.event = event;
         this.file = file;
         this.isDirectory = file.isDirectory();
-        if(isFile()){
-            size = new SimpleLongProperty(file.length());
-        }
-        else {
-            size = new SimpleLongProperty(0);
-        }
+        this.sizeProperty = new SimpleLongProperty(isFile() ? file.length() : 0);
     }
 
     public FileData(File file) {
@@ -33,7 +29,7 @@ public class FileData {
         this(path.toFile(), null);
     }
 
-    public Optional<WatchKey> getEvent() {
+    public Optional<WatchKey> getEventKey() {
         return Optional.ofNullable(event);
     }
 
@@ -45,27 +41,37 @@ public class FileData {
         return file;
     }
 
-    public Path getPath(){
+    public Path getPath() {
         return file.toPath();
     }
 
-    public boolean isDirectory(){
+    public boolean isDirectory() {
         return isDirectory;
     }
 
-    public boolean isFile(){
+    public boolean isFile() {
         return !isDirectory;
     }
 
-    public SimpleLongProperty size(){
-        return size;
+    public SimpleLongProperty sizePropertyProperty() {
+        return sizeProperty;
     }
 
-    public void refreshFileSize() {
-        this.size.set(file.length());
+    public long getSize() {
+        return sizeProperty.getValue();
+    }
+
+    public long getActualSize(){
+        return file.length();
+    }
+
+    public long updateFileSize() { // update size and return the old one
+        var actualSize = getActualSize();
+        sizeProperty.set(actualSize);
+        return actualSize;
     }
 
     public void modifySize(long size) {
-        this.size.set(this.size.getValue() + size);
+        sizeProperty.set(getSize() + size);
     }
 }

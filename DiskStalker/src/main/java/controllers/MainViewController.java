@@ -56,7 +56,7 @@ public class MainViewController {
 
         //todo: setCellFactory for sizeColumn (status bar?)
         sizeColumn.setCellValueFactory(node ->
-                node.getValue().getValue().size());
+                node.getValue().getValue().sizePropertyProperty());
 
         sizeColumn.setCellFactory(ttc -> {
             TreeTableCell<FileData, Number> cell = new TreeTableCell<>() {

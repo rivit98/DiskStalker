@@ -3,6 +3,7 @@ package model;
 import javafx.scene.control.TreeItem;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 
 public class TreeFileNode extends TreeItem<FileData> {
@@ -11,7 +12,7 @@ public class TreeFileNode extends TreeItem<FileData> {
     }
 
     @Override
-    public boolean isLeaf(){
+    public boolean isLeaf() {
         return getValue().isFile();
     }
 
@@ -45,7 +46,7 @@ public class TreeFileNode extends TreeItem<FileData> {
         }
 
         cachedList.add(index, node);
-        getValue().modifySize(node.getValue().size().getValue());
+        getValue().modifySize(node.getValue().getSize());
     }
 
     public void addNode(TreeFileNode node) {
@@ -63,13 +64,13 @@ public class TreeFileNode extends TreeItem<FileData> {
                 }
 
                 if (TreeFileNode.isChild(tnode.getValue().getPath(), node.getValue().getPath())) {
-                    getValue().modifySize(node.getValue().size().getValue());
+                    getValue().modifySize(node.getValue().getSize());
                     tnode.addNode(node);
                     return;
                 }
             }
 
-            throw new IllegalStateException("Cos sie popsulo i nie dodalo mnie :(");
+            throw new IllegalStateException("addNode failed! | " + node.getValue().getFile().getName());
         }
     }
 
@@ -78,5 +79,26 @@ public class TreeFileNode extends TreeItem<FileData> {
         var absoluteChildPath = child.normalize().toAbsolutePath();
 
         return absoluteChildPath.startsWith(absoluteParentPath);
+    }
+
+    public void deleteMe() {
+        updateParentSize(getParent(), -getValue().getSize());
+        this.getParent().getChildren().remove(this);
+    }
+
+    private void updateParentSize(TreeItem<FileData> node, long deltaSize) {
+        var parentNode = Optional.ofNullable(node.getParent());
+        parentNode.ifPresent(parent -> {
+            if (parent.getValue() != null) {
+                parent.getValue().modifySize(deltaSize);
+                updateParentSize(parent, deltaSize);
+            }
+        });
+    }
+
+    public void updateMe(){
+        var fileData = getValue();
+        var oldSize = fileData.getSize();
+        updateParentSize(this, fileData.updateFileSize() - oldSize);
     }
 }

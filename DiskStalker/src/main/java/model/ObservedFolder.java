@@ -10,7 +10,6 @@ import static java.nio.file.StandardWatchEventKinds.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.WatchEvent;
 import java.nio.file.WatchService;
 import java.util.HashMap;
 import java.util.Optional;
@@ -55,7 +54,7 @@ public class ObservedFolder {
         var insertedNode = treeBuilder.addItem(fileData);
         pathToTreeMap.put(fileData.getFile().toPath(), insertedNode);
 
-        fileData.getEvent().ifPresent(watchKey -> {
+        fileData.getEventKey().ifPresent(watchKey -> {
             eventProcessor.addTrackedDirectory(watchKey, fileData.getFile());
         });
     }
@@ -87,6 +86,7 @@ public class ObservedFolder {
         var path = watchEvent.context();
         var resolvedPath = from.resolve(path);
         System.out.println(eventType.name() + " | context: " + path);
+        System.out.println("From: " + from);
         System.out.println("Resolved path: " + resolvedPath);
 
         if (eventType.equals(ENTRY_CREATE)) {
@@ -98,31 +98,33 @@ public class ObservedFolder {
         }else{
             throw new IllegalStateException("invalid event");
         }
+        System.out.println("------------");
     }
 
     private void handleModifyEvent(Path resolvedPath) {
         var modifiedNode = pathToTreeMap.get(resolvedPath);
-        if(modifiedNode.getValue().isFile()){
-            System.out.println(modifiedNode.getValue().getFile().length() - modifiedNode.getValue().size().getValue());
-            updateParentSize(modifiedNode, modifiedNode.getValue().getFile().length() - modifiedNode.getValue().size().getValue());
-            modifiedNode.getValue().refreshFileSize();
+        var fileData = modifiedNode.getValue();
+        if(fileData.isFile()){
+            modifiedNode.updateMe();
         } else {
-            //TODO:if directory
+            //TODO: if directory
             System.out.println("handleModifyEvent directory - NOT IMPLEMENTED");
         }
     }
 
     private void handleDeleteEvent(Path resolvedPath) {
-        var node = pathToTreeMap.remove(resolvedPath); // this is the folder where something has changed
-        var fileData = node.getValue();
+        var affectedNode = pathToTreeMap.remove(resolvedPath); // this is the folder where something has changed
+        var fileData = affectedNode.getValue();
         if(fileData.isFile()){
-            updateParentSize(node.getParent(), -fileData.size().getValue());
-            System.out.println(-fileData.size().getValue());
-            eventProcessor.getDirectoryMap().remove(fileData.getFile());
-            node.getParent().getChildren().remove(node);
+            fileData.getEventKey().ifPresent(key -> {
+                eventProcessor.removeTrackedDirectory(key);
+            });
+            affectedNode.deleteMe();
         } else {
             //TODO: if directory
             //TODO: remove from eventprocessor
+            //TODO: remove childs from pathToTreeMap
+            //TODO: remove childs from eventprocessor
             System.out.println("handleDeleteEvent directory - NOT IMPLEMENTED");
         }
     }
@@ -186,7 +188,7 @@ public class ObservedFolder {
         var itemChildren = treeItem.getChildren().stream();
         itemChildren.forEach(this::deleteNodes);
 
-        eventProcessor.getDirectoryMap().remove(treeItem.getValue().getEvent());
+        eventProcessor.getDirectoryMap().remove(treeItem.getValue().getEventKey());
         pathToTreeMap.remove(treeItem.getValue().getPath());
     }
 }
