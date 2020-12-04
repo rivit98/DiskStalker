@@ -25,7 +25,6 @@ public class MainViewController {
 
     @FXML
     private TreeTableView<FileData> locationTreeView;
-
     @FXML
     private Button addButton;
     @FXML
@@ -117,11 +116,15 @@ public class MainViewController {
     public void deleteButtonClicked(ActionEvent actionEvent){
         var selectedTreeItem = Optional.ofNullable(locationTreeView.getSelectionModel().getSelectedItem());
 
-        selectedTreeItem.ifPresent(item -> folderList.stream()
-                .filter(observedFolder -> observedFolder.getPath().equals(item.getValue().getPath()))
-                .forEach(ObservedFolder::destroy)
-        );
-        selectedTreeItem.ifPresent(item -> item.getParent().getChildren().remove(item));
+        selectedTreeItem.ifPresent(item -> {
+            var folder = folderList.stream()
+                                                        .filter(observedFolder -> observedFolder.checkIfNodeIsChild(item.getValue().getPath()))
+                                                        .findAny();
+
+
+            folder.ifPresent(folderWithNode -> folderWithNode.deleteNodes(item));
+            item.getParent().getChildren().remove(item);
+        });
     }
 
     public void onExit(){

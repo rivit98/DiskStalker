@@ -115,6 +115,7 @@ public class ObservedFolder {
         if (eventType.equals(ENTRY_CREATE)) {
             var newNode = treeBuilder.addItem(new FileData(resolvedPath));
             nodeMap.put(newNode.getValue().getPath(), newNode);
+            System.out.println(newNode.getValue().size());
             if (newNode.getValue().isDirectory()) { //new dir created, we have to register watcher for it
                 //TODO: refactor this
                 //TODO: TreeFileNode - add proxy method for getting path
@@ -127,12 +128,19 @@ public class ObservedFolder {
             }
         } else if (eventType.equals(ENTRY_DELETE)) {
             var node = nodeMap.remove(resolvedPath); // this is the folder where something has changed
-            node.getParent().getChildren().remove(node);
-            //TODO: updateSize!
-            //TODO: remove from directoryMap?
+            if(node.getValue().isFile()){
+                updateParentSize(node.getParent(), -node.getValue().size().getValue());
+                System.out.println(-node.getValue().size().getValue());
+                directoryMap.remove(node.getValue().getFile());
+                node.getParent().getChildren().remove(node);
+            } else {
+                //TODO: if directory
+            }
+
         }else if(eventType.equals(ENTRY_MODIFY)){
             var modifiedNode = nodeMap.get(resolvedPath);
             if(modifiedNode.getValue().isFile()){
+                System.out.println(modifiedNode.getValue().getFile().length() - modifiedNode.getValue().size().getValue());
                 updateParentSize(modifiedNode, modifiedNode.getValue().getFile().length() - modifiedNode.getValue().size().getValue());
                 modifiedNode.getValue().refreshFileSize();
             } else {
@@ -143,16 +151,12 @@ public class ObservedFolder {
 
     private void updateParentSize(TreeItem<FileData> node, long deltaSize){
         var parentNode = Optional.ofNullable(node.getParent());
-        parentNode.ifPresent(parent -> {if(parent.getValue()!=null){
+        parentNode.ifPresent(parent -> {
+            if(parent.getValue()!=null){
             parent.getValue().modifySize(deltaSize);
-//            var backup = parent.getValue(); //todo: temporary? workaround
-//            parent.setValue(null);
-//            parent.setValue(backup);
             updateParentSize(parent, deltaSize);
-            System.out.println(parent.getValue().getPath());
-        }
+            }
         });
-        //TODO:don't know why parent.getValue() can be null ;(
     }
 
 
@@ -187,7 +191,15 @@ public class ObservedFolder {
         return treeBuilder.getRoot(); //TODO: after refreshing tree we have to notify main view about change, maybe binding?
     }
 
-    public Path getPath(){
-        return dirToWatch;
+    public boolean checkIfNodeIsChild(Path path){
+        return nodeMap.get(path) != null;
+    }
+
+    public void deleteNodes(TreeItem<FileData> treeItem){
+        var itemChildren = treeItem.getChildren().stream();
+        itemChildren.forEach(this::deleteNodes);
+
+        directoryMap.remove(treeItem.getValue().getFile());
+        nodeMap.remove(treeItem.getValue().getPath());
     }
 }
