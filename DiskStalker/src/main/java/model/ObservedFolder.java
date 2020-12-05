@@ -6,34 +6,27 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.SingleSubject;
 import javafx.scene.control.TreeItem;
 
-import static java.nio.file.StandardWatchEventKinds.*;
-
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.WatchService;
 import java.util.HashMap;
 
-
-// TODO: CLOSE WATCHSERVICE (OBSERVABLE FOLDER) WHEN DELETING ITEM FROM TREEVIEW OR ****CLOSING APP****
 
 public class ObservedFolder {
     private final HashMap<Path, TreeFileNode> pathToTreeMap = new HashMap<>();
     private final Path dirToWatch;
-    private WatchService watchService;
     private TreeBuilder treeBuilder;
     private DirWatcher dirWatcher;
     private EventProcessor eventProcessor;
 
-    public ObservedFolder(Path dirToWatch) throws IOException {
+    public ObservedFolder(Path dirToWatch) {
         this.dirToWatch = dirToWatch;
 
         scan();
     }
 
-    public void initialize() throws IOException {
-        watchService = dirToWatch.getFileSystem().newWatchService();
+    public void initialize() {
         treeBuilder = new TreeBuilder();
-        dirWatcher = new DirWatcher(watchService);
+        dirWatcher = new DirWatcher(dirToWatch);
         eventProcessor = new EventProcessor();
     }
 
@@ -52,10 +45,6 @@ public class ObservedFolder {
     public void processFileData(FileData fileData) {
         var insertedNode = treeBuilder.addItem(fileData);
         pathToTreeMap.put(fileData.getPath(), insertedNode);
-
-        fileData.getEventKey().ifPresent(watchKey -> {
-            eventProcessor.addTrackedDirectory(watchKey, fileData.getPath());
-        });
     }
 
     public void startMonitoring() {
@@ -64,12 +53,9 @@ public class ObservedFolder {
                 .watchForChanges()
                 .subscribeOn(Schedulers.io())
 //                .observeOn(JavaFxScheduler.platform())
-                .subscribe(watchKey -> {
-                    eventProcessor
-                            .processEvents(watchKey)
-                            .forEach(this::processEvent);
-                },
-                        System.out::println);
+                .subscribe(this::processEvent,
+                        System.out::println
+                );
     }
 
     //TODO: if not valid, remove treeitem, remove watchkey from map - is it necessary?
@@ -78,62 +64,52 @@ public class ObservedFolder {
     //TODO: better idea - use nodemap for inserting - requries updating size in reverse order (bottom-up)
 
     public void processEvent(EventObject eventObject) {
-        Path from = eventObject.getTargetDir();
-        var watchEvent = eventObject.getPathWatchEvent();
+        Path resolvedPath = eventObject.getTargetDir();
         var eventType = eventObject.getEventType();
-        var path = watchEvent.context();
-        var resolvedPath = from.resolve(path);
-        System.out.println(eventType.name() + " | context: " + path + "(cnt: " + watchEvent.count() + ")");
-        System.out.println("From: " + from);
-        System.out.println("Resolved path: " + resolvedPath);
+        System.out.println(eventType.name() + " | context: " + resolvedPath);
 
-        if (eventType.equals(ENTRY_CREATE)) {
-            handleCreateEvent(resolvedPath);
-        } else if (eventType.equals(ENTRY_DELETE)) {
-            handleDeleteEvent(resolvedPath);
-        }else if(eventType.equals(ENTRY_MODIFY)){
-            handleModifyEvent(resolvedPath);
+        switch (eventType) {
+            case FILE_CREATED, DIR_CREATED -> handleCreateEvent(resolvedPath);
+            case DIR_DELETED -> handleDeleteEventDir(resolvedPath);
+            case FILE_DELETED -> handleDeleteEventFile(resolvedPath);
+            case FILE_MODIFIED -> handleModifyEventFile(resolvedPath);
+            case DIR_MODIFIED -> handleModifyEventDir(resolvedPath);
         }
+
         System.out.println("------------");
     }
 
-    private void handleModifyEvent(Path resolvedPath) {
+    private void handleModifyEventFile(Path resolvedPath) {
         var modifiedNode = pathToTreeMap.get(resolvedPath);
-        var fileData = modifiedNode.getValue(); //TODO: nullptr when copying data into observed folder
-        if(fileData.isFile()){
-            modifiedNode.updateMe();
-        } else {
-            //TODO: if directory
-            System.out.println("handleModifyEvent directory - NOT IMPLEMENTED");
-        }
+        modifiedNode.updateMe();
     }
 
-    private void handleDeleteEvent(Path resolvedPath) {
+    private void handleModifyEventDir(Path resolvedPath) {
+        //TODO
+        var modifiedNode = pathToTreeMap.get(resolvedPath);
+        System.out.println("handleModifyEvent directory - NOT IMPLEMENTED");
+    }
+
+    private void handleDeleteEventFile(Path resolvedPath) {
         var affectedNode = pathToTreeMap.remove(resolvedPath); // this is the folder where something has changed
         var fileData = affectedNode.getValue();
-        if(fileData.isFile()){
-            fileData.getEventKey().ifPresent(key -> {
-                eventProcessor.removeTrackedDirectory(key);
-            });
-            affectedNode.deleteMe();
-        } else {
-            eventProcessor.removeTrackedDirectoriesRecursively(affectedNode);
-            removeMappedDirsRecursively(affectedNode);
-            affectedNode.deleteMe();
-        }
+        fileData.getEventKey().ifPresent(key -> {
+            eventProcessor.removeTrackedDirectory(key);
+        });
+        affectedNode.deleteMe();
     }
 
-    public void handleCreateEvent(Path resolvedPath){
+    private void handleDeleteEventDir(Path resolvedPath) {
+        var affectedNode = pathToTreeMap.remove(resolvedPath); // this is the folder where something has changed
+        eventProcessor.removeTrackedDirectoriesRecursively(affectedNode);
+        removeMappedDirsRecursively(affectedNode);
+        affectedNode.deleteMe();
+    }
+
+    public void handleCreateEvent(Path resolvedPath) {
         var newNode = treeBuilder.addItem(new FileData(resolvedPath));
         var fileData = newNode.getValue();
         pathToTreeMap.put(fileData.getPath(), newNode);
-        if (fileData.isDirectory()) {
-            // new dir created, we have to register watcher for it
-            // no need to register this for files
-            dirWatcher.registerWatchedDirectory(fileData.getPath()).ifPresent(watchKey -> {
-                eventProcessor.addTrackedDirectory(watchKey, fileData.getPath());
-            });
-        }
     }
 
     public void refresh() throws IOException { //TODO: test this!
@@ -141,7 +117,7 @@ public class ObservedFolder {
         scan();
     }
 
-    public void scan() throws IOException {
+    public void scan() {
         initialize();
         scanDirectory();
     }
@@ -151,20 +127,14 @@ public class ObservedFolder {
     }
 
     public void cleanup() {
-        try {
-            dirWatcher.stop();
-            watchService.close();
-            eventProcessor.clearTrackedDirectories();
-        } catch (IOException exception) {
-            exception.printStackTrace(); //TODO: what should we do here? :/
-        }
+        dirWatcher.stop();
     }
 
     public SingleSubject<TreeFileNode> getTree() {
         return treeBuilder.getRoot();
     }
 
-    public boolean containsNode(Path path){
+    public boolean containsNode(Path path) {
         return pathToTreeMap.containsKey(path);
     }
 

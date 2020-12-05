@@ -6,7 +6,6 @@ import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import model.FileData;
@@ -15,7 +14,6 @@ import model.ObservedFolder;
 import model.TreeFileNode;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
@@ -92,15 +90,11 @@ public class MainViewController {
     }
 
     public void loadTreeItems(Path pathToWatch) {
-        try {
-            var folder = new ObservedFolder(pathToWatch);
-            folder.getTree().subscribe(treeFileNode -> {
-                addToMainTree(treeFileNode);
-                folderList.add(folder);
-            });
-        } catch (IOException exception) {
-            exception.printStackTrace();
-        }
+        var folder = new ObservedFolder(pathToWatch);
+        folder.getTree().subscribe(treeFileNode -> {
+            addToMainTree(treeFileNode);
+            folderList.add(folder);
+        });
     }
 
     private void initializeButtons() {
@@ -111,7 +105,7 @@ public class MainViewController {
 
     public void initializeSizeField() {
         locationTreeView.getSelectionModel().selectedItemProperty().addListener((observable, oldTreeItem, newTreeItem) -> {
-            if(oldTreeItem!=null){
+            if (oldTreeItem != null) {
                 directorySize.textProperty().unbind();
             }
             directorySize.textProperty().bind(newTreeItem.getValue().getMaximumSizePropertyAsStringProperty());
@@ -128,7 +122,7 @@ public class MainViewController {
             var rootChildrens = locationTreeView.getRoot().getChildren().stream()
                     .filter(rootChildren -> rootChildren.getValue().getPath().equals(selectedFolder.toPath()))
                     .findAny();
-            if(rootChildrens.isPresent()){
+            if (rootChildrens.isPresent()) {
                 var alert = createAlert("Warning", "You already observe this directory!");
                 alert.showAndWait()
                         .filter(response -> response == ButtonType.OK);
@@ -164,13 +158,13 @@ public class MainViewController {
         return alert;
     }
 
-    public void removeFolder(ObservedFolder folder, TreeItem<FileData> nodeToRemove){
+    public void removeFolder(ObservedFolder folder, TreeItem<FileData> nodeToRemove) {
         var c = (TreeFileNode) nodeToRemove;
-        if(locationTreeView.getRoot().getChildren().contains(c)){ //we are removing main folder
+        if (locationTreeView.getRoot().getChildren().contains(c)) { //we are removing main folder
             folder.destroy();
             locationTreeView.getRoot().getChildren().remove(c);
             folderList.remove(folder);
-        }else{
+        } else {
             c.deleteMe();
         }
     }

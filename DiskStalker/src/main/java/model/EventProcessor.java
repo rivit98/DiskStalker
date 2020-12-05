@@ -12,44 +12,6 @@ import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 public class EventProcessor {
     private final HashMap<WatchKey, Path> keyToFileMap = new HashMap<>(); //TODO: remove proper key after deleting node
 
-    public List<EventObject> processEvents(WatchKey key){
-        List<EventObject> returnEvents = new ArrayList<>();
-        if (!keyToFileMap.containsKey(key)) {
-            key.cancel();
-            return returnEvents;
-        }
-
-        var triggeredDir = (Path) key.watchable();
-        var events = key.pollEvents();
-        var eventsValid = validateEvents(events);
-        if (eventsValid) {
-            for (final WatchEvent<?> event : events) {
-                @SuppressWarnings("unchecked")
-                var castedEvent = (WatchEvent<Path>)event;
-                returnEvents.add(new EventObject(triggeredDir, castedEvent));
-            }
-        }
-
-        var valid = key.reset();
-        if (!valid) {
-            // processEvent should remove this node automatically, because event fires also for parent folder
-            keyToFileMap.remove(key);
-        }
-
-        return returnEvents;
-    }
-
-    private boolean validateEvents(List<WatchEvent<?>> events) {
-        for (var event : events) {
-            if (event.kind() == OVERFLOW) { //events may be corrupted
-                System.out.println("invalid event");
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     public void clearTrackedDirectories(){
         keyToFileMap.clear();
     }
@@ -64,7 +26,6 @@ public class EventProcessor {
     }
 
     public void removeTrackedDirectoriesRecursively(TreeItem<FileData> node) {
-        System.out.println("eventprocessor remove: " + node.getValue().getPath());
 
         node.getValue().getEventKey().ifPresent(this::removeTrackedDirectory);
         node.getChildren().forEach(this::removeTrackedDirectoriesRecursively);

@@ -3,24 +3,20 @@ package model;
 import java.nio.file.Path;
 import java.nio.file.WatchEvent;
 
-class EventObject {
+public class EventObject {
     private final Path targetDir;
-    private final WatchEvent<Path> pathWatchEvent;
+    private final EventType type;
 
-    public EventObject(Path targetDir, WatchEvent<Path> pathWatchEvent) {
+    public EventObject(Path targetDir, EventType eventType) {
         this.targetDir = targetDir;
-        this.pathWatchEvent = pathWatchEvent;
+        this.type = eventType;
     }
 
     public Path getTargetDir() {
         return targetDir;
     }
 
-    public WatchEvent<Path> getPathWatchEvent() {
-        return pathWatchEvent;
-    }
-
-    public WatchEvent.Kind<Path> getEventType() {
-        return pathWatchEvent.kind();
+    public EventType getEventType() {
+        return type;
     }
 }
