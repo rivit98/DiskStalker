@@ -4,7 +4,6 @@ import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.WatchKey;
 import java.util.Optional;

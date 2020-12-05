@@ -68,7 +68,8 @@ public class ObservedFolder {
                     eventProcessor
                             .processEvents(watchKey)
                             .forEach(this::processEvent);
-                });
+                },
+                        System.out::println);
     }
 
     //TODO: if not valid, remove treeitem, remove watchkey from map - is it necessary?
