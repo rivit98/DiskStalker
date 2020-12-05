@@ -1,33 +1,61 @@
 package model;
 
-import javafx.scene.control.TreeItem;
-
 import java.nio.file.Path;
-import java.nio.file.WatchEvent;
-import java.nio.file.WatchKey;
-import java.util.*;
-
-import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
 public class EventProcessor {
-    private final HashMap<WatchKey, Path> keyToFileMap = new HashMap<>(); //TODO: remove proper key after deleting node
+    private final ObservedFolder observedFolder;
+    private final TreeBuilder treeBuilder;
 
-    public void clearTrackedDirectories(){
-        keyToFileMap.clear();
+    public EventProcessor(ObservedFolder observedFolder, TreeBuilder treeBuilder) {
+        this.observedFolder = observedFolder;
+        this.treeBuilder = treeBuilder;
     }
 
-    public void addTrackedDirectory(WatchKey key, Path f){
-        keyToFileMap.put(key, f);
+    //TODO: if not valid, remove treeitem, remove watchkey from map - is it necessary?
+    //TODO: case when user removes root folder!
+    //TODO: when updating branch, update parents size!
+    //TODO: better idea - use nodemap for inserting - requries updating size in reverse order (bottom-up)
+
+    public void processEvent(EventObject eventObject) {
+        Path resolvedPath = eventObject.getTargetDir();
+        var eventType = eventObject.getEventType();
+        System.out.println(eventType.name() + " | context: " + resolvedPath);
+
+        switch (eventType) {
+            case FILE_CREATED, DIR_CREATED -> handleCreateEvent(resolvedPath);
+            case DIR_DELETED -> handleDeleteEventDir(resolvedPath);
+            case FILE_DELETED -> handleDeleteEventFile(resolvedPath);
+            case FILE_MODIFIED -> handleModifyEventFile(resolvedPath);
+            case DIR_MODIFIED -> handleModifyEventDir(resolvedPath);
+        }
     }
 
-    public Path removeTrackedDirectory(WatchKey key){
-        key.cancel();
-        return keyToFileMap.remove(key);
+    private void handleModifyEventFile(Path resolvedPath) {
+        var modifiedNode = observedFolder.getPathToTreeMap().get(resolvedPath);
+        modifiedNode.updateMe();
     }
 
-    public void removeTrackedDirectoriesRecursively(TreeItem<FileData> node) {
+    private void handleModifyEventDir(Path resolvedPath) {
+        //FIXME, TEST this
+        var modifiedNode = observedFolder.getPathToTreeMap().get(resolvedPath);
+        modifiedNode.updateMe();
+    }
 
-        node.getValue().getEventKey().ifPresent(this::removeTrackedDirectory);
-        node.getChildren().forEach(this::removeTrackedDirectoriesRecursively);
+    private void handleDeleteEventFile(Path resolvedPath) {
+        var affectedNode = observedFolder.getPathToTreeMap().remove(resolvedPath); // this is the folder where something has changed
+        var fileData = affectedNode.getValue();
+        affectedNode.deleteMe();
+    }
+
+    private void handleDeleteEventDir(Path resolvedPath) {
+        var affectedNode = observedFolder.getPathToTreeMap().remove(resolvedPath); // this is the folder where something has changed
+        observedFolder.removeMappedDirsRecursively(affectedNode);
+        affectedNode.deleteMe();
+    }
+
+    public void handleCreateEvent(Path resolvedPath) {
+        var newNode = treeBuilder.addItem(new FileData(resolvedPath));
+        var fileData = newNode.getValue();
+        observedFolder.getPathToTreeMap().put(fileData.getPath(), newNode);
     }
 }
