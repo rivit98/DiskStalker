@@ -76,7 +76,6 @@ public class ObservedFolder {
     //TODO: case when user removes root folder!
     //TODO: when updating branch, update parents size!
     //TODO: better idea - use nodemap for inserting - requries updating size in reverse order (bottom-up)
-    //TODO: refactor this
 
     public void processEvent(EventObject eventObject) {
         Path from = eventObject.getTargetDir();
@@ -84,7 +83,7 @@ public class ObservedFolder {
         var eventType = eventObject.getEventType();
         var path = watchEvent.context();
         var resolvedPath = from.resolve(path);
-        System.out.println(eventType.name() + " | context: " + path);
+        System.out.println(eventType.name() + " | context: " + path + "(cnt: " + watchEvent.count() + ")");
         System.out.println("From: " + from);
         System.out.println("Resolved path: " + resolvedPath);
 
@@ -94,8 +93,6 @@ public class ObservedFolder {
             handleDeleteEvent(resolvedPath);
         }else if(eventType.equals(ENTRY_MODIFY)){
             handleModifyEvent(resolvedPath);
-        }else{
-            throw new IllegalStateException("invalid event");
         }
         System.out.println("------------");
     }

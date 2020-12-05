@@ -12,8 +12,8 @@ public class FileData {
     private final Path file;
     private final boolean isDirectory;
     private final SimpleLongProperty sizeProperty;
+    private final SimpleLongProperty maximumSizeProperty;
     private WatchKey event;
-    private SimpleLongProperty maximumSizeProperty;
     private boolean maximumSizeSet;
 
 

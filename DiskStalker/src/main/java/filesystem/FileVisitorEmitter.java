@@ -7,11 +7,10 @@ import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
-import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
 
 import static java.nio.file.FileVisitResult.CONTINUE;
-import static java.nio.file.StandardWatchEventKinds.*;
+import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
 
 public class FileVisitorEmitter extends SimpleFileVisitor<Path> {
     private final ObservableEmitter<FileData> observer;
@@ -49,8 +48,10 @@ public class FileVisitorEmitter extends SimpleFileVisitor<Path> {
 
     @Override
     public FileVisitResult visitFileFailed(Path file, IOException exc) {
-        observer.onError(exc);
-        //TODO: AccessDenied handle
-        return CONTINUE;
+        if (!observer.isDisposed()) {
+            observer.onError(exc);
+        }
+        //TODO: AccessDenied handle - TEST
+        return SKIP_SUBTREE;
     }
 }

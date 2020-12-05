@@ -2,7 +2,6 @@ package model;
 
 import javafx.scene.control.TreeItem;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
