@@ -30,6 +30,7 @@ public class EventProcessor {
         }
     }
 
+    //FIXME: somewhere here we got nullptrexception :(
     private void handleModifyEventFile(Path resolvedPath) {
         var modifiedNode = observedFolder.getPathToTreeMap().get(resolvedPath);
         modifiedNode.updateMe();
