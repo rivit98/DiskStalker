@@ -30,7 +30,7 @@ public class ObservedFolder {
     }
 
     public void scanDirectory() {
-        var scanner = new FileTreeScanner(dirWatcher);
+        var scanner = new FileTreeScanner();
         scanner
                 .scanDirectory(dirToWatch)
                 .subscribeOn(Schedulers.io())

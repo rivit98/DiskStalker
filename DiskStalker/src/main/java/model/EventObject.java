@@ -1,7 +1,6 @@
 package model;
 
 import java.nio.file.Path;
-import java.nio.file.WatchEvent;
 
 public class EventObject {
     private final Path targetDir;
