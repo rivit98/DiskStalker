@@ -1,6 +1,7 @@
 package model;
 
-import java.io.File;
+import javafx.scene.control.TreeItem;
+
 import java.nio.file.Path;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
@@ -9,7 +10,7 @@ import java.util.*;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
 public class EventProcessor {
-    private final HashMap<WatchKey, File> keyToFileMap = new HashMap<>(); //TODO: remove proper key after deleting node
+    private final HashMap<WatchKey, Path> keyToFileMap = new HashMap<>(); //TODO: remove proper key after deleting node
 
     public List<EventObject> processEvents(WatchKey key){
         List<EventObject> returnEvents = new ArrayList<>();
@@ -41,6 +42,7 @@ public class EventProcessor {
     private boolean validateEvents(List<WatchEvent<?>> events) {
         for (var event : events) {
             if (event.kind() == OVERFLOW) { //events may be corrupted
+                System.out.println("invalid event");
                 return false;
             }
         }
@@ -48,15 +50,23 @@ public class EventProcessor {
         return true;
     }
 
-    public HashMap<WatchKey, File> getDirectoryMap() {
-        return keyToFileMap;
+    public void clearTrackedDirectories(){
+        keyToFileMap.clear();
     }
 
-    public void addTrackedDirectory(WatchKey key, File f){
+    public void addTrackedDirectory(WatchKey key, Path f){
         keyToFileMap.put(key, f);
     }
 
-    public File removeTrackedDirectory(WatchKey key){
+    public Path removeTrackedDirectory(WatchKey key){
+        key.cancel();
         return keyToFileMap.remove(key);
+    }
+
+    public void removeTrackedDirectoriesRecursively(TreeItem<FileData> node) {
+        System.out.println("eventprocessor remove: " + node.getValue().getPath());
+
+        node.getValue().getEventKey().ifPresent(this::removeTrackedDirectory);
+        node.getChildren().forEach(this::removeTrackedDirectoriesRecursively);
     }
 }

@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.WatchService;
 import java.util.HashMap;
-import java.util.Optional;
 
 
 // TODO: CLOSE WATCHSERVICE (OBSERVABLE FOLDER) WHEN DELETING ITEM FROM TREEVIEW OR ****CLOSING APP****
@@ -52,10 +51,10 @@ public class ObservedFolder {
 
     public void processFileData(FileData fileData) {
         var insertedNode = treeBuilder.addItem(fileData);
-        pathToTreeMap.put(fileData.getFile().toPath(), insertedNode);
+        pathToTreeMap.put(fileData.getPath(), insertedNode);
 
         fileData.getEventKey().ifPresent(watchKey -> {
-            eventProcessor.addTrackedDirectory(watchKey, fileData.getFile());
+            eventProcessor.addTrackedDirectory(watchKey, fileData.getPath());
         });
     }
 
@@ -69,15 +68,14 @@ public class ObservedFolder {
                     eventProcessor
                             .processEvents(watchKey)
                             .forEach(this::processEvent);
-                });
+                },
+                        System.out::println);
     }
 
     //TODO: if not valid, remove treeitem, remove watchkey from map - is it necessary?
     //TODO: case when user removes root folder!
     //TODO: when updating branch, update parents size!
-    //TODO: better idea - use nodemap for inserting
-    //TODO: refactor this
-    //TODO: TreeFileNode - add proxy method for getting path
+    //TODO: better idea - use nodemap for inserting - requries updating size in reverse order (bottom-up)
 
     public void processEvent(EventObject eventObject) {
         Path from = eventObject.getTargetDir();
@@ -85,7 +83,7 @@ public class ObservedFolder {
         var eventType = eventObject.getEventType();
         var path = watchEvent.context();
         var resolvedPath = from.resolve(path);
-        System.out.println(eventType.name() + " | context: " + path);
+        System.out.println(eventType.name() + " | context: " + path + "(cnt: " + watchEvent.count() + ")");
         System.out.println("From: " + from);
         System.out.println("Resolved path: " + resolvedPath);
 
@@ -95,15 +93,13 @@ public class ObservedFolder {
             handleDeleteEvent(resolvedPath);
         }else if(eventType.equals(ENTRY_MODIFY)){
             handleModifyEvent(resolvedPath);
-        }else{
-            throw new IllegalStateException("invalid event");
         }
         System.out.println("------------");
     }
 
     private void handleModifyEvent(Path resolvedPath) {
         var modifiedNode = pathToTreeMap.get(resolvedPath);
-        var fileData = modifiedNode.getValue();
+        var fileData = modifiedNode.getValue(); //TODO: nullptr when copying data into observed folder
         if(fileData.isFile()){
             modifiedNode.updateMe();
         } else {
@@ -121,11 +117,9 @@ public class ObservedFolder {
             });
             affectedNode.deleteMe();
         } else {
-            //TODO: if directory
-            //TODO: remove from eventprocessor
-            //TODO: remove childs from pathToTreeMap
-            //TODO: remove childs from eventprocessor
-            System.out.println("handleDeleteEvent directory - NOT IMPLEMENTED");
+            eventProcessor.removeTrackedDirectoriesRecursively(affectedNode);
+            removeMappedDirsRecursively(affectedNode);
+            affectedNode.deleteMe();
         }
     }
 
@@ -137,19 +131,9 @@ public class ObservedFolder {
             // new dir created, we have to register watcher for it
             // no need to register this for files
             dirWatcher.registerWatchedDirectory(fileData.getPath()).ifPresent(watchKey -> {
-                eventProcessor.addTrackedDirectory(watchKey, fileData.getFile());
+                eventProcessor.addTrackedDirectory(watchKey, fileData.getPath());
             });
         }
-    }
-
-    private void updateParentSize(TreeItem<FileData> node, long deltaSize){
-        var parentNode = Optional.ofNullable(node.getParent());
-        parentNode.ifPresent(parent -> {
-            if(parent.getValue()!=null){
-            parent.getValue().modifySize(deltaSize);
-            updateParentSize(parent, deltaSize);
-            }
-        });
     }
 
     public void refresh() throws IOException { //TODO: test this!
@@ -170,7 +154,7 @@ public class ObservedFolder {
         try {
             dirWatcher.stop();
             watchService.close();
-            eventProcessor.getDirectoryMap().clear();
+            eventProcessor.clearTrackedDirectories();
         } catch (IOException exception) {
             exception.printStackTrace(); //TODO: what should we do here? :/
         }
@@ -180,15 +164,13 @@ public class ObservedFolder {
         return treeBuilder.getRoot();
     }
 
-    public boolean checkIfNodeIsChild(Path path){
-        return pathToTreeMap.get(path) != null;
+    public boolean containsNode(Path path){
+        return pathToTreeMap.containsKey(path);
     }
 
-    public void deleteNodes(TreeItem<FileData> treeItem){
-        var itemChildren = treeItem.getChildren().stream();
-        itemChildren.forEach(this::deleteNodes);
-
-        eventProcessor.getDirectoryMap().remove(treeItem.getValue().getEventKey());
-        pathToTreeMap.remove(treeItem.getValue().getPath());
+    public void removeMappedDirsRecursively(TreeItem<FileData> node) {
+        System.out.println("pathMap remove: " + node.getValue().getPath());
+        pathToTreeMap.remove(node.getValue().getPath());
+        node.getChildren().forEach(this::removeMappedDirsRecursively);
     }
 }
