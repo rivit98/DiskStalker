@@ -6,8 +6,9 @@ import model.FileData;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class FileTreeScanner {
-    public Observable<FileData> scanDirectory(Path dirPath) {
+public class FileTreeScanner implements IFilesystemScanner {
+    @Override
+    public Observable<FileData> scan(Path dirPath) {
         return Observable.create(emitter -> {
             Files.walkFileTree(dirPath, new FileVisitorEmitter(emitter));
             emitter.onComplete();

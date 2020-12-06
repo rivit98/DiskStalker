@@ -1,11 +1,13 @@
 package model;
 
 import filesystem.dirwatcher.DirWatcher;
+import filesystem.dirwatcher.IFilesystemWatcher;
 import filesystem.scanner.FileTreeScanner;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.SingleSubject;
 import javafx.scene.control.TreeItem;
 import model.events.EventProcessor;
+import model.events.IEventProcessor;
 import model.tree.TreeBuilder;
 import model.tree.TreeFileNode;
 
@@ -17,8 +19,8 @@ public class ObservedFolder {
     private final HashMap<Path, TreeFileNode> pathToTreeMap = new HashMap<>();
     private final Path dirToWatch;
     private TreeBuilder treeBuilder;
-    private DirWatcher dirWatcher;
-    private EventProcessor eventProcessor;
+    private IFilesystemWatcher IFileSystemWatcher;
+    private IEventProcessor IEventProcessor;
 
     public ObservedFolder(Path dirToWatch) {
         this.dirToWatch = dirToWatch;
@@ -28,14 +30,14 @@ public class ObservedFolder {
 
     public void initialize() {
         treeBuilder = new TreeBuilder();
-        dirWatcher = new DirWatcher(dirToWatch);
-        eventProcessor = new EventProcessor(this, treeBuilder);
+        IFileSystemWatcher = new DirWatcher(dirToWatch);
+        IEventProcessor = new EventProcessor(this, treeBuilder);
     }
 
     public void scanDirectory() {
         var scanner = new FileTreeScanner();
         scanner
-                .scanDirectory(dirToWatch)
+                .scan(dirToWatch)
                 .subscribeOn(Schedulers.io())
 //                .observeOn(JavaFxScheduler.platform())
                 .subscribe(this::processFileData,
@@ -51,11 +53,11 @@ public class ObservedFolder {
 
     public void startMonitoring() {
         System.out.println("Start monitoring");
-        dirWatcher
-                .watchForChanges()
+        IFileSystemWatcher
+                .start()
                 .subscribeOn(Schedulers.io())
 //                .observeOn(JavaFxScheduler.platform())
-                .subscribe(eventProcessor::processEvent,
+                .subscribe(IEventProcessor::processEvent,
                         System.out::println
                 );
     }
@@ -70,7 +72,7 @@ public class ObservedFolder {
     }
 
     public void cleanup() {
-        dirWatcher.stop();
+        IFileSystemWatcher.stop();
     }
 
     public SingleSubject<TreeFileNode> getTree() {
