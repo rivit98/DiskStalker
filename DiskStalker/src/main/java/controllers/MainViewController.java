@@ -12,6 +12,7 @@ import model.FileData;
 import graphics.GraphicsFactory;
 import model.ObservedFolder;
 import model.tree.TreeFileNode;
+import persistence.ObservedFoldersSQL;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -77,6 +78,14 @@ public class MainViewController {
         //TODO: repair buttons bindings
         setSizeButton.disableProperty().bind(Bindings.isEmpty(locationTreeView.getSelectionModel().getSelectedItems()));
         deleteButton.disableProperty().bind(Bindings.isEmpty(locationTreeView.getSelectionModel().getSelectedItems()));
+
+        loadSavedSettings(); //TODO: test this
+    }
+
+    private void loadSavedSettings(){
+        ObservedFoldersSQL
+                .loadFolders()
+                .forEach(this::addObservedFolder);
     }
 
     private void createRoot() {
@@ -89,8 +98,7 @@ public class MainViewController {
         locationTreeView.getRoot().getChildren().add(node);
     }
 
-    private void loadTreeItems(Path pathToWatch) {
-        var folder = new ObservedFolder(pathToWatch);
+    private void addObservedFolder(ObservedFolder folder) {
         folder.getTree().subscribe(treeFileNode -> {
             addToMainTree(treeFileNode);
             folderList.add(folder);
@@ -127,7 +135,8 @@ public class MainViewController {
                 alert.showAndWait()
                         .filter(response -> response == ButtonType.OK);
             } else {
-                loadTreeItems(selectedFolder.toPath());
+                var folder = new ObservedFolder(selectedFolder.toPath());
+                addObservedFolder(folder);
             }
         });
     }

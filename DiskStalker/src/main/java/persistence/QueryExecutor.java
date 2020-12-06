@@ -17,10 +17,9 @@ public final class QueryExecutor {
 
     static {
         try {
-            LOGGER.info("Creating table Grade");
             create("CREATE TABLE IF NOT EXISTS observedFolders (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "name VARCHAR(1024) NOT NULL, " +
+                    "path VARCHAR(1024) NOT NULL, " +
                     "max_size INT NOT NULL" +
                     ");");
 
@@ -53,7 +52,6 @@ public final class QueryExecutor {
         PreparedStatement ps = ConnectionProvider.getConnection().prepareStatement(sql);
         QueryHelper.mapParams(ps, args);
         final ResultSet resultSet = ps.executeQuery();
-        LOGGER.info(String.format("Query: %s executed.", sql));
         return resultSet;
     }
 
@@ -69,7 +67,6 @@ public final class QueryExecutor {
             PreparedStatement ps = ConnectionProvider.getConnection().prepareStatement(sql.get(i));
             QueryHelper.mapParams(ps, args.get(i));
             ps.executeUpdate();
-            LOGGER.info(String.format("Query: %s executed.", sql.get(i)));
         }
         ConnectionProvider.getConnection().commit();
         ConnectionProvider.getConnection().setAutoCommit(true);
