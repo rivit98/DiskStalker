@@ -9,9 +9,9 @@ import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import model.FileData;
-import model.GraphicsFactory;
+import graphics.GraphicsFactory;
 import model.ObservedFolder;
-import model.TreeFileNode;
+import model.tree.TreeFileNode;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -79,17 +79,17 @@ public class MainViewController {
         deleteButton.disableProperty().bind(Bindings.isEmpty(locationTreeView.getSelectionModel().getSelectedItems()));
     }
 
-    public void createRoot() {
+    private void createRoot() {
         locationTreeView.setRoot(new TreeItem<>());
         locationTreeView.setShowRoot(false);
         locationTreeView.getRoot().setExpanded(true);
     }
 
-    public void addToMainTree(TreeFileNode node) {
+    private void addToMainTree(TreeFileNode node) {
         locationTreeView.getRoot().getChildren().add(node);
     }
 
-    public void loadTreeItems(Path pathToWatch) {
+    private void loadTreeItems(Path pathToWatch) {
         var folder = new ObservedFolder(pathToWatch);
         folder.getTree().subscribe(treeFileNode -> {
             addToMainTree(treeFileNode);
@@ -103,7 +103,7 @@ public class MainViewController {
         setSizeButton.setOnAction(this::setSizeButtonClicked);
     }
 
-    public void initializeSizeField() {
+    private void initializeSizeField() {
         locationTreeView.getSelectionModel().selectedItemProperty().addListener((observable, oldTreeItem, newTreeItem) -> {
             if (oldTreeItem != null) {
                 directorySize.textProperty().unbind();
@@ -112,17 +112,17 @@ public class MainViewController {
         });
     }
 
-    public void addButtonClicked(ActionEvent actionEvent) {
+    private void addButtonClicked(ActionEvent actionEvent) {
         var directoryChooser = new DirectoryChooser();
         directoryChooser.setInitialDirectory(new File("."));
         directoryChooser.setTitle("Choose directory to watch");
 
         var selectedFolderOptional = Optional.ofNullable(directoryChooser.showDialog(new Stage()));
         selectedFolderOptional.ifPresent(selectedFolder -> {
-            var rootChildrens = locationTreeView.getRoot().getChildren().stream()
-                    .filter(rootChildren -> rootChildren.getValue().getPath().equals(selectedFolder.toPath()))
+            var rootChildren = locationTreeView.getRoot().getChildren().stream()
+                    .filter(children -> children.getValue().getPath().equals(selectedFolder.toPath()))
                     .findAny();
-            if (rootChildrens.isPresent()) {
+            if (rootChildren.isPresent()) {
                 var alert = createAlert("Warning", "You already observe this directory!");
                 alert.showAndWait()
                         .filter(response -> response == ButtonType.OK);
@@ -132,7 +132,7 @@ public class MainViewController {
         });
     }
 
-    public void deleteButtonClicked(ActionEvent actionEvent) {
+    private void deleteButtonClicked(ActionEvent actionEvent) {
         var selectedTreeItem = Optional.ofNullable(locationTreeView.getSelectionModel().getSelectedItem());
         selectedTreeItem.ifPresent(item -> {
             var searchedPath = item.getValue().getPath();
@@ -158,7 +158,7 @@ public class MainViewController {
         return alert;
     }
 
-    public void removeFolder(ObservedFolder folder, TreeItem<FileData> nodeToRemove) {
+    private void removeFolder(ObservedFolder folder, TreeItem<FileData> nodeToRemove) {
         var c = (TreeFileNode) nodeToRemove;
         if (locationTreeView.getRoot().getChildren().contains(c)) { //we are removing main folder
             folder.destroy();

@@ -1,10 +1,13 @@
 package model;
 
-import filesystem.DirWatcher;
-import filesystem.FileTreeScanner;
+import filesystem.dirwatcher.DirWatcher;
+import filesystem.scanner.FileTreeScanner;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.SingleSubject;
 import javafx.scene.control.TreeItem;
+import model.events.EventProcessor;
+import model.tree.TreeBuilder;
+import model.tree.TreeFileNode;
 
 import java.nio.file.Path;
 import java.util.HashMap;

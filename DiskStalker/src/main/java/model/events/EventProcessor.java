@@ -1,4 +1,8 @@
-package model;
+package model.events;
+
+import model.FileData;
+import model.ObservedFolder;
+import model.tree.TreeBuilder;
 
 import java.nio.file.Path;
 
@@ -11,7 +15,6 @@ public class EventProcessor {
         this.treeBuilder = treeBuilder;
     }
 
-    //TODO: if not valid, remove treeitem, remove watchkey from map - is it necessary?
     //TODO: case when user removes root folder!
     //TODO: when updating branch, update parents size!
     //TODO: better idea - use nodemap for inserting - requries updating size in reverse order (bottom-up)
@@ -30,7 +33,7 @@ public class EventProcessor {
         }
     }
 
-    //FIXME: somewhere here we got nullptrexception :(
+    //FIXME: somewhere here (handleModifyEventFile, handleModifyEventDir) we got nullptrexception :(
     private void handleModifyEventFile(Path resolvedPath) {
         var modifiedNode = observedFolder.getPathToTreeMap().get(resolvedPath);
         modifiedNode.updateMe();

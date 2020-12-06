@@ -1,6 +1,6 @@
-package model;
+package filesystem.dirwatcher;
 
-import filesystem.DirWatcher;
+import model.events.EventType;
 import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
 
 import java.io.File;

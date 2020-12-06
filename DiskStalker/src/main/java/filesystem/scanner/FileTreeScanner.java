@@ -1,4 +1,4 @@
-package filesystem;
+package filesystem.scanner;
 
 import io.reactivex.rxjava3.core.Observable;
 import model.FileData;

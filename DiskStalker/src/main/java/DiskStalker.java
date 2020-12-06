@@ -4,8 +4,15 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import persistence.ConnectionProvider;
+
+import java.sql.SQLException;
 
 public class DiskStalker extends Application {
+    static {
+        ConnectionProvider.init("jdbc:sqlite:observed_folders.db");
+    }
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         FXMLLoader loader = new FXMLLoader();
@@ -15,6 +22,11 @@ public class DiskStalker extends Application {
         primaryStage.setOnCloseRequest(event -> {
             var mainController = (MainViewController) loader.getController();
             mainController.onExit();
+            try {
+                ConnectionProvider.close();
+            } catch (SQLException exception) {
+                exception.printStackTrace();
+            }
         });
 
         configureStage(primaryStage, layout);

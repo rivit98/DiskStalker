@@ -1,10 +1,9 @@
-package filesystem;
+package filesystem.dirwatcher;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
-import model.EventObject;
-import model.EventType;
-import model.FileChangeListener;
+import model.events.EventObject;
+import model.events.EventType;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
 
