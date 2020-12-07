@@ -37,6 +37,38 @@ public class EventProcessor implements IEventProcessor {
         }
     }
 
+    //FIXME: somewhere here (handleModifyEventFile, handleModifyEventDir) we got nullptrexception :(
+    void handleModifyEventFile(Path resolvedPath) {
+        var modifiedNode = observedFolder.getPathToTreeMap().get(resolvedPath);
+        modifiedNode.updateMe();
+    }
+
+    void handleModifyEventDir(Path resolvedPath) {
+        //FIXME, TEST this
+        var modifiedNode = observedFolder.getPathToTreeMap().get(resolvedPath);
+        modifiedNode.updateMe();
+    }
+
+    void handleDeleteEventFile(Path resolvedPath) {
+        var affectedNode = observedFolder.getPathToTreeMap().remove(resolvedPath); // this is the folder where something has changed
+        var fileData = affectedNode.getValue();
+        affectedNode.deleteMe();
+    }
+
+    void handleDeleteEventDir(Path resolvedPath) {
+        var affectedNode = observedFolder.getPathToTreeMap().remove(resolvedPath); // this is the folder where something has changed
+        observedFolder.removeMappedDirsRecursively(affectedNode);
+        affectedNode.deleteMe();
+    }
+
+    void handleCreateEventFile(Path resolvedPath) {
+        handleCreateCommon(resolvedPath);
+    }
+
+    void handleCreateEventDir(Path resolvedPath) {
+        handleCreateCommon(resolvedPath);
+    }
+
     private void handleCreateCommon(Path resolvedPath) {
         var newNode = treeBuilder.addItem(new FileData(resolvedPath));
         var fileData = newNode.getValue();
