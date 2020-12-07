@@ -36,11 +36,11 @@ public class MainViewController {
 
     private final List<ObservedFolder> folderList = new LinkedList<>();
 
+    private Alerts alerts = new Alerts();
+
     @FXML
     public void initialize() {
         createRoot();
-        locationTreeView.getSelectionModel().setSelectionMode(
-                SelectionMode.SINGLE);
         //todo: refactor this
         TreeTableColumn<FileData, Path> pathColumn = new TreeTableColumn<>("Name");
         TreeTableColumn<FileData, Number> sizeColumn = new TreeTableColumn<>("Size");
@@ -129,9 +129,7 @@ public class MainViewController {
                     .filter(rootChildren -> rootChildren.getValue().getPath().equals(selectedFolder.toPath()))
                     .findAny();
             if(rootChildrens.isPresent()){
-                var alert = createAlert("Warning", "You already observe this directory!");
-                alert.showAndWait()
-                        .filter(response -> response == ButtonType.OK);
+                alerts.tryingToAddSameFolderToObservedAlert();
             } else {
                 loadTreeItems(selectedFolder.toPath());
             }
@@ -155,13 +153,6 @@ public class MainViewController {
 
     private void setSizeButtonClicked(ActionEvent actionEvent) {
         //TODO: set max dir size
-    }
-
-    private Alert createAlert(String headerText, String information) {
-        var alert = new Alert(Alert.AlertType.WARNING);
-        alert.setHeaderText(headerText);
-        alert.setContentText(information);
-        return alert;
     }
 
     public void removeFolder(ObservedFolder folder, TreeItem<FileData> nodeToRemove){
