@@ -19,13 +19,13 @@ public class TreeFileNode extends TreeItem<FileData> {
 
     // inserts node and keeps proper ordering
     public void insertNode(TreeFileNode node) { //TODO: rewrite this
-        var isDir = node.getValue().isDirectory();
-        var targetName = node.getValue().getPath();
+        var value = node.getValue();
+        var isDir = value.isDirectory();
+        var targetName = value.getPath();
         int index = 0;
         var cachedList = getChildren();
-        for (var ch : cachedList) {
-            var tnode = (TreeFileNode) ch;
-            var tnodeIsDir = tnode.getValue().isDirectory();
+        for (var childNode : cachedList) {
+            var tnodeIsDir = childNode.getValue().isDirectory();
 
             if (!isDir && tnodeIsDir) { // we want to put file, so skip all dirs
                 index++;
@@ -35,19 +35,18 @@ public class TreeFileNode extends TreeItem<FileData> {
             if (isDir && !tnodeIsDir) { // no more dirs, so our is last
                 break;
             }
+            index++;
 
-            var tnodeName = tnode.getValue().getPath();
+            var tnodeName = childNode.getValue().getPath();
             if (targetName.compareTo(tnodeName) > 0) { //compare names to determine order
-                index++;
                 continue;
             }
 
-            index++;
             break;
         }
 
         cachedList.add(index, node);
-        getValue().modifySize(node.getValue().getSize());
+        updateParentSize(node, value.getSize());
     }
 
     public void addNode(TreeFileNode node) {
@@ -64,8 +63,7 @@ public class TreeFileNode extends TreeItem<FileData> {
                     continue;
                 }
 
-                if (TreeFileNode.isChild(tnode.getValue().getPath(), node.getValue().getPath())) {
-                    getValue().modifySize(node.getValue().getSize());
+                if (isChild(tnode.getValue().getPath(), node.getValue().getPath())) {
                     tnode.addNode(node);
                     return;
                 }
@@ -82,22 +80,23 @@ public class TreeFileNode extends TreeItem<FileData> {
         return absoluteChildPath.startsWith(absoluteParentPath);
     }
 
+    private void updateParentSize(TreeItem<FileData> node, long deltaSize) {
+        Optional.ofNullable(node.getParent())
+                .ifPresent(parent -> {
+                    Optional.ofNullable(parent.getValue())
+                            .ifPresent(value -> {
+                                value.modifySize(deltaSize);
+                                updateParentSize(parent, deltaSize);
+                            });
+                });
+    }
+
     public void deleteMe() {
         updateParentSize(this, -getValue().getSize());
         this.getParent().getChildren().remove(this);
     }
 
-    private void updateParentSize(TreeItem<FileData> node, long deltaSize) {
-        var parentNode = Optional.ofNullable(node.getParent());
-        parentNode.ifPresent(parent -> {
-            if (parent.getValue() != null) {
-                parent.getValue().modifySize(deltaSize);
-                updateParentSize(parent, deltaSize);
-            }
-        });
-    }
-
-    public void updateMe(){
+    public void updateMe() {
         var fileData = getValue();
         var oldSize = fileData.getSize();
         updateParentSize(this, fileData.updateFileSize() - oldSize);

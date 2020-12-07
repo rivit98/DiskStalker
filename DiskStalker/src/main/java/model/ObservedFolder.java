@@ -18,23 +18,21 @@ import java.util.HashMap;
 public class ObservedFolder {
     private final HashMap<Path, TreeFileNode> pathToTreeMap = new HashMap<>();
     private final Path dirToWatch;
-    private TreeBuilder treeBuilder;
-    private IFilesystemWatcher IFileSystemWatcher;
-    private IEventProcessor IEventProcessor;
+    private final TreeBuilder treeBuilder;
+    private final IFilesystemWatcher filesystemWatcher;
+    private final IEventProcessor eventProcessor;
+    private TreeFileNode root;
 
     public ObservedFolder(Path dirToWatch) {
         this.dirToWatch = dirToWatch;
 
-        scan();
-    }
-
-    public void initialize() {
         treeBuilder = new TreeBuilder();
-        IFileSystemWatcher = new DirWatcher(dirToWatch);
-        IEventProcessor = new EventProcessor(this, treeBuilder);
+        filesystemWatcher = new DirWatcher(dirToWatch);
+        eventProcessor = new EventProcessor(this);
+        scanDirectory();
     }
 
-    public void scanDirectory() {
+    private void scanDirectory() {
         var scanner = new FileTreeScanner();
         scanner
                 .scan(dirToWatch)
@@ -46,37 +44,30 @@ public class ObservedFolder {
                 );
     }
 
-    public void processFileData(FileData fileData) {
+    private void processFileData(FileData fileData) {
         var insertedNode = treeBuilder.addItem(fileData);
         pathToTreeMap.put(fileData.getPath(), insertedNode);
     }
 
-    public void startMonitoring() {
+    private void startMonitoring() {
         System.out.println("Start monitoring");
-        IFileSystemWatcher
+        filesystemWatcher
                 .start()
                 .subscribeOn(Schedulers.io())
 //                .observeOn(JavaFxScheduler.platform())
-                .subscribe(IEventProcessor::processEvent,
+                .subscribe(eventProcessor::processEvent,
                         System.out::println
                 );
     }
 
-    public void scan() {
-        initialize();
-        scanDirectory();
-    }
-
     public void destroy() {
-        cleanup();
-    }
-
-    public void cleanup() {
-        IFileSystemWatcher.stop();
+        filesystemWatcher.stop();
     }
 
     public SingleSubject<TreeFileNode> getTree() {
-        return treeBuilder.getRoot();
+        var observableRoot = treeBuilder.getRoot();
+        observableRoot.subscribe(node -> root = node);
+        return observableRoot;
     }
 
     public boolean containsNode(Path path) {
@@ -88,8 +79,11 @@ public class ObservedFolder {
     }
 
     public void removeMappedDirsRecursively(TreeItem<FileData> node) {
-        System.out.println("pathMap remove: " + node.getValue().getPath());
-        pathToTreeMap.remove(node.getValue().getPath());
+        removeMappedDirs(node);
         node.getChildren().forEach(this::removeMappedDirsRecursively);
+    }
+
+    public void removeMappedDirs(TreeItem<FileData> node) {
+        pathToTreeMap.remove(node.getValue().getPath());
     }
 }
