@@ -3,27 +3,24 @@ package model.events;
 import model.FileData;
 import model.ObservedFolder;
 import model.tree.TreeBuilder;
+import model.tree.TreeFileNode;
 
 import java.nio.file.Path;
 
 public class EventProcessor implements IEventProcessor {
     private final ObservedFolder observedFolder;
-    private final TreeBuilder treeBuilder;
 
-    public EventProcessor(ObservedFolder observedFolder, TreeBuilder treeBuilder) {
+    public EventProcessor(ObservedFolder observedFolder) {
         this.observedFolder = observedFolder;
-        this.treeBuilder = treeBuilder;
     }
 
     //TODO: case when user removes root folder!
-    //TODO: when updating branch, update parents size!
-    //TODO: better idea - use nodemap for inserting - requries updating size in reverse order (bottom-up)
 
     @Override
     public void processEvent(EventObject eventObject) {
         Path resolvedPath = eventObject.getTargetDir();
         var eventType = eventObject.getEventType();
-        System.out.println(eventType.name() + " | context: " + resolvedPath);
+        System.out.println(eventType.name() + " | " + resolvedPath);
 
         switch (eventType) {
             case FILE_CREATED -> handleCreateEventFile(resolvedPath);
@@ -33,45 +30,43 @@ public class EventProcessor implements IEventProcessor {
             case DIR_DELETED -> handleDeleteEventDir(resolvedPath);
 
             case FILE_MODIFIED -> handleModifyEventFile(resolvedPath);
-            case DIR_MODIFIED -> handleModifyEventDir(resolvedPath);
+//            case DIR_MODIFIED -> handleModifyEventDir(resolvedPath);
         }
     }
 
-    //FIXME: somewhere here (handleModifyEventFile, handleModifyEventDir) we got nullptrexception :(
-    void handleModifyEventFile(Path resolvedPath) {
+    private void handleModifyEventFile(Path resolvedPath) {
         var modifiedNode = observedFolder.getPathToTreeMap().get(resolvedPath);
         modifiedNode.updateMe();
     }
 
-    void handleModifyEventDir(Path resolvedPath) {
-        //FIXME, TEST this
-        var modifiedNode = observedFolder.getPathToTreeMap().get(resolvedPath);
-        modifiedNode.updateMe();
+    private void handleDeleteEventFile(Path resolvedPath) {
+        handleDeleteEventCommon(resolvedPath);
     }
 
-    void handleDeleteEventFile(Path resolvedPath) {
-        var affectedNode = observedFolder.getPathToTreeMap().remove(resolvedPath); // this is the folder where something has changed
-        var fileData = affectedNode.getValue();
-        affectedNode.deleteMe();
+    private void handleDeleteEventDir(Path resolvedPath) {
+        handleDeleteEventCommon(resolvedPath);
     }
 
-    void handleDeleteEventDir(Path resolvedPath) {
-        var affectedNode = observedFolder.getPathToTreeMap().remove(resolvedPath); // this is the folder where something has changed
+    private void handleDeleteEventCommon(Path resolvedPath) {
+        var affectedNode = observedFolder.getPathToTreeMap().remove(resolvedPath);
         observedFolder.removeMappedDirsRecursively(affectedNode);
         affectedNode.deleteMe();
     }
 
-    void handleCreateEventFile(Path resolvedPath) {
+    private void handleCreateEventFile(Path resolvedPath) {
         handleCreateCommon(resolvedPath);
     }
 
-    void handleCreateEventDir(Path resolvedPath) {
+    private void handleCreateEventDir(Path resolvedPath) {
         handleCreateCommon(resolvedPath);
     }
 
     private void handleCreateCommon(Path resolvedPath) {
-        var newNode = treeBuilder.addItem(new FileData(resolvedPath));
-        var fileData = newNode.getValue();
-        observedFolder.getPathToTreeMap().put(fileData.getPath(), newNode);
+        var fileData = new FileData(resolvedPath);
+        var newTreeNode = new TreeFileNode(fileData);
+        var parentPath = resolvedPath.getParent();
+        var parentNode = observedFolder.getPathToTreeMap().get(parentPath);
+        parentNode.insertNode(newTreeNode);
+        observedFolder.getPathToTreeMap().put(fileData.getPath(), newTreeNode);
     }
 }

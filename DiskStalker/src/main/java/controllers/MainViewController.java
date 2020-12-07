@@ -2,6 +2,9 @@ package controllers;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -15,6 +18,8 @@ import model.tree.TreeFileNode;
 import persistence.ObservedFoldersSQL;
 
 import java.io.File;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,22 +40,32 @@ public class MainViewController {
 
     private final List<ObservedFolder> folderList = new LinkedList<>();
 
-    private Alerts alerts = new Alerts();
+    //private Alerts alerts = new Alerts();
 
-    @FXML
-    public void initialize() {
+    private void initializeTree() {
         createRoot();
         //todo: refactor this
         TreeTableColumn<FileData, Path> pathColumn = new TreeTableColumn<>("Name");
         TreeTableColumn<FileData, Number> sizeColumn = new TreeTableColumn<>("Size");
         pathColumn.setPrefWidth(200); //todo: set proper width
-        pathColumn.setCellValueFactory(node -> new SimpleObjectProperty<>(node.getValue().getValue().getPath()));
+        pathColumn.setCellValueFactory(node -> {
+            var pathOptional = Optional.ofNullable(node.getValue())
+                    .flatMap(v -> Optional.ofNullable(v.getValue()))
+                    .map(FileData::getPath);
+
+            return pathOptional.map(SimpleObjectProperty::new).orElseGet(SimpleObjectProperty::new);
+        });
 
         pathColumn.setCellFactory(ttc -> new TreeTableCell<>() {
             @Override
             protected void updateItem(Path item, boolean empty) {
                 super.updateItem(item, empty);
-                setText(empty ? null : item.getFileName().toString());
+                if(!empty && item.getFileName() == null) {
+                    setText(item.toString());
+                }
+                else {
+                    setText(empty ? null : item.getFileName().toString());
+                }
                 setGraphic(empty ? null : GraphicsFactory.getGraphic(item.toFile().isDirectory()));
             }
         });
@@ -62,8 +77,16 @@ public class MainViewController {
             TreeTableCell<FileData, Number> cell = new TreeTableCell<>() {
                 @Override
                 protected void updateItem(Number value, boolean empty) {
+                    var treeItem = getTreeTableRow().getTreeItem();
                     super.updateItem(value, empty);
                     setText(empty ? null : value.toString());
+                    if(treeItem != null) {
+                        var maximumSize = treeItem.getValue().getMaximumSize();
+                        if (treeItem.getParent() != null && treeItem.getParent().getValue() == null
+                                && value.longValue() > maximumSize) {
+                            Alerts.sizeExceededAlert(treeItem.getValue().getPath().toString(), maximumSize / (1024 * 1024)); //todo: remove magic numbers
+                        }
+                    }
                 }
             };
             cell.pseudoClassStateChanged(PseudoClass.getPseudoClass("centered"), true);
@@ -73,10 +96,23 @@ public class MainViewController {
 
         locationTreeView.getColumns().add(pathColumn);
         locationTreeView.getColumns().add(sizeColumn);
+    }
+
+    @FXML
+    public void initialize() {
+        initializeTree();
         initializeButtons();
         initializeSizeField();
         //TODO: repair buttons bindings
-        setSizeButton.disableProperty().bind(Bindings.isEmpty(locationTreeView.getSelectionModel().getSelectedItems()));
+        setSizeButton.disableProperty().bind(Bindings.createBooleanBinding(() -> { //todo: refactor this
+            if(!locationTreeView.getSelectionModel().getSelectedItems().isEmpty()) {
+                var selectedItem = locationTreeView.getSelectionModel().getSelectedItem();
+                if (selectedItem != null && selectedItem.getParent() != null && !directorySize.getText().equals("")) {
+                    return selectedItem.getParent().getValue() != null;
+                }
+            }
+            return true;
+        }, locationTreeView.getSelectionModel().selectedItemProperty(), directorySize.textProperty()));//isEmpty(locationTreeView.getSelectionModel().getSelectedItems()));
         deleteButton.disableProperty().bind(Bindings.isEmpty(locationTreeView.getSelectionModel().getSelectedItems()));
 
         loadSavedSettings(); //TODO: test this
@@ -112,11 +148,23 @@ public class MainViewController {
     }
 
     private void initializeSizeField() {
+
+        directorySize.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                directorySize.setText(newValue.replaceAll("[^\\d]", ""));
+            }
+        });
+
         locationTreeView.getSelectionModel().selectedItemProperty().addListener((observable, oldTreeItem, newTreeItem) -> {
             if (oldTreeItem != null) {
                 directorySize.textProperty().unbind();
             }
-            directorySize.textProperty().bind(newTreeItem.getValue().getMaximumSizePropertyAsStringProperty());
+            if(newTreeItem != null && newTreeItem.getParent() != null && newTreeItem.getParent().getValue() == null) {
+                directorySize.textProperty().bindBidirectional(newTreeItem.getValue().getMaximumSizePropertyAsStringProperty()); //todo: is this good?
+            }
+//            else { //todo: consider if we want this
+//                directorySize.textProperty().unbind();
+//            }
         });
     }
 
@@ -131,7 +179,7 @@ public class MainViewController {
                     .filter(children -> children.getValue().getPath().equals(selectedFolder.toPath()))
                     .findAny();
             if(rootChildrens.isPresent()){
-                alerts.tryingToAddSameFolderToObservedAlert();
+                Alerts.tryingToAddSameFolderToObservedAlert();
             } else {
                 var folder = new ObservedFolder(selectedFolder.toPath());
                 addObservedFolder(folder);
@@ -156,6 +204,13 @@ public class MainViewController {
 
     private void setSizeButtonClicked(ActionEvent actionEvent) {
         //TODO: set max dir size
+        var maximumSize = Long.parseLong(directorySize.getText())*1024*1024; //todo: remove "magic numbers"
+        var selectedItem = locationTreeView.getSelectionModel().getSelectedItem().getValue();
+        selectedItem.setMaximumSizeProperty(maximumSize);
+        Alerts.setMaxSizeAlert(selectedItem.getPath().toString(), maximumSize/(1024*1024));
+        if(selectedItem.getSize() > maximumSize) {
+            Alerts.sizeExceededAlert(selectedItem.getPath().toString(), maximumSize/(1024*1024));
+        }
     }
 
     private void removeFolder(ObservedFolder folder, TreeItem<FileData> nodeToRemove) {
