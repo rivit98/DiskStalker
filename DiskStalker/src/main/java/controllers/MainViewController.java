@@ -54,7 +54,12 @@ public class MainViewController {
             @Override
             protected void updateItem(Path item, boolean empty) {
                 super.updateItem(item, empty);
-                setText(empty ? null : item.getFileName().toString());
+                if(!empty && item.getFileName() == null) {
+                    setText(item.toString());
+                }
+                else {
+                    setText(empty ? null : item.getFileName().toString());
+                }
                 setGraphic(empty ? null : GraphicsFactory.getGraphic(item.toFile().isDirectory()));
             }
         });
