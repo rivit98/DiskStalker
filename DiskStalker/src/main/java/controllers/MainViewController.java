@@ -208,11 +208,8 @@ public class MainViewController {
         var selectedItem = locationTreeView.getSelectionModel().getSelectedItem().getValue();
         selectedItem.setMaximumSizeProperty(maximumSize);
         Alerts.setMaxSizeAlert(selectedItem.getPath().toString(), maximumSize/(1024*1024));
-        for(var c : locationTreeView.getRoot().getChildren()) {
-            var fileData = c.getValue();
-            if(fileData.getSize() > maximumSize) {
-                Alerts.sizeExceededAlert(fileData.getPath().toString(), maximumSize/(1024*1024));
-            }
+        if(selectedItem.getSize() > maximumSize) {
+            Alerts.sizeExceededAlert(selectedItem.getPath().toString(), maximumSize/(1024*1024));
         }
     }
 
