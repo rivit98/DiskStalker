@@ -42,5 +42,5 @@ dependencies {
     implementation group: 'org.springframework', name: 'spring-context', version: '5.2.11.RELEASE'
     implementation group: 'org.springframework', name: 'spring-beans', version: '5.2.11.RELEASE'
     implementation group: 'commons-io', name: 'commons-io', version: '2.6'
-
+    implementation group: 'org.xerial', name: 'sqlite-jdbc', version: '3.32.3.2'
 }

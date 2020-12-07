@@ -1,6 +1,7 @@
-package model;
+package model.tree;
 
 import javafx.scene.control.TreeItem;
+import model.FileData;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -101,4 +102,6 @@ public class TreeFileNode extends TreeItem<FileData> {
         var oldSize = fileData.getSize();
         updateParentSize(this, fileData.updateFileSize() - oldSize);
     }
+
+    //TODO: maybe override equals
 }

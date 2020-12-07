@@ -1,4 +1,4 @@
-package filesystem;
+package filesystem.scanner;
 
 import io.reactivex.rxjava3.core.ObservableEmitter;
 import model.FileData;
@@ -14,12 +14,10 @@ import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
 
 public class FileVisitorEmitter extends SimpleFileVisitor<Path> {
     private final ObservableEmitter<FileData> observer;
-    private final DirWatcher dirWatcher;
 
 
-    public FileVisitorEmitter(ObservableEmitter<FileData> observer, DirWatcher dirWatcher) {
+    public FileVisitorEmitter(ObservableEmitter<FileData> observer) {
         this.observer = observer;
-        this.dirWatcher = dirWatcher;
     }
 
     public void emitPath(Path path) {
@@ -27,11 +25,7 @@ public class FileVisitorEmitter extends SimpleFileVisitor<Path> {
             return;
         }
 
-        var fileData = new FileData(path);
-        if (fileData.isDirectory()) {
-            dirWatcher.registerWatchedDirectory(path).ifPresent(fileData::setEventKey);
-        }
-        observer.onNext(fileData);
+        observer.onNext(new FileData(path));
     }
 
     @Override
