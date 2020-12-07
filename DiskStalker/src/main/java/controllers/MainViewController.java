@@ -40,7 +40,7 @@ public class MainViewController {
 
     private final List<ObservedFolder> folderList = new LinkedList<>();
 
-    private Alerts alerts = new Alerts();
+    //private Alerts alerts = new Alerts();
 
     private void initializeTree() {
         createRoot();
@@ -60,7 +60,12 @@ public class MainViewController {
             @Override
             protected void updateItem(Path item, boolean empty) {
                 super.updateItem(item, empty);
-                setText(empty ? null : item.getFileName().toString());
+                if(!empty && item.getFileName() == null) {
+                    setText(item.toString());
+                }
+                else {
+                    setText(empty ? null : item.getFileName().toString());
+                }
                 setGraphic(empty ? null : GraphicsFactory.getGraphic(item.toFile().isDirectory()));
             }
         });
@@ -79,7 +84,7 @@ public class MainViewController {
                         var maximumSize = treeItem.getValue().getMaximumSize();
                         if (treeItem.getParent() != null && treeItem.getParent().getValue() == null
                                 && value.longValue() > maximumSize) {
-                            alerts.sizeExceededAlert(treeItem.getValue().getPath().toString(), maximumSize / (1024 * 1024)); //todo: remove magic numbers
+                            Alerts.sizeExceededAlert(treeItem.getValue().getPath().toString(), maximumSize / (1024 * 1024)); //todo: remove magic numbers
                         }
                     }
                 }
@@ -102,12 +107,12 @@ public class MainViewController {
         setSizeButton.disableProperty().bind(Bindings.createBooleanBinding(() -> { //todo: refactor this
             if(!locationTreeView.getSelectionModel().getSelectedItems().isEmpty()) {
                 var selectedItem = locationTreeView.getSelectionModel().getSelectedItem();
-                if (selectedItem != null && selectedItem.getParent() != null) {
+                if (selectedItem != null && selectedItem.getParent() != null && !directorySize.getText().equals("")) {
                     return selectedItem.getParent().getValue() != null;
                 }
             }
             return true;
-        }, locationTreeView.getSelectionModel().selectedItemProperty()));//isEmpty(locationTreeView.getSelectionModel().getSelectedItems()));
+        }, locationTreeView.getSelectionModel().selectedItemProperty(), directorySize.textProperty()));//isEmpty(locationTreeView.getSelectionModel().getSelectedItems()));
         deleteButton.disableProperty().bind(Bindings.isEmpty(locationTreeView.getSelectionModel().getSelectedItems()));
 
         loadSavedSettings(); //TODO: test this
@@ -154,7 +159,7 @@ public class MainViewController {
             if (oldTreeItem != null) {
                 directorySize.textProperty().unbind();
             }
-            if(newTreeItem.getParent() != null && newTreeItem.getParent().getValue() == null) {
+            if(newTreeItem != null && newTreeItem.getParent() != null && newTreeItem.getParent().getValue() == null) {
                 directorySize.textProperty().bindBidirectional(newTreeItem.getValue().getMaximumSizePropertyAsStringProperty()); //todo: is this good?
             }
 //            else { //todo: consider if we want this
@@ -174,7 +179,7 @@ public class MainViewController {
                     .filter(children -> children.getValue().getPath().equals(selectedFolder.toPath()))
                     .findAny();
             if(rootChildrens.isPresent()){
-                alerts.tryingToAddSameFolderToObservedAlert();
+                Alerts.tryingToAddSameFolderToObservedAlert();
             } else {
                 var folder = new ObservedFolder(selectedFolder.toPath());
                 addObservedFolder(folder);
@@ -202,11 +207,11 @@ public class MainViewController {
         var maximumSize = Long.parseLong(directorySize.getText())*1024*1024; //todo: remove "magic numbers"
         var selectedItem = locationTreeView.getSelectionModel().getSelectedItem().getValue();
         selectedItem.setMaximumSizeProperty(maximumSize);
-        alerts.setMaxSizeAlert(selectedItem.getPath().toString(), maximumSize/(1024*1024));
+        Alerts.setMaxSizeAlert(selectedItem.getPath().toString(), maximumSize/(1024*1024));
         for(var c : locationTreeView.getRoot().getChildren()) {
             var fileData = c.getValue();
             if(fileData.getSize() > maximumSize) {
-                alerts.sizeExceededAlert(fileData.getPath().toString(), maximumSize/(1024*1024));
+                Alerts.sizeExceededAlert(fileData.getPath().toString(), maximumSize/(1024*1024));
             }
         }
     }
