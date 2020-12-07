@@ -6,16 +6,15 @@ import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import model.FileData;
-import model.GraphicsFactory;
+import graphics.GraphicsFactory;
 import model.ObservedFolder;
-import model.TreeFileNode;
+import model.tree.TreeFileNode;
+import persistence.ObservedFoldersSQL;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
@@ -79,28 +78,31 @@ public class MainViewController {
         //TODO: repair buttons bindings
         setSizeButton.disableProperty().bind(Bindings.isEmpty(locationTreeView.getSelectionModel().getSelectedItems()));
         deleteButton.disableProperty().bind(Bindings.isEmpty(locationTreeView.getSelectionModel().getSelectedItems()));
+
+        loadSavedSettings(); //TODO: test this
     }
 
-    public void createRoot() {
+    private void loadSavedSettings(){
+        ObservedFoldersSQL
+                .loadFolders()
+                .forEach(this::addObservedFolder);
+    }
+
+    private void createRoot() {
         locationTreeView.setRoot(new TreeItem<>());
         locationTreeView.setShowRoot(false);
         locationTreeView.getRoot().setExpanded(true);
     }
 
-    public void addToMainTree(TreeFileNode node) {
+    private void addToMainTree(TreeFileNode node) {
         locationTreeView.getRoot().getChildren().add(node);
     }
 
-    public void loadTreeItems(Path pathToWatch) {
-        try {
-            var folder = new ObservedFolder(pathToWatch);
-            folder.getTree().subscribe(treeFileNode -> {
-                addToMainTree(treeFileNode);
-                folderList.add(folder);
-            });
-        } catch (IOException exception) {
-            exception.printStackTrace();
-        }
+    private void addObservedFolder(ObservedFolder folder) {
+        folder.getTree().subscribe(treeFileNode -> {
+            addToMainTree(treeFileNode);
+            folderList.add(folder);
+        });
     }
 
     private void initializeButtons() {
@@ -109,16 +111,16 @@ public class MainViewController {
         setSizeButton.setOnAction(this::setSizeButtonClicked);
     }
 
-    public void initializeSizeField() {
+    private void initializeSizeField() {
         locationTreeView.getSelectionModel().selectedItemProperty().addListener((observable, oldTreeItem, newTreeItem) -> {
-            if(oldTreeItem!=null){
+            if (oldTreeItem != null) {
                 directorySize.textProperty().unbind();
             }
             directorySize.textProperty().bind(newTreeItem.getValue().getMaximumSizePropertyAsStringProperty());
         });
     }
 
-    public void addButtonClicked(ActionEvent actionEvent) {
+    private void addButtonClicked(ActionEvent actionEvent) {
         var directoryChooser = new DirectoryChooser();
         directoryChooser.setInitialDirectory(new File("."));
         directoryChooser.setTitle("Choose directory to watch");
@@ -126,17 +128,18 @@ public class MainViewController {
         var selectedFolderOptional = Optional.ofNullable(directoryChooser.showDialog(new Stage()));
         selectedFolderOptional.ifPresent(selectedFolder -> {
             var rootChildrens = locationTreeView.getRoot().getChildren().stream()
-                    .filter(rootChildren -> rootChildren.getValue().getPath().equals(selectedFolder.toPath()))
+                    .filter(children -> children.getValue().getPath().equals(selectedFolder.toPath()))
                     .findAny();
             if(rootChildrens.isPresent()){
                 alerts.tryingToAddSameFolderToObservedAlert();
             } else {
-                loadTreeItems(selectedFolder.toPath());
+                var folder = new ObservedFolder(selectedFolder.toPath());
+                addObservedFolder(folder);
             }
         });
     }
 
-    public void deleteButtonClicked(ActionEvent actionEvent) {
+    private void deleteButtonClicked(ActionEvent actionEvent) {
         var selectedTreeItem = Optional.ofNullable(locationTreeView.getSelectionModel().getSelectedItem());
         selectedTreeItem.ifPresent(item -> {
             var searchedPath = item.getValue().getPath();
@@ -155,13 +158,13 @@ public class MainViewController {
         //TODO: set max dir size
     }
 
-    public void removeFolder(ObservedFolder folder, TreeItem<FileData> nodeToRemove){
+    private void removeFolder(ObservedFolder folder, TreeItem<FileData> nodeToRemove) {
         var c = (TreeFileNode) nodeToRemove;
-        if(locationTreeView.getRoot().getChildren().contains(c)){ //we are removing main folder
+        if (locationTreeView.getRoot().getChildren().contains(c)) { //we are removing main folder
             folder.destroy();
             locationTreeView.getRoot().getChildren().remove(c);
             folderList.remove(folder);
-        }else{
+        } else {
             c.deleteMe();
         }
     }

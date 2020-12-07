@@ -1,4 +1,4 @@
-package filesystem;
+package filesystem.scanner;
 
 import io.reactivex.rxjava3.core.ObservableEmitter;
 import model.FileData;
@@ -7,20 +7,17 @@ import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
-import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
 
 import static java.nio.file.FileVisitResult.CONTINUE;
-import static java.nio.file.StandardWatchEventKinds.*;
+import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
 
 public class FileVisitorEmitter extends SimpleFileVisitor<Path> {
     private final ObservableEmitter<FileData> observer;
-    private final DirWatcher dirWatcher;
 
 
-    public FileVisitorEmitter(ObservableEmitter<FileData> observer, DirWatcher dirWatcher) {
+    public FileVisitorEmitter(ObservableEmitter<FileData> observer) {
         this.observer = observer;
-        this.dirWatcher = dirWatcher;
     }
 
     public void emitPath(Path path) {
@@ -28,11 +25,7 @@ public class FileVisitorEmitter extends SimpleFileVisitor<Path> {
             return;
         }
 
-        var fileData = new FileData(path);
-        if (fileData.isDirectory()) {
-            dirWatcher.registerWatchedDirectory(path).ifPresent(fileData::setEventKey);
-        }
-        observer.onNext(fileData);
+        observer.onNext(new FileData(path));
     }
 
     @Override
@@ -49,8 +42,10 @@ public class FileVisitorEmitter extends SimpleFileVisitor<Path> {
 
     @Override
     public FileVisitResult visitFileFailed(Path file, IOException exc) {
-        observer.onError(exc);
-        //TODO: AccessDenied handle
-        return CONTINUE;
+        if (!observer.isDisposed()) {
+            observer.onError(exc);
+        }
+        //TODO: AccessDenied handle - TEST
+        return SKIP_SUBTREE;
     }
 }

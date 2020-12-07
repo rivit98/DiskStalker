@@ -1,6 +1,7 @@
-package model;
+package model.tree;
 
 import io.reactivex.rxjava3.subjects.SingleSubject;
+import model.FileData;
 
 
 public class TreeBuilder {
