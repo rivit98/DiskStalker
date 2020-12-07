@@ -48,7 +48,13 @@ public class MainViewController {
         TreeTableColumn<FileData, Path> pathColumn = new TreeTableColumn<>("Name");
         TreeTableColumn<FileData, Number> sizeColumn = new TreeTableColumn<>("Size");
         pathColumn.setPrefWidth(200); //todo: set proper width
-        pathColumn.setCellValueFactory(node -> new SimpleObjectProperty<>(node.getValue().getValue().getPath()));
+        pathColumn.setCellValueFactory(node -> {
+            var pathOptional = Optional.ofNullable(node.getValue())
+                    .flatMap(v -> Optional.ofNullable(v.getValue()))
+                    .map(FileData::getPath);
+
+            return pathOptional.map(SimpleObjectProperty::new).orElseGet(SimpleObjectProperty::new);
+        });
 
         pathColumn.setCellFactory(ttc -> new TreeTableCell<>() {
             @Override
