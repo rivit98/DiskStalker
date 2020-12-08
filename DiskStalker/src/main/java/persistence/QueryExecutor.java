@@ -34,7 +34,7 @@ public final class QueryExecutor {
     public static int createAndObtainId(final String insertSql, Object... args) throws SQLException {
         lock.lock();
         PreparedStatement statement = ConnectionProvider.getConnection().prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
-        QueryHelper.mapParams(statement, args);
+        mapParams(statement, args);
         statement.execute();
         try (final ResultSet resultSet = statement.getGeneratedKeys()) {
             lock.unlock();
@@ -49,7 +49,7 @@ public final class QueryExecutor {
     public static void create(final String insertSql, Object... args) throws SQLException {
         lock.lock();
         PreparedStatement ps = ConnectionProvider.getConnection().prepareStatement(insertSql);
-        QueryHelper.mapParams(ps, args);
+        mapParams(ps, args);
         ps.execute();
         lock.unlock();
     }
@@ -57,7 +57,7 @@ public final class QueryExecutor {
     public static ResultSet read(final String sql, Object... args) throws SQLException {
         lock.lock();
         PreparedStatement ps = ConnectionProvider.getConnection().prepareStatement(sql);
-        QueryHelper.mapParams(ps, args);
+        mapParams(ps, args);
         final ResultSet resultSet = ps.executeQuery();
         lock.unlock();
         return resultSet;
@@ -66,7 +66,7 @@ public final class QueryExecutor {
     public static void delete(final String sql, Object... args) throws SQLException {
         lock.lock();
         PreparedStatement ps = ConnectionProvider.getConnection().prepareStatement(sql);
-        QueryHelper.mapParams(ps, args);
+        mapParams(ps, args);
         ps.executeUpdate();
         lock.unlock();
     }
@@ -76,11 +76,28 @@ public final class QueryExecutor {
         ConnectionProvider.getConnection().setAutoCommit(false);
 
         PreparedStatement ps = ConnectionProvider.getConnection().prepareStatement(sql);
-        QueryHelper.mapParams(ps, args);
+        mapParams(ps, args);
         ps.executeUpdate();
 
         ConnectionProvider.getConnection().commit();
         ConnectionProvider.getConnection().setAutoCommit(true);
         lock.unlock();
+    }
+
+    public static void mapParams(PreparedStatement ps, Object... args) throws SQLException {
+        int i = 1;
+        for (Object arg : args) {
+            if (arg instanceof Integer) {
+                ps.setInt(i++, (Integer) arg);
+            } else if (arg instanceof Long) {
+                ps.setLong(i++, (Long) arg);
+            } else if (arg instanceof Double) {
+                ps.setDouble(i++, (Double) arg);
+            } else if (arg instanceof Float) {
+                ps.setFloat(i++, (Float) arg);
+            } else {
+                ps.setString(i++, (String) arg);
+            }
+        }
     }
 }

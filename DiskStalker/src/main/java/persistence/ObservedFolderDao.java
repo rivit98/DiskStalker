@@ -1,7 +1,6 @@
-package persistence.dao;
+package persistence;
 
 import model.ObservedFolder;
-import persistence.QueryExecutor;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,20 +8,14 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
-//TODO: check if folder exists after loading
-//TODO: test this
-//TODO: add update, save
+public class ObservedFolderDao{
 
-public class ObservedFolderDao implements GenericDao<ObservedFolder> {
-
-    public void save(ObservedFolder observedFolder) {
+    protected static void save(ObservedFolder observedFolder) {
         var path = observedFolder.getDirToWatch().toString();
         var maxSize = -1;
 
         String insertIntoDB = "INSERT INTO observedFolders (path, max_size) VALUES (?, ?);";
         Object[] args = {path, maxSize};
-
-        System.out.println(path);
 
         try {
             QueryExecutor.createAndObtainId(insertIntoDB, args);
@@ -31,14 +24,14 @@ public class ObservedFolderDao implements GenericDao<ObservedFolder> {
         }
     }
 
-    public void update(ObservedFolder observedFolder) {
+    protected static void update(ObservedFolder observedFolder) {
         var path = observedFolder.getDirToWatch().toString();
         var observedFolderTreeRoot = observedFolder.getTree().getValue();
         var maxSize = observedFolderTreeRoot.getValue().getMaximumSize();
 
         String updateDB = "UPDATE observedFolders SET max_size = (?) WHERE path = (?);";
-        Object[] args = {path, maxSize};
-
+        var conversionFromBToMB = 1024 *1024;
+        Object[] args = {maxSize/conversionFromBToMB, path};
 
         try {
             QueryExecutor.executeUpdate(updateDB, args);
@@ -47,7 +40,7 @@ public class ObservedFolderDao implements GenericDao<ObservedFolder> {
         }
     }
 
-    public void delete(ObservedFolder observedFolder){
+    protected static void delete(ObservedFolder observedFolder){
         var path = observedFolder.getDirToWatch().toString();
 
         String deleteObservedFolder = "DELETE FROM observedFolders WHERE path = (?);";
