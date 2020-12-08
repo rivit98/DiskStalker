@@ -170,9 +170,13 @@ public class MainViewController {
             }
         });
 
-        locationTreeView.getSelectionModel().selectedItemProperty().addListener((observable, oldTreeItem, newTreeItem) ->
-                newTreeItem.getValue().getMaximumSizeProperty().addListener((obs, oldVal, newVal) ->
-                        Platform.runLater(() -> directorySize.setText(String.valueOf((newVal.longValue()/(1024*1024))))))); //todo: remove magic numbers
+        locationTreeView.getSelectionModel().selectedItemProperty().addListener((observable, oldTreeItem, newTreeItem) -> {
+            directorySize.setText(String.valueOf(newTreeItem.getValue().getMaximumSize()/ (1024 * 1024))); //todo: remove magic numbers
+            newTreeItem.getValue().getMaximumSizeProperty().addListener((obs, oldVal, newVal) -> { //todo: change?
+                Platform.runLater(() -> directorySize.setText(String.valueOf((newVal.longValue() / (1024 * 1024)))));
+            });
+        });
+
     }
 
     private void addButtonClicked(ActionEvent actionEvent) {
