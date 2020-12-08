@@ -2,9 +2,6 @@ package controllers;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -15,12 +12,14 @@ import model.FileData;
 import graphics.GraphicsFactory;
 import model.ObservedFolder;
 import model.tree.TreeFileNode;
-import persistence.ObservedFoldersSQL;
+import persistence.DatabaseCommand;
+import persistence.DatabaseCommandExecutor;
+import persistence.dao.ObservedFolderDao;
 
 import java.io.File;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -39,8 +38,6 @@ public class MainViewController {
     private TextField directorySize; //TODO: bind to field, after change validate conditions, display warning
 
     private final List<ObservedFolder> folderList = new LinkedList<>();
-
-    //private Alerts alerts = new Alerts();
 
     private void initializeTree() {
         createRoot();
@@ -118,9 +115,9 @@ public class MainViewController {
         loadSavedSettings(); //TODO: test this
     }
 
-    private void loadSavedSettings(){
-        ObservedFoldersSQL
-                .loadFolders()
+    private void loadSavedSettings() {
+        ObservedFolderDao.getAll()
+                .stream()
                 .forEach(this::addObservedFolder);
     }
 
@@ -183,6 +180,7 @@ public class MainViewController {
             } else {
                 var folder = new ObservedFolder(selectedFolder.toPath());
                 addObservedFolder(folder);
+                new DatabaseCommandExecutor(folder, DatabaseCommand.SAVE).run();
             }
         });
     }
@@ -211,11 +209,13 @@ public class MainViewController {
         if(selectedItem.getSize() > maximumSize) {
             Alerts.sizeExceededAlert(selectedItem.getPath().toString(), maximumSize/(1024*1024));
         }
+        //new DatabaseCommandExecutor()
     }
 
     private void removeFolder(ObservedFolder folder, TreeItem<FileData> nodeToRemove) {
         var c = (TreeFileNode) nodeToRemove;
         if (locationTreeView.getRoot().getChildren().contains(c)) { //we are removing main folder
+            new DatabaseCommandExecutor(folder, DatabaseCommand.DELETE).run();
             folder.destroy();
             locationTreeView.getRoot().getChildren().remove(c);
             folderList.remove(folder);

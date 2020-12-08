@@ -4,12 +4,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
 
 public final class QueryExecutor {
 
     private static final Logger LOGGER = Logger.getGlobal();
+    private static Lock lock = new ReentrantLock();
 
     private QueryExecutor() {
         throw new UnsupportedOperationException();
@@ -30,10 +32,12 @@ public final class QueryExecutor {
     }
 
     public static int createAndObtainId(final String insertSql, Object... args) throws SQLException {
+        lock.lock();
         PreparedStatement statement = ConnectionProvider.getConnection().prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
         QueryHelper.mapParams(statement, args);
         statement.execute();
         try (final ResultSet resultSet = statement.getGeneratedKeys()) {
+            lock.unlock();
             return readIdFromResultSet(resultSet);
         }
     }
@@ -43,32 +47,40 @@ public final class QueryExecutor {
     }
 
     public static void create(final String insertSql, Object... args) throws SQLException {
+        lock.lock();
         PreparedStatement ps = ConnectionProvider.getConnection().prepareStatement(insertSql);
         QueryHelper.mapParams(ps, args);
         ps.execute();
+        lock.unlock();
     }
 
     public static ResultSet read(final String sql, Object... args) throws SQLException {
+        lock.lock();
         PreparedStatement ps = ConnectionProvider.getConnection().prepareStatement(sql);
         QueryHelper.mapParams(ps, args);
         final ResultSet resultSet = ps.executeQuery();
+        lock.unlock();
         return resultSet;
     }
 
     public static void delete(final String sql, Object... args) throws SQLException {
+        lock.lock();
         PreparedStatement ps = ConnectionProvider.getConnection().prepareStatement(sql);
         QueryHelper.mapParams(ps, args);
         ps.executeUpdate();
+        lock.unlock();
     }
 
-    public static void executeUpdate(final List<String> sql, List<List<Object>> args) throws SQLException {
+    public static void executeUpdate(final String sql, Object... args) throws SQLException {
+        lock.lock();
         ConnectionProvider.getConnection().setAutoCommit(false);
-        for (int i = 0; i < sql.size(); i++) {
-            PreparedStatement ps = ConnectionProvider.getConnection().prepareStatement(sql.get(i));
-            QueryHelper.mapParams(ps, args.get(i));
-            ps.executeUpdate();
-        }
+
+        PreparedStatement ps = ConnectionProvider.getConnection().prepareStatement(sql);
+        QueryHelper.mapParams(ps, args);
+        ps.executeUpdate();
+
         ConnectionProvider.getConnection().commit();
         ConnectionProvider.getConnection().setAutoCommit(true);
+        lock.unlock();
     }
 }

@@ -86,4 +86,8 @@ public class ObservedFolder {
     public void removeMappedDirs(TreeItem<FileData> node) {
         pathToTreeMap.remove(node.getValue().getPath());
     }
+
+    public Path getDirToWatch(){
+        return this.dirToWatch;
+    }
 }
