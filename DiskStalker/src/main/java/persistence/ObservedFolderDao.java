@@ -62,6 +62,11 @@ public class ObservedFolderDao{
                 var path = Path.of(rs.getString("path"));
                 if (Files.exists(path) && Files.isDirectory(path)) {
                     resultList.add(new ObservedFolder(path));
+                } else {
+                    String delete = "DELETE FROM observedFolders WHERE path = (?);";
+                    Object[] args = {path.toString()};
+
+                    QueryExecutor.delete(delete, args);
                 }
             }
         } catch (SQLException e) {
