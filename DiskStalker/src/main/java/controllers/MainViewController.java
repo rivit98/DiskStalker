@@ -209,6 +209,7 @@ public class MainViewController {
         if(selectedItem.getSize() > maximumSize) {
             Alerts.sizeExceededAlert(selectedItem.getPath().toString(), maximumSize/(1024*1024));
         }
+        //TODO: update object in db
         //new DatabaseCommandExecutor()
     }
 
