@@ -2,7 +2,6 @@ package model.events;
 
 import model.FileData;
 import model.ObservedFolder;
-import model.tree.TreeBuilder;
 import model.tree.TreeFileNode;
 
 import java.nio.file.Path;

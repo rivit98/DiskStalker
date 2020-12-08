@@ -7,7 +7,9 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.SingleSubject;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
 import javafx.scene.control.TreeItem;
+import model.events.EventObject;
 import model.events.EventProcessor;
+import model.events.EventType;
 import model.events.IEventProcessor;
 import model.tree.TreeBuilder;
 import model.tree.TreeFileNode;
@@ -45,8 +47,12 @@ public class ObservedFolder {
     }
 
     private void processFileData(FileData fileData) {
-        var insertedNode = treeBuilder.addItem(fileData);
-        pathToTreeMap.put(fileData.getPath(), insertedNode);
+        if(root != null){
+            eventProcessor.processEvent(new EventObject(fileData.getPath(), EventType.FILE_CREATED));
+        }else{
+            var insertedNode = treeBuilder.addItem(fileData);
+            pathToTreeMap.put(fileData.getPath(), insertedNode);
+        }
     }
 
     private void startMonitoring() {
@@ -67,7 +73,10 @@ public class ObservedFolder {
 
     public SingleSubject<TreeFileNode> getTree() {
         var observableRoot = treeBuilder.getRoot();
-        observableRoot.subscribe(node -> root = node);
+        observableRoot.subscribe(node -> {
+            root = node;
+            pathToTreeMap.put(root.getValue().getPath(), node);
+        });
         return observableRoot;
     }
 
