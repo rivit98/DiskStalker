@@ -32,8 +32,7 @@ public class DirWatcher implements IFilesystemWatcher {
     public void stop() {
         try {
             monitor.stop();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
     }
 
@@ -41,8 +40,7 @@ public class DirWatcher implements IFilesystemWatcher {
     public Observable<EventObject> start() {
         try {
             monitor.start();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
         return subject;
     }

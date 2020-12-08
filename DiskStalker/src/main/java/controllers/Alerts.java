@@ -2,7 +2,10 @@ package controllers;
 
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
+
+import java.nio.file.Path;
 
 public final class Alerts {
     private Alerts(){}
@@ -23,8 +26,17 @@ public final class Alerts {
         Platform.runLater(newAlert::showAndWait);
     }
 
+    public static void cannotAddFolderAlert(Path path){
+        var newAlert = createAlert("Error", "Cannot add " + path.toString(), AlertType.ERROR);
+        Platform.runLater(newAlert::showAndWait);
+    }
+
     private static Alert createAlert(String headerText, String information) {
-        var alert = new Alert(Alert.AlertType.WARNING);
+        return createAlert(headerText, information, AlertType.WARNING);
+    }
+
+    private static Alert createAlert(String headerText, String information, AlertType type) {
+        var alert = new Alert(type);
         alert.setHeaderText(headerText);
         alert.setContentText(information);
         return alert;

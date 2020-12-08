@@ -25,10 +25,9 @@ public class ObservedFolder {
 
     public ObservedFolder(Path dirToWatch) {
         this.dirToWatch = dirToWatch;
-
-        treeBuilder = new TreeBuilder();
-        filesystemWatcher = new DirWatcher(dirToWatch);
-        eventProcessor = new EventProcessor(this);
+        this.treeBuilder = new TreeBuilder();
+        this.filesystemWatcher = new DirWatcher(dirToWatch);
+        this.eventProcessor = new EventProcessor(this);
         scanDirectory();
     }
 
@@ -55,7 +54,8 @@ public class ObservedFolder {
                 .start()
                 .subscribeOn(Schedulers.io())
 //                .observeOn(JavaFxScheduler.platform())
-                .subscribe(eventProcessor::processEvent,
+                .subscribe(
+                        eventProcessor::processEvent,
                         System.out::println
                 );
     }

@@ -6,38 +6,38 @@ import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
 import java.io.File;
 
 public class FileChangeListener extends FileAlterationListenerAdaptor {
-    private final IFilesystemWatcher IFileSystemWatcher;
-    public FileChangeListener(IFilesystemWatcher IFileSystemWatcher){
-        this.IFileSystemWatcher = IFileSystemWatcher;
+    private final IFilesystemWatcher filesystemWatcher;
+    public FileChangeListener(IFilesystemWatcher filesystemWatcher){
+        this.filesystemWatcher = filesystemWatcher;
     }
 
     @Override
     public void onFileCreate(File file) {
-        IFileSystemWatcher.emitEvent(file.toPath(), EventType.FILE_CREATED);
+        filesystemWatcher.emitEvent(file.toPath(), EventType.FILE_CREATED);
     }
 
     @Override
     public void onFileChange(File file) {
-        IFileSystemWatcher.emitEvent(file.toPath(), EventType.FILE_MODIFIED);
+        filesystemWatcher.emitEvent(file.toPath(), EventType.FILE_MODIFIED);
     }
 
     @Override
     public void onFileDelete(File file) {
-        IFileSystemWatcher.emitEvent(file.toPath(), EventType.FILE_DELETED);
+        filesystemWatcher.emitEvent(file.toPath(), EventType.FILE_DELETED);
     }
 
     @Override
     public void onDirectoryCreate(File directory) {
-        IFileSystemWatcher.emitEvent(directory.toPath(), EventType.DIR_CREATED);
+        filesystemWatcher.emitEvent(directory.toPath(), EventType.DIR_CREATED);
     }
 
     @Override
     public void onDirectoryChange(File directory) {
-        IFileSystemWatcher.emitEvent(directory.toPath(), EventType.DIR_MODIFIED);
+        filesystemWatcher.emitEvent(directory.toPath(), EventType.DIR_MODIFIED);
     }
 
     @Override
     public void onDirectoryDelete(File directory) {
-        IFileSystemWatcher.emitEvent(directory.toPath(), EventType.DIR_DELETED);
+        filesystemWatcher.emitEvent(directory.toPath(), EventType.DIR_DELETED);
     }
 }
