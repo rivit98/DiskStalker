@@ -4,6 +4,8 @@ import graphics.GraphicsFactory;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -170,11 +172,20 @@ public class MainViewController {
             }
         });
 
-        locationTreeView.getSelectionModel().selectedItemProperty().addListener((observable, oldTreeItem, newTreeItem) -> {
-            directorySize.setText(String.valueOf(newTreeItem.getValue().getMaximumSize()/ (1024 * 1024))); //todo: remove magic numbers
-            newTreeItem.getValue().getMaximumSizeProperty().addListener((obs, oldVal, newVal) -> { //todo: change?
+        ChangeListener listener = new ChangeListener(){
+            @Override
+            public void changed(ObservableValue observable, Object oldValue, Object newValue) {
+                var newVal = (Number) newValue;
                 Platform.runLater(() -> directorySize.setText(String.valueOf((newVal.longValue() / (1024 * 1024)))));
-            });
+            }
+        };
+
+        locationTreeView.getSelectionModel().selectedItemProperty().addListener((observable, oldTreeItem, newTreeItem) -> {
+            if(oldTreeItem != null) {
+                oldTreeItem.getValue().getMaximumSizeProperty().removeListener(listener);
+            }
+            Platform.runLater(() -> directorySize.setText(String.valueOf(newTreeItem.getValue().getMaximumSize()/ (1024 * 1024)))); //todo: remove magic numbers
+            newTreeItem.getValue().getMaximumSizeProperty().addListener(listener);
         });
 
     }
