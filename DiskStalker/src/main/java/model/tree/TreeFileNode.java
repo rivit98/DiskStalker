@@ -4,6 +4,7 @@ import javafx.scene.control.TreeItem;
 import model.FileData;
 
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.Optional;
 
 
@@ -18,11 +19,11 @@ public class TreeFileNode extends TreeItem<FileData> {
     }
 
     // inserts node and keeps proper ordering
-    public void insertNode(TreeFileNode node) { //TODO: rewrite this
+    public void insertNode(TreeFileNode node) {
         var value = node.getValue();
         var isDir = value.isDirectory();
         var targetName = value.getPath();
-        int index = 0;
+        var index = 0;
         var cachedList = getChildren();
         for (var childNode : cachedList) {
             var tnodeIsDir = childNode.getValue().isDirectory();
@@ -102,5 +103,11 @@ public class TreeFileNode extends TreeItem<FileData> {
         updateParentSize(this, fileData.updateFileSize() - oldSize);
     }
 
-    //TODO: maybe override equals
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        var node = (TreeFileNode) o;
+        return Objects.equals(getValue(), node.getValue());
+    }
 }

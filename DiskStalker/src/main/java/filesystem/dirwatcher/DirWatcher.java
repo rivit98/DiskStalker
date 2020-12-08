@@ -12,7 +12,7 @@ import java.nio.file.Path;
 public class DirWatcher implements IFilesystemWatcher {
     private final PublishSubject<EventObject> subject = PublishSubject.create();
     private final FileAlterationMonitor monitor;
-    private final long pollingInterval = 1500;
+    private final long pollingInterval = 1600;
 
     public DirWatcher(Path path) {
         monitor = new FileAlterationMonitor(pollingInterval);
@@ -32,8 +32,7 @@ public class DirWatcher implements IFilesystemWatcher {
     public void stop() {
         try {
             monitor.stop();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
     }
 
@@ -41,8 +40,7 @@ public class DirWatcher implements IFilesystemWatcher {
     public Observable<EventObject> start() {
         try {
             monitor.start();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
         return subject;
     }
