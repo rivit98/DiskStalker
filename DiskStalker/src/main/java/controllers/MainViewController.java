@@ -1,6 +1,7 @@
 package controllers;
 
 import graphics.GraphicsFactory;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.css.PseudoClass;
@@ -20,6 +21,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class MainViewController {
@@ -55,17 +57,25 @@ public class MainViewController {
             @Override
             protected void updateItem(Path item, boolean empty) {
                 super.updateItem(item, empty);
-                if (!empty && item.getFileName() == null) {
-                    setText(item.toString());
-                } else {
-                    setText(empty ? null : item.getFileName().toString());
+                if(item != null) {
+                    if (!empty && item.getFileName() == null) {
+                        setText(item.toString());
+                    } else {
+                        setText(empty ? null : Objects.requireNonNull(item).getFileName().toString());
+                    }
+                }
+                else {
+                    setText(null);
                 }
                 setGraphic(empty ? null : GraphicsFactory.getGraphic(item.toFile().isDirectory()));
             }
         });
 
         //todo: setCellFactory for sizeColumn (status bar?)
-        sizeColumn.setCellValueFactory(node -> node.getValue().getValue().sizePropertyProperty());
+        sizeColumn.setCellValueFactory(node -> {
+            var sizePropertyOptional = Optional.ofNullable(node.getValue());
+            return sizePropertyOptional.<javafx.beans.value.ObservableValue<Number>>map(fileDataTreeItem -> fileDataTreeItem.getValue().sizePropertyProperty()).orElse(null);
+        });
 
         sizeColumn.setCellFactory(ttc -> {
             TreeTableCell<FileData, Number> cell = new TreeTableCell<>() {
@@ -73,7 +83,10 @@ public class MainViewController {
                 protected void updateItem(Number value, boolean empty) {
                     var treeItem = getTreeTableRow().getTreeItem();
                     super.updateItem(value, empty);
-                    setText(empty ? null : value.toString());
+                    if(value != null)
+                        setText(empty ? null : value.toString());
+                    else
+                        setText(null);
                     if (treeItem != null) {
                         var maximumSize = treeItem.getValue().getMaximumSize();
                         if (value!= null && treeItem.getParent() != null && treeItem.getParent().getValue() == null
@@ -157,17 +170,9 @@ public class MainViewController {
             }
         });
 
-        locationTreeView.getSelectionModel().selectedItemProperty().addListener((observable, oldTreeItem, newTreeItem) -> {
-            if (oldTreeItem != null) {
-                directorySize.textProperty().unbind();
-            }
-            if (newTreeItem != null && newTreeItem.getParent() != null && newTreeItem.getParent().getValue() == null) {
-                directorySize.textProperty().bindBidirectional(newTreeItem.getValue().getMaximumSizePropertyAsStringProperty()); //todo: is this good?
-            }
-//            else { //todo: consider if we want this
-//                directorySize.textProperty().unbind();
-//            }
-        });
+        locationTreeView.getSelectionModel().selectedItemProperty().addListener((observable, oldTreeItem, newTreeItem) ->
+                newTreeItem.getValue().getMaximumSizeProperty().addListener((obs, oldVal, newVal) ->
+                        Platform.runLater(() -> directorySize.setText(String.valueOf((newVal.longValue()/(1024*1024))))))); //todo: remove magic numbers
     }
 
     private void addButtonClicked(ActionEvent actionEvent) {
