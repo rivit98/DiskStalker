@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import java.nio.file.Path;
+import java.util.Objects;
 
 public class FileData {
     private final Path file;
@@ -73,5 +74,13 @@ public class FileData {
 
     public long getMaximumSize() {
         return maximumSizeProperty.getValue();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        var fileData = (FileData) o;
+        return Objects.equals(file, fileData.file);
     }
 }

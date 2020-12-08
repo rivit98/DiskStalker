@@ -5,6 +5,7 @@ import filesystem.dirwatcher.IFilesystemWatcher;
 import filesystem.scanner.FileTreeScanner;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.SingleSubject;
+import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
 import javafx.scene.control.TreeItem;
 import model.events.EventProcessor;
 import model.events.IEventProcessor;
@@ -36,7 +37,7 @@ public class ObservedFolder {
         scanner
                 .scan(dirToWatch)
                 .subscribeOn(Schedulers.io())
-//                .observeOn(JavaFxScheduler.platform())
+                .observeOn(JavaFxScheduler.platform())
                 .subscribe(this::processFileData,
                         System.out::println,
                         this::startMonitoring
@@ -53,7 +54,7 @@ public class ObservedFolder {
         filesystemWatcher
                 .start()
                 .subscribeOn(Schedulers.io())
-//                .observeOn(JavaFxScheduler.platform())
+                .observeOn(JavaFxScheduler.platform())
                 .subscribe(
                         eventProcessor::processEvent,
                         System.out::println
