@@ -64,4 +64,8 @@ public class ObservedFolder {
     public boolean containsNode(Path path) {
         return treeBuilder.containsNode(path);
     }
+
+    public Path getDirToWatch(){
+        return this.dirToWatch;
+    }
 }

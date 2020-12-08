@@ -23,8 +23,7 @@ public final class ConnectionProvider {
         }
     }
 
-    private ConnectionProvider() {
-    }
+    private ConnectionProvider() {}
 
     public static Connection getConnection() {
         return connection.orElseThrow(() -> new RuntimeException("Connection is not valid."));
