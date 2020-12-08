@@ -1,16 +1,16 @@
 package model.events;
 
 import model.FileData;
-import model.ObservedFolder;
+import model.tree.TreeBuilder;
 import model.tree.TreeFileNode;
 
 import java.nio.file.Path;
 
 public class EventProcessor implements IEventProcessor {
-    private final ObservedFolder observedFolder;
+    private final TreeBuilder treeBuilder;
 
-    public EventProcessor(ObservedFolder observedFolder) {
-        this.observedFolder = observedFolder;
+    public EventProcessor(TreeBuilder treeBuilder) {
+        this.treeBuilder = treeBuilder;
     }
 
     //TODO: case when user removes root folder!
@@ -34,7 +34,7 @@ public class EventProcessor implements IEventProcessor {
     }
 
     private void handleModifyEventFile(Path resolvedPath) {
-        var modifiedNode = observedFolder.getPathToTreeMap().get(resolvedPath);
+        var modifiedNode = treeBuilder.getPathToTreeMap().get(resolvedPath);
         modifiedNode.updateMe();
     }
 
@@ -47,8 +47,8 @@ public class EventProcessor implements IEventProcessor {
     }
 
     private void handleDeleteEventCommon(Path resolvedPath) {
-        var affectedNode = observedFolder.getPathToTreeMap().remove(resolvedPath);
-        observedFolder.removeMappedDirsRecursively(affectedNode);
+        var affectedNode = treeBuilder.getPathToTreeMap().remove(resolvedPath);
+        treeBuilder.removeMappedDirsRecursively(affectedNode);
         affectedNode.deleteMe();
     }
 
@@ -63,9 +63,6 @@ public class EventProcessor implements IEventProcessor {
     private void handleCreateCommon(Path resolvedPath) {
         var fileData = new FileData(resolvedPath);
         var newTreeNode = new TreeFileNode(fileData);
-        var parentPath = resolvedPath.getParent();
-        var parentNode = observedFolder.getPathToTreeMap().get(parentPath);
-        parentNode.insertNode(newTreeNode);
-        observedFolder.getPathToTreeMap().put(fileData.getPath(), newTreeNode);
+        treeBuilder.insertNewNode(newTreeNode);
     }
 }
