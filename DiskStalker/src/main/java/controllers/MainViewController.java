@@ -184,8 +184,10 @@ public class MainViewController {
             if(oldTreeItem != null) {
                 oldTreeItem.getValue().getMaximumSizeProperty().removeListener(listener);
             }
-            Platform.runLater(() -> directorySize.setText(String.valueOf(newTreeItem.getValue().getMaximumSize()/ (1024 * 1024)))); //todo: remove magic numbers
-            newTreeItem.getValue().getMaximumSizeProperty().addListener(listener);
+            if(newTreeItem != null) {
+                Platform.runLater(() -> directorySize.setText(String.valueOf(newTreeItem.getValue().getMaximumSize() / (1024 * 1024)))); //todo: remove magic numbers
+                newTreeItem.getValue().getMaximumSizeProperty().addListener(listener);
+            }
         });
 
     }
