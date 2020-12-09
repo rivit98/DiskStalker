@@ -62,9 +62,8 @@ public class FileData {
         }
     }
 
-    public StringProperty getMaximumSizePropertyAsStringProperty() {
-        var longPropertyAsString = Long.toString(maximumSizeProperty.get()/(1024*1024)); //todo: remove magic numbers
-        return new SimpleStringProperty(longPropertyAsString);
+    public SimpleLongProperty getMaximumSizeProperty() {
+        return this.maximumSizeProperty;
     }
 
     public void setMaximumSizeProperty(long maximumSizeProperty) {
