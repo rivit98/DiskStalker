@@ -41,6 +41,14 @@ public class MainViewController {
 
     private final List<ObservedFolder> folderList = new LinkedList<>();
 
+    private final ChangeListener listener = new ChangeListener() {
+        @Override
+        public void changed(ObservableValue observable, Object oldValue, Object newValue) {
+            var newVal = (Number) newValue;
+            Platform.runLater(() -> directorySize.setText(String.valueOf((newVal.longValue() / (1024 * 1024)))));
+        }
+    };
+
     private void initializeTree() {
         createRoot();
         //todo: refactor this
@@ -172,22 +180,17 @@ public class MainViewController {
             }
         });
 
-        ChangeListener listener = new ChangeListener(){
-            @Override
-            public void changed(ObservableValue observable, Object oldValue, Object newValue) {
-                var newVal = (Number) newValue;
-                Platform.runLater(() -> directorySize.setText(String.valueOf((newVal.longValue() / (1024 * 1024)))));
-            }
-        };
-
         locationTreeView.getSelectionModel().selectedItemProperty().addListener((observable, oldTreeItem, newTreeItem) -> {
             if(oldTreeItem != null) {
                 oldTreeItem.getValue().getMaximumSizeProperty().removeListener(listener);
             }
-            if(newTreeItem != null) {
+            if(newTreeItem != null && newTreeItem.getParent().getValue() == null) {
                 Platform.runLater(() -> directorySize.setText(String.valueOf(newTreeItem.getValue().getMaximumSize() / (1024 * 1024)))); //todo: remove magic numbers
                 newTreeItem.getValue().getMaximumSizeProperty().addListener(listener);
             }
+//            else if(newTreeItem == null) {
+//                Platform.runLater(() -> directorySize.setText(""));
+//            }
         });
 
     }
@@ -215,6 +218,8 @@ public class MainViewController {
     private void deleteButtonClicked(ActionEvent actionEvent) {
         var selectedTreeItem = Optional.ofNullable(locationTreeView.getSelectionModel().getSelectedItem());
         selectedTreeItem.ifPresent(item -> {
+            item.getValue().getMaximumSizeProperty().removeListener(listener);
+            Platform.runLater(() -> directorySize.setText(""));
             var searchedPath = item.getValue().getPath();
             var rootFolder =
                     folderList.stream()
