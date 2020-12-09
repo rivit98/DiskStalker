@@ -73,11 +73,12 @@ public class MainViewController {
                     } else {
                         setText(empty ? null : Objects.requireNonNull(item).getFileName().toString());
                     }
+                    setGraphic(empty ? null : GraphicsFactory.getGraphic(item.toFile().isDirectory()));
                 }
                 else {
                     setText(null);
+                    setGraphic(null);
                 }
-                setGraphic(empty ? null : GraphicsFactory.getGraphic(item.toFile().isDirectory()));
             }
         });
 
