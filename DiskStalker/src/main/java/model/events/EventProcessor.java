@@ -13,8 +13,6 @@ public class EventProcessor implements IEventProcessor {
         this.treeBuilder = treeBuilder;
     }
 
-    //TODO: case when user removes root folder!
-
     @Override
     public void processEvent(EventObject eventObject) {
         Path resolvedPath = eventObject.getTargetDir();

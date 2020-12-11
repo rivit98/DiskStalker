@@ -52,8 +52,8 @@ public class MainViewController {
     private void initializeTree() {
         createRoot();
         //todo: refactor this
-        TreeTableColumn<FileData, Path> pathColumn = new TreeTableColumn<>("Name");
-        TreeTableColumn<FileData, Number> sizeColumn = new TreeTableColumn<>("Size");
+        var pathColumn = new TreeTableColumn<FileData, Path>("Name");
+        var sizeColumn = new TreeTableColumn<FileData, Number>("Size");
         pathColumn.setPrefWidth(200); //todo: set proper width
         pathColumn.setCellValueFactory(node -> {
             var pathOptional = Optional.ofNullable(node.getValue())
@@ -267,6 +267,7 @@ public class MainViewController {
     }
 
     public void onExit() {
+        //TODO: debug, why app closes so long
         folderList.forEach(ObservedFolder::destroy);
     }
 }

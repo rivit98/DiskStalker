@@ -1,23 +1,22 @@
 package model;
 
 import javafx.beans.property.SimpleLongProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 
 import java.nio.file.Path;
 import java.util.Objects;
 
+//TODO: rename this to something more meaningful (ex. NodeData or sth like this)
 public class FileData {
-    private final Path file;
+    private final Path path;
     private final boolean isDirectory;
     private final SimpleLongProperty sizeProperty;
     private final SimpleLongProperty maximumSizeProperty;
     private boolean maximumSizeSet;
 
 
-    public FileData(Path file) {
-        this.file = file;
-        var f = file.toFile();
+    public FileData(Path path) {
+        this.path = path;
+        var f = path.toFile();
         this.isDirectory = f.isDirectory();
         this.sizeProperty = new SimpleLongProperty(isFile() ? f.length() : 0);
         this.maximumSizeProperty = new SimpleLongProperty(sizeProperty.longValue());
@@ -25,7 +24,7 @@ public class FileData {
     }
 
     public Path getPath() {
-        return file;
+        return path;
     }
 
     public boolean isDirectory() {
@@ -45,7 +44,7 @@ public class FileData {
     }
 
     public long getActualSize() {
-        return file.toFile().length();
+        return path.toFile().length();
     }
 
     public long updateFileSize() { // update size and return the old one
@@ -80,6 +79,6 @@ public class FileData {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         var fileData = (FileData) o;
-        return Objects.equals(file, fileData.file);
+        return Objects.equals(path, fileData.path);
     }
 }

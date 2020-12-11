@@ -50,37 +50,6 @@ public class TreeFileNode extends TreeItem<FileData> {
         updateParentSize(node, value.getSize());
     }
 
-    public void addNode(TreeFileNode node) {
-        var relativizedPath = this.getValue().getPath().relativize(node.getValue().getPath()); // strip common part
-        int relativePathDepth = relativizedPath.getNameCount();
-
-        if (relativePathDepth == 1) { // we are adding new node to current node (folder or file)
-            insertNode(node);
-        } else {
-            // loop over childs, find the proper one and enter
-            for (var ch : getChildren()) {
-                var tnode = (TreeFileNode) ch;
-                if (tnode.getValue().isFile()) {
-                    continue;
-                }
-
-                if (isChild(tnode.getValue().getPath(), node.getValue().getPath())) {
-                    tnode.addNode(node);
-                    return;
-                }
-            }
-
-            throw new IllegalStateException("addNode failed! | " + node.getValue().getPath());
-        }
-    }
-
-    private static boolean isChild(Path parent, Path child) {
-        var absoluteParentPath = parent.normalize().toAbsolutePath();
-        var absoluteChildPath = child.normalize().toAbsolutePath();
-
-        return absoluteChildPath.startsWith(absoluteParentPath);
-    }
-
     private void updateParentSize(TreeItem<FileData> node, long deltaSize) {
         Optional.ofNullable(node.getParent())
                 .ifPresent(parent -> {
