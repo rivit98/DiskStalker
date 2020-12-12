@@ -135,7 +135,7 @@ public class MainView {
         }, locationTreeView.getSelectionModel().selectedItemProperty(), directorySize.textProperty()));//isEmpty(locationTreeView.getSelectionModel().getSelectedItems()));
         deleteButton.disableProperty().bind(Bindings.isEmpty(locationTreeView.getSelectionModel().getSelectedItems()));
 
-//        loadSavedSettings();
+        loadSavedSettings();
     }
 
     private void loadSavedSettings() {
