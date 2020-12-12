@@ -10,12 +10,12 @@ import java.util.List;
 
 public class ObservedFolderDao {
 
+    //TODO: check if folder exists?
     protected static void save(ObservedFolder observedFolder) {
-        var path = observedFolder.getDirToWatch().toString();
-        var maxSize = -1;
+        var path = observedFolder.getPath().toString();
 
         String insertIntoDB = "INSERT INTO observedFolders (path, max_size) VALUES (?, ?);";
-        Object[] args = {path, maxSize};
+        Object[] args = {path, 0};
 
         try {
             QueryExecutor.createAndObtainId(insertIntoDB, args);
@@ -25,13 +25,10 @@ public class ObservedFolderDao {
     }
 
     protected static void update(ObservedFolder observedFolder) {
-        var path = observedFolder.getDirToWatch().toString();
-        var observedFolderTreeRoot = observedFolder.getTree().getValue();
-        var maxSize = observedFolderTreeRoot.getValue().getMaximumSize();
-
-        String updateDB = "UPDATE observedFolders SET max_size = (?) WHERE path = (?);";
-        var conversionFromBToMB = 1024 * 1024;
-        Object[] args = {maxSize / conversionFromBToMB, path};
+        var path = observedFolder.getPath().toString();
+        var maxSize = observedFolder.getMaximumSize();
+        var updateDB = "UPDATE observedFolders SET max_size = (?) WHERE path = (?);";
+        Object[] args = {maxSize, path};
 
         try {
             QueryExecutor.executeUpdate(updateDB, args);
@@ -41,9 +38,8 @@ public class ObservedFolderDao {
     }
 
     protected static void delete(ObservedFolder observedFolder) {
-        var path = observedFolder.getDirToWatch().toString();
-
-        String deleteObservedFolder = "DELETE FROM observedFolders WHERE path = (?);";
+        var path = observedFolder.getPath().toString();
+        var deleteObservedFolder = "DELETE FROM observedFolders WHERE path = (?);";
         Object[] args = {path};
 
         try {
@@ -55,16 +51,17 @@ public class ObservedFolderDao {
 
     //TODO: size to observed folder? - to return here maxSize effectively
     public static List<ObservedFolder> getAll() {
-        String findObservedFolders = "SELECT * FROM observedFolders;";
+        var findObservedFolders = "SELECT * FROM observedFolders;";
 
         var resultList = new LinkedList<ObservedFolder>();
         try (var rs = QueryExecutor.read(findObservedFolders)) {
             while (rs.next()) {
                 var path = Path.of(rs.getString("path"));
+                var maxSize = rs.getInt("max_size");
                 if (Files.exists(path) && Files.isDirectory(path)) {
-                    resultList.add(new ObservedFolder(path));
+                    resultList.add(new ObservedFolder(path, maxSize));
                 } else {
-                    String delete = "DELETE FROM observedFolders WHERE path = (?);";
+                    var delete = "DELETE FROM observedFolders WHERE path = (?);";
                     Object[] args = {path.toString()};
 
                     QueryExecutor.delete(delete, args);

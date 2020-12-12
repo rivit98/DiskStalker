@@ -12,6 +12,7 @@ import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import net.rgielen.fxweaver.core.FxmlView;
+import org.agh.diskstalker.application.StringToIntFormatter;
 import org.agh.diskstalker.graphics.Alerts;
 import org.agh.diskstalker.graphics.GraphicsFactory;
 import org.agh.diskstalker.model.FileData;
@@ -20,6 +21,7 @@ import org.agh.diskstalker.model.tree.TreeFileNode;
 import org.agh.diskstalker.persistence.DatabaseCommand;
 import org.agh.diskstalker.persistence.DatabaseCommandExecutor;
 import org.agh.diskstalker.persistence.ObservedFolderDao;
+import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -44,6 +46,7 @@ public class MainView {
     private Button setSizeButton;
     @FXML
     private TextField directorySize; //TODO: bind to field, after change validate conditions, display warning
+
     private final ChangeListener listener = new ChangeListener() {
         @Override
         public void changed(ObservableValue observable, Object oldValue, Object newValue) {
@@ -87,7 +90,7 @@ public class MainView {
         //todo: setCellFactory for sizeColumn (status bar?)
         sizeColumn.setCellValueFactory(node -> {
             var sizePropertyOptional = Optional.ofNullable(node.getValue());
-            return sizePropertyOptional.<javafx.beans.value.ObservableValue<Number>>map(fileDataTreeItem -> fileDataTreeItem.getValue().sizePropertyProperty()).orElse(null);
+            return sizePropertyOptional.<ObservableValue<Number>>map(fileDataTreeItem -> fileDataTreeItem.getValue().sizePropertyProperty()).orElse(null);
         });
 
         sizeColumn.setCellFactory(ttc -> {
@@ -100,13 +103,15 @@ public class MainView {
                         setText(empty ? null : value.toString());
                     else
                         setText(null);
-                    if (treeItem != null) {
-                        var maximumSize = treeItem.getValue().getMaximumSize();
-                        if (value != null && treeItem.getParent() != null && treeItem.getParent().getValue() == null
-                                && value.longValue() > maximumSize) {
-                            Alerts.sizeExceededAlert(treeItem.getValue().getPath().toString(), maximumSize / (1024 * 1024)); //todo: remove magic numbers
-                        }
-                    }
+//                    if (treeItem != null) {
+//                        var maximumSize = treeItem.getValue().getMaximumSize();
+//                        if (value != null && treeItem.getParent() != null && treeItem.getParent().getValue() == null
+//                                && value.longValue() > maximumSize) {
+//                            Alerts.sizeExceededAlert(treeItem.getValue().getPath().toString(), maximumSize / (1024 * 1024)); //todo: remove magic numbers
+//                        }
+//                    }
+                    //TODO: we need some kind of notifying about exceeding size,
+                    // notifications should be emitted from observed folder via some kind of subject
                 }
             };
             cell.pseudoClassStateChanged(PseudoClass.getPseudoClass("centered"), true);
@@ -140,7 +145,6 @@ public class MainView {
 
     private void loadSavedSettings() {
         ObservedFolderDao.getAll()
-                .stream()
                 .forEach(observedFolder -> {
                     addObservedFolder(observedFolder);
                     try {
@@ -176,25 +180,31 @@ public class MainView {
     }
 
     private void initializeSizeField() {
+        directorySize.setTextFormatter(new StringToIntFormatter().getFormatter());
 
-        directorySize.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches("\\d*")) {
-                directorySize.setText(newValue.replaceAll("[^\\d]", ""));
-            }
-        });
+        locationTreeView
+                .getSelectionModel()
+                .selectedItemProperty()
+                .addListener((observable, oldTreeItem, newTreeItem) -> {
+                    var oldFolder = getObservedFolderFromTreeItem(oldTreeItem);
+                    var newFolder = getObservedFolderFromTreeItem(newTreeItem);
 
-        locationTreeView.getSelectionModel().selectedItemProperty().addListener((observable, oldTreeItem, newTreeItem) -> {
-            if (oldTreeItem != null) {
-                oldTreeItem.getValue().getMaximumSizeProperty().removeListener(listener);
-            }
-            if (newTreeItem != null && newTreeItem.getParent().getValue() == null) {
-                Platform.runLater(() -> directorySize.setText(String.valueOf(newTreeItem.getValue().getMaximumSize() / (1024 * 1024)))); //todo: remove magic numbers
-                newTreeItem.getValue().getMaximumSizeProperty().addListener(listener);
-            }
-//            else if(newTreeItem == null) {
-//                Platform.runLater(() -> directorySize.setText(""));
-//            }
-        });
+                    oldFolder.ifPresentOrElse(oldObservedFolder -> {
+                        newFolder.ifPresent(newObservedFolder -> {
+                            if (!oldObservedFolder.equals(newObservedFolder)) {
+                                directorySize.setText(String.valueOf(newObservedFolder.getMaximumSize() / FileUtils.ONE_MB));
+                                // this won't work because:
+                                // 1) unbind removes all listeners
+                                // 2) bind prevents inputting value
+//                            directorySize.textProperty().unbind();
+//                            directorySize.textProperty().bind(newObservedFolder.getMaximumSizeProperty().asString());
+                            }
+
+                        });
+                    }, () -> newFolder.ifPresent(newObservedFolder -> {
+                        directorySize.setText(String.valueOf(newObservedFolder.getMaximumSize() / FileUtils.ONE_MB));
+                    }));
+                });
 
     }
 
@@ -205,10 +215,11 @@ public class MainView {
 
         var selectedFolderOptional = Optional.ofNullable(directoryChooser.showDialog(new Stage()));
         selectedFolderOptional.ifPresent(selectedFolder -> {
-            var rootChildrens = locationTreeView.getRoot().getChildren().stream()
+            var rootChildren = locationTreeView.getRoot().getChildren().stream()
                     .filter(children -> children.getValue().getPath().equals(selectedFolder.toPath()))
-                    .findAny();
-            if (rootChildrens.isPresent()) {
+                    .findFirst();
+
+            if (rootChildren.isPresent()) {
                 Alerts.tryingToAddSameFolderToObservedAlert();
             } else {
                 var folder = new ObservedFolder(selectedFolder.toPath());
@@ -219,53 +230,57 @@ public class MainView {
     }
 
     private void deleteButtonClicked(ActionEvent actionEvent) {
-        var selectedTreeItem = Optional.ofNullable(locationTreeView.getSelectionModel().getSelectedItem());
-        selectedTreeItem.ifPresent(item -> {
-            item.getValue().getMaximumSizeProperty().removeListener(listener);
+        Optional.ofNullable(locationTreeView.getSelectionModel().getSelectedItem()).ifPresent(item -> {
             Platform.runLater(() -> directorySize.setText(""));
             var searchedPath = item.getValue().getPath();
-            var rootFolder =
-                    folderList.stream()
-                            .filter(observedFolder -> observedFolder.containsNode(searchedPath))
-                            .findFirst();
 
-            rootFolder.ifPresent(observedFolder -> { //should always be present
+            getObservedFolderFromTreePath(searchedPath).ifPresent(observedFolder -> { //should always be present
                 removeFolder(observedFolder, item);
             });
         });
     }
 
     private void setSizeButtonClicked(ActionEvent actionEvent) {
-        //TODO: set max dir size
-        var maximumSize = Long.parseLong(directorySize.getText()) * 1024 * 1024; //todo: remove "magic numbers"
+        var maximumSize = Long.parseLong(directorySize.getText()) * FileUtils.ONE_MB;
         var selectedTreeItem = locationTreeView.getSelectionModel().getSelectedItem();
-        var selectedItem = selectedTreeItem.getValue();
-        selectedItem.setMaximumSizeProperty(maximumSize);
-        Alerts.setMaxSizeAlert(selectedItem.getPath().toString(), maximumSize / (1024 * 1024));
-        if (selectedItem.getSize() > maximumSize) {
-            Alerts.sizeExceededAlert(selectedItem.getPath().toString(), maximumSize / (1024 * 1024));
-        }
+        var value = selectedTreeItem.getValue();
 
-        var rootFolder =
-                folderList.stream()
-                        .filter(observedFolder -> observedFolder.containsNode(selectedItem.getPath()))
-                        .findFirst();
-
-        rootFolder.ifPresent(observedFolder -> {
+        getObservedFolderFromTreePath(value.getPath()).ifPresent(observedFolder -> {
+            observedFolder.setMaximumSizeProperty(maximumSize);
             new DatabaseCommandExecutor(observedFolder, DatabaseCommand.UPDATE).run();
+            Alerts.setMaxSizeAlert(value.getPath().toString(), maximumSize / FileUtils.ONE_MB);
+            if (observedFolder.isSizeLimitExceeded()) {
+                Alerts.sizeExceededAlert(observedFolder.toString(), maximumSize / FileUtils.ONE_MB);
+            }
         });
     }
 
-    private void removeFolder(ObservedFolder folder, TreeItem<FileData> nodeToRemove) {
-        var c = (TreeFileNode) nodeToRemove;
-        if (locationTreeView.getRoot().getChildren().contains(c)) { //we are removing main folder
+    private void removeFolder(ObservedFolder folder, TreeItem<FileData> treeItem) {
+        var nodeToRemove = (TreeFileNode) treeItem;
+        if (locationTreeView.getRoot().getChildren().contains(nodeToRemove)) { //we are removing main folder
             new DatabaseCommandExecutor(folder, DatabaseCommand.DELETE).run();
             folder.destroy();
-            locationTreeView.getRoot().getChildren().remove(c);
+            locationTreeView.getRoot().getChildren().remove(nodeToRemove);
             folderList.remove(folder);
         } else {
-            c.deleteMe();
+            nodeToRemove.deleteMe();
         }
+    }
+
+    private Optional<ObservedFolder> getObservedFolderFromTreePath(Path searchedPath) {
+        return folderList.stream()
+                .filter(observedFolder -> observedFolder.containsNode(searchedPath))
+                .findFirst();
+    }
+
+    private Optional<ObservedFolder> getObservedFolderFromSelection() {
+        return Optional.ofNullable(locationTreeView.getSelectionModel().getSelectedItem())
+                .flatMap(item -> getObservedFolderFromTreePath(item.getValue().getPath()));
+    }
+
+    private Optional<ObservedFolder> getObservedFolderFromTreeItem(TreeItem<FileData> treeItem) {
+        return Optional.ofNullable(treeItem)
+                .flatMap(item -> getObservedFolderFromTreePath(item.getValue().getPath()));
     }
 
     public void onExit() {

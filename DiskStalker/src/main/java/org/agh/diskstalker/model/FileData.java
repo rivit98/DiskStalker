@@ -10,17 +10,13 @@ public class FileData {
     private final Path path;
     private final boolean isDirectory;
     private final SimpleLongProperty sizeProperty;
-    private final SimpleLongProperty maximumSizeProperty;
-    private boolean maximumSizeSet;
-
 
     public FileData(Path path) {
         this.path = path;
         var f = path.toFile();
         this.isDirectory = f.isDirectory();
         this.sizeProperty = new SimpleLongProperty(isFile() ? f.length() : 0);
-        this.maximumSizeProperty = new SimpleLongProperty(sizeProperty.longValue());
-        this.maximumSizeSet = false;
+
     }
 
     public Path getPath() {
@@ -56,22 +52,6 @@ public class FileData {
     public void modifySize(long size) {
         var newSize = getSize() + size;
         sizeProperty.set(newSize);
-        if (!maximumSizeSet) {
-            this.maximumSizeProperty.set(newSize);
-        }
-    }
-
-    public SimpleLongProperty getMaximumSizeProperty() {
-        return this.maximumSizeProperty;
-    }
-
-    public void setMaximumSizeProperty(long maximumSizeProperty) {
-        this.maximumSizeProperty.set(maximumSizeProperty);
-        maximumSizeSet = true;
-    }
-
-    public long getMaximumSize() {
-        return maximumSizeProperty.getValue();
     }
 
     @Override

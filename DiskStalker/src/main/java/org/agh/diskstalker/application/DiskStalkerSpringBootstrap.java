@@ -7,7 +7,7 @@ import org.agh.diskstalker.DiskStalkerMain;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 
-public class SpringbootJavaFxApplication extends Application {
+public class DiskStalkerSpringBootstrap extends Application {
 
     private ConfigurableApplicationContext context;
 
