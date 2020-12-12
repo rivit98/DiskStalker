@@ -37,7 +37,5 @@ class PrimaryStageInitializer implements ApplicationListener<StageReadyEvent> {
         primaryStage.setTitle("Disk Stalker");
 //        primaryStage.minWidthProperty().bind(layout.minWidthProperty());
 //        primaryStage.minHeightProperty().bind(layout.minHeightProperty());
-
-        primaryStage.seton
     }
 }
