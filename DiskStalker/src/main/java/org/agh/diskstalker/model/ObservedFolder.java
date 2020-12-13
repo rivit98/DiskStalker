@@ -60,8 +60,12 @@ public class ObservedFolder {
     private void processEvent(FilesystemEvent event){
         eventProcessor.processEvent(event);
         if (event.isModifyEvent() || event.isCreateEvent()) {
-            eventStream.onNext(new FolderEvent(FolderEventType.SIZE_CHANGED));
+            sendSizeChangedEvent();
         }
+    }
+
+    private void sendSizeChangedEvent(){
+        eventStream.onNext(new FolderEvent(FolderEventType.SIZE_CHANGED));
     }
 
     private void startMonitoring() {
@@ -97,6 +101,7 @@ public class ObservedFolder {
 
     public void setMaximumSizeProperty(long value) {
         maximumSizeProperty.set(value);
+        sendSizeChangedEvent();
     }
 
     public Long getMaximumSize() {

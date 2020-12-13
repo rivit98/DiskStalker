@@ -168,25 +168,20 @@ public class MainView {
         deleteButton.setOnAction(this::deleteButtonClicked);
         setSizeButton.setOnAction(this::setSizeButtonClicked);
 
-        //TODO: repair buttons bindings
-        var selectionModel = locationTreeView.getSelectionModel()
+        var selectionModel = locationTreeView.getSelectionModel();
         var selectedItems = selectionModel.getSelectedItems();
-        var selectedItem = selectionModel.getSelectedItem();
-        setSizeButton.disableProperty().bind(Bindings.createBooleanBinding(
-                () -> { //todo: refactor this
-                    if (selectedItems.size() > 0) {
-                        if (selectedItem != null && selectedItem.getParent() != null && !maxSizeField.getText().equals("")) {
-                            return selectedItem.getParent().getValue() != null;
-                        }
-                    }
-                    return true;
-                },
-                selectionModel.selectedItemProperty(),
-                maxSizeField.textProperty()
-                )
-        );
 
-        deleteButton.disableProperty().bind(Bindings.isEmpty(selectionModel.getSelectedItems()));
+        setSizeButton.disableProperty().bind(Bindings.createBooleanBinding(() -> { //todo: refactor this
+            if (!selectedItems.isEmpty()) {
+                var selectedItem = selectionModel.getSelectedItem();
+                if (selectedItem != null && selectedItem.getParent() != null && !maxSizeField.getText().equals("")) {
+                    return selectedItem.getParent().getValue() != null;
+                }
+            }
+            return true;
+        }, selectionModel.selectedItemProperty(), maxSizeField.textProperty()));//isEmpty(locationTreeView.getSelectionModel().getSelectedItems()));
+
+        deleteButton.disableProperty().bind(Bindings.isEmpty(selectedItems));
     }
 
     private void initializeSizeField() {
@@ -258,9 +253,6 @@ public class MainView {
             observedFolder.setMaximumSizeProperty(maximumSize);
             new DatabaseCommandExecutor(observedFolder, DatabaseCommand.UPDATE).run();
             Alerts.setMaxSizeAlert(value.getPath().toString(), maximumSize);
-            if (observedFolder.isSizeLimitExceeded()) {
-                Alerts.sizeExceededAlert(observedFolder.toString(), maximumSize);
-            }
         });
     }
 
