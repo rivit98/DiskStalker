@@ -2,15 +2,15 @@ package org.agh.diskstalker.filesystem.dirwatcher;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
-import org.agh.diskstalker.model.events.EventObject;
-import org.agh.diskstalker.model.events.EventType;
+import org.agh.diskstalker.model.events.FilesystemEvent;
+import org.agh.diskstalker.model.events.FilesystemEventType;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
 
 import java.nio.file.Path;
 
 public class DirWatcher implements IFilesystemWatcher {
-    private final PublishSubject<EventObject> subject = PublishSubject.create();
+    private final PublishSubject<FilesystemEvent> subject = PublishSubject.create();
     private final FileAlterationMonitor monitor;
     private final long pollingInterval = 1600;
 
@@ -24,8 +24,8 @@ public class DirWatcher implements IFilesystemWatcher {
     }
 
     @Override
-    public void emitEvent(Path path, EventType eventType) {
-        subject.onNext(new EventObject(path, eventType));
+    public void emitEvent(Path path, FilesystemEventType filesystemEventType) {
+        subject.onNext(new FilesystemEvent(path, filesystemEventType));
     }
 
     @Override
@@ -37,7 +37,7 @@ public class DirWatcher implements IFilesystemWatcher {
     }
 
     @Override
-    public Observable<EventObject> start() {
+    public Observable<FilesystemEvent> start() {
         try {
             monitor.start();
         } catch (Exception ignored) {

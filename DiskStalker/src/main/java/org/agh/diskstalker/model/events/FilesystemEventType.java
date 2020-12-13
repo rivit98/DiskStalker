@@ -1,10 +1,12 @@
 package org.agh.diskstalker.model.events;
 
-public enum EventType {
+public enum FilesystemEventType {
     FILE_CREATED,
-    FILE_MODIFIED,
-    FILE_DELETED,
     DIR_CREATED,
+
+    FILE_MODIFIED,
     DIR_MODIFIED,
+
+    FILE_DELETED,
     DIR_DELETED
 }

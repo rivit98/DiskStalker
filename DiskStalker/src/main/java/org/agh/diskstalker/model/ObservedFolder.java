@@ -1,14 +1,15 @@
 package org.agh.diskstalker.model;
 
+import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjava3.subjects.SingleSubject;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
 import javafx.beans.property.SimpleLongProperty;
 import org.agh.diskstalker.filesystem.dirwatcher.DirWatcher;
 import org.agh.diskstalker.filesystem.dirwatcher.IFilesystemWatcher;
 import org.agh.diskstalker.filesystem.scanner.FileTreeScanner;
-import org.agh.diskstalker.model.events.EventProcessor;
-import org.agh.diskstalker.model.events.IEventProcessor;
+import org.agh.diskstalker.model.events.*;
 import org.agh.diskstalker.model.tree.TreeBuilder;
 import org.agh.diskstalker.model.tree.TreeFileNode;
 
@@ -22,21 +23,26 @@ public class ObservedFolder {
     private final IFilesystemWatcher filesystemWatcher;
     private final IEventProcessor eventProcessor;
     private final TreeBuilder treeBuilder;
-    private final SimpleLongProperty maximumSizeProperty;
+    private final SimpleLongProperty maximumSizeProperty = new SimpleLongProperty(0);
+    ;
+    private final PublishSubject<FolderEvent> eventStream = PublishSubject.create();
 
-    public ObservedFolder(Path dirToWatch) {
+    public ObservedFolder(Path dirToWatch, long maxSize) {
         this.dirToWatch = dirToWatch;
         this.filesystemWatcher = new DirWatcher(dirToWatch);
         this.treeBuilder = new TreeBuilder();
         this.eventProcessor = new EventProcessor(treeBuilder);
-        this.maximumSizeProperty = new SimpleLongProperty(0);
+        setMaximumSizeProperty(maxSize);
 
         scanDirectory();
     }
 
-    public ObservedFolder(Path dirToWatch, long maxSize){
-        this(dirToWatch);
-        setMaximumSizeProperty(maxSize);
+    public ObservedFolder(Path dirToWatch) {
+        this(dirToWatch, 0);
+    }
+
+    private void errorHandler(Throwable t) {
+        eventStream.onNext(new FolderEvent(FolderEventType.ERROR, t.getClass().getCanonicalName()));
     }
 
     private void scanDirectory() {
@@ -46,25 +52,31 @@ public class ObservedFolder {
                 .subscribeOn(Schedulers.io())
                 .observeOn(JavaFxScheduler.platform())
                 .subscribe(treeBuilder::processFileData,
-                        System.out::println,
+                        this::errorHandler,
                         this::startMonitoring
                 );
     }
 
+    private void processEvent(FilesystemEvent event){
+        eventProcessor.processEvent(event);
+        if (event.isModifyEvent() || event.isCreateEvent()) {
+            eventStream.onNext(new FolderEvent(FolderEventType.SIZE_CHANGED));
+        }
+    }
 
     private void startMonitoring() {
         filesystemWatcher
                 .start()
                 .subscribeOn(Schedulers.io())
                 .observeOn(JavaFxScheduler.platform())
-                .subscribe(
-                        eventProcessor::processEvent,
-                        System.out::println
+                .subscribe(this::processEvent, //TODO: how to do this better only with eventprocessor
+                        this::errorHandler
                 );
     }
 
     public void destroy() {
         filesystemWatcher.stop();
+        eventStream.onComplete();
     }
 
     public SingleSubject<TreeFileNode> getTree() {
@@ -80,23 +92,30 @@ public class ObservedFolder {
     }
 
     public SimpleLongProperty getMaximumSizeProperty() {
-        return this.maximumSizeProperty;
+        return maximumSizeProperty;
     }
 
-    public void setMaximumSizeProperty(long maximumSizeProperty) {
-        this.maximumSizeProperty.set(maximumSizeProperty);
+    public void setMaximumSizeProperty(long value) {
+        maximumSizeProperty.set(value);
     }
 
     public Long getMaximumSize() {
         return maximumSizeProperty.getValue();
     }
 
-    public boolean isSizeLimitExceeded(){
-        var maxSize = getMaximumSize();
-        return maxSize > 0 &&
-                Optional.ofNullable(treeBuilder.getRoot().getValue())
+    public Long getSize() {
+        return Optional.ofNullable(treeBuilder.getRoot().getValue())
                 .map(rootNode -> rootNode.getValue().getSize())
-                .orElse(0L) > maxSize;
+                .orElse(0L);
+    }
+
+    public boolean isSizeLimitExceeded() {
+        var maxSize = getMaximumSize();
+        return maxSize > 0 && getSize() > maxSize;
+    }
+
+    public Observable<FolderEvent> getEventStream() {
+        return eventStream;
     }
 
     @Override

@@ -1,6 +1,6 @@
 package org.agh.diskstalker.filesystem.dirwatcher;
 
-import org.agh.diskstalker.model.events.EventType;
+import org.agh.diskstalker.model.events.FilesystemEventType;
 import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
 
 import java.io.File;
@@ -14,31 +14,31 @@ public class FileChangeListener extends FileAlterationListenerAdaptor {
 
     @Override
     public void onFileCreate(File file) {
-        filesystemWatcher.emitEvent(file.toPath(), EventType.FILE_CREATED);
+        filesystemWatcher.emitEvent(file.toPath(), FilesystemEventType.FILE_CREATED);
     }
 
     @Override
     public void onFileChange(File file) {
-        filesystemWatcher.emitEvent(file.toPath(), EventType.FILE_MODIFIED);
+        filesystemWatcher.emitEvent(file.toPath(), FilesystemEventType.FILE_MODIFIED);
     }
 
     @Override
     public void onFileDelete(File file) {
-        filesystemWatcher.emitEvent(file.toPath(), EventType.FILE_DELETED);
+        filesystemWatcher.emitEvent(file.toPath(), FilesystemEventType.FILE_DELETED);
     }
 
     @Override
     public void onDirectoryCreate(File directory) {
-        filesystemWatcher.emitEvent(directory.toPath(), EventType.DIR_CREATED);
+        filesystemWatcher.emitEvent(directory.toPath(), FilesystemEventType.DIR_CREATED);
     }
 
     @Override
     public void onDirectoryChange(File directory) {
-        filesystemWatcher.emitEvent(directory.toPath(), EventType.DIR_MODIFIED);
+        filesystemWatcher.emitEvent(directory.toPath(), FilesystemEventType.DIR_MODIFIED);
     }
 
     @Override
     public void onDirectoryDelete(File directory) {
-        filesystemWatcher.emitEvent(directory.toPath(), EventType.DIR_DELETED);
+        filesystemWatcher.emitEvent(directory.toPath(), FilesystemEventType.DIR_DELETED);
     }
 }

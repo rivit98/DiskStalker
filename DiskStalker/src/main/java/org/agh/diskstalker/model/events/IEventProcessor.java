@@ -1,5 +1,5 @@
 package org.agh.diskstalker.model.events;
 
 public interface IEventProcessor {
-    void processEvent(EventObject eventObject);
+    void processEvent(FilesystemEvent filesystemEvent);
 }

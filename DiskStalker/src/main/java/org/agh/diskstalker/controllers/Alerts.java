@@ -1,0 +1,54 @@
+package org.agh.diskstalker.controllers;
+
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
+import org.apache.commons.io.FileUtils;
+
+import java.nio.file.Path;
+
+public final class Alerts {
+    private Alerts() {
+    }
+
+    public static void tryingToAddSameFolderToObservedAlert() {
+        var newAlert = createAlert(
+                "You already observe this directory!"
+        );
+        newAlert.showAndWait().filter(response -> response == ButtonType.OK);
+    }
+
+    public static void setMaxSizeAlert(String path, Long size) {
+        var newAlert = createAlert(
+                "Max size for folder:\n" + path + "\nset to:\n" + FileUtils.byteCountToDisplaySize(size),
+                AlertType.INFORMATION
+        );
+        newAlert.showAndWait().filter(response -> response == ButtonType.OK);
+    }
+
+    public static void sizeExceededAlert(String path, Long size) {
+        var newAlert = createAlert(
+                "Folder:\n" + path + "\nexceeded size:\n" + FileUtils.byteCountToDisplaySize(size)
+        );
+        Platform.runLater(newAlert::showAndWait);
+    }
+
+    public static void genericErrorAlert(Path path, String message) {
+        var newAlert = createAlert(
+                path.toString() + "\n" + message,
+                AlertType.ERROR
+        );
+        Platform.runLater(newAlert::showAndWait);
+    }
+
+    private static Alert createAlert(String information) {
+        return createAlert(information, AlertType.WARNING);
+    }
+
+    private static Alert createAlert(String information, AlertType type) {
+        var alert = new Alert(type);
+        alert.setContentText(information);
+        return alert;
+    }
+}

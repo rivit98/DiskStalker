@@ -1,5 +1,6 @@
 package org.agh.diskstalker.controllers;
 
+import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
@@ -13,10 +14,11 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.agh.diskstalker.application.StringToIntFormatter;
-import org.agh.diskstalker.graphics.Alerts;
 import org.agh.diskstalker.graphics.GraphicsFactory;
 import org.agh.diskstalker.model.FileData;
 import org.agh.diskstalker.model.ObservedFolder;
+import org.agh.diskstalker.model.events.FolderEvent;
+import org.agh.diskstalker.model.events.FolderEventType;
 import org.agh.diskstalker.model.tree.TreeFileNode;
 import org.agh.diskstalker.persistence.DatabaseCommand;
 import org.agh.diskstalker.persistence.DatabaseCommandExecutor;
@@ -26,10 +28,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @FxmlView("/views/MainView.fxml")
@@ -167,10 +167,32 @@ public class MainView {
     }
 
     private void addObservedFolder(ObservedFolder folder) {
-        folder.getTree().subscribe(treeFileNode -> {
-            addToMainTree(treeFileNode);
-            folderList.add(folder);
-        });
+        folder.getTree()
+                .observeOn(JavaFxScheduler.platform())
+                .subscribe(treeFileNode -> {
+                    addToMainTree(treeFileNode);
+                    folderList.add(folder);
+                });
+
+        folder.getEventStream()
+                .buffer(1, TimeUnit.SECONDS)
+                .observeOn(JavaFxScheduler.platform())
+                .subscribe(eventList -> {
+                    Set<FolderEventType> set = new HashSet<>(eventList.size());
+                    eventList.removeIf(e -> !set.add(e.getEventType()));
+                    eventList.forEach(event -> {
+                        switch (event.getEventType()) {
+                            case ERROR -> { //TODO: error alert
+                                Alerts.genericErrorAlert(folder.getPath(), event.getMessage());
+                            }
+                            case SIZE_CHANGED -> {
+                                if (folder.isSizeLimitExceeded()) {
+                                    Alerts.sizeExceededAlert(folder.getPath().toString(), folder.getMaximumSize());
+                                }
+                            }
+                        }
+                    });
+                });
     }
 
     private void initializeButtons() {
@@ -248,9 +270,9 @@ public class MainView {
         getObservedFolderFromTreePath(value.getPath()).ifPresent(observedFolder -> {
             observedFolder.setMaximumSizeProperty(maximumSize);
             new DatabaseCommandExecutor(observedFolder, DatabaseCommand.UPDATE).run();
-            Alerts.setMaxSizeAlert(value.getPath().toString(), maximumSize / FileUtils.ONE_MB);
+            Alerts.setMaxSizeAlert(value.getPath().toString(), maximumSize);
             if (observedFolder.isSizeLimitExceeded()) {
-                Alerts.sizeExceededAlert(observedFolder.toString(), maximumSize / FileUtils.ONE_MB);
+                Alerts.sizeExceededAlert(observedFolder.toString(), maximumSize);
             }
         });
     }

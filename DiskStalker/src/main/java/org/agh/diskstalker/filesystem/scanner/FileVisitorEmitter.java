@@ -42,10 +42,6 @@ public class FileVisitorEmitter extends SimpleFileVisitor<Path> {
 
     @Override
     public FileVisitResult visitFileFailed(Path file, IOException exc) {
-        if (!observer.isDisposed()) {
-            observer.onError(exc);
-        }
-        //TODO: AccessDenied handle - TEST
         return SKIP_SUBTREE;
     }
 }

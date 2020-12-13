@@ -14,10 +14,9 @@ public class EventProcessor implements IEventProcessor {
     }
 
     @Override
-    public void processEvent(EventObject eventObject) {
-        Path resolvedPath = eventObject.getTargetDir();
-        var eventType = eventObject.getEventType();
-        System.out.println(eventType.name() + " | " + resolvedPath);
+    public void processEvent(FilesystemEvent filesystemEvent) {
+        var resolvedPath = filesystemEvent.getTargetDir();
+        var eventType = filesystemEvent.getEventType();
 
         switch (eventType) {
             case FILE_CREATED -> handleCreateEventFile(resolvedPath);
