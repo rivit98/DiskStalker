@@ -51,7 +51,7 @@ public class ObservedFolder {
                 .scan(dirToWatch)
                 .subscribeOn(Schedulers.io())
                 .observeOn(JavaFxScheduler.platform())
-                .subscribe(treeBuilder::processFileData,
+                .subscribe(treeBuilder::processnodeData,
                         this::errorHandler,
                         this::startMonitoring
                 );
@@ -69,7 +69,7 @@ public class ObservedFolder {
                 .start()
                 .subscribeOn(Schedulers.io())
                 .observeOn(JavaFxScheduler.platform())
-                .subscribe(this::processEvent, //TODO: how to do this better only with eventprocessor
+                .subscribe(this::processEvent, //TODO: how to do this better only with eventsprocessor
                         this::errorHandler
                 );
     }

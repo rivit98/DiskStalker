@@ -1,6 +1,6 @@
 package org.agh.diskstalker.model.events;
 
-import org.agh.diskstalker.model.FileData;
+import org.agh.diskstalker.model.NodeData;
 import org.agh.diskstalker.model.tree.TreeBuilder;
 import org.agh.diskstalker.model.tree.TreeFileNode;
 
@@ -58,8 +58,8 @@ public class EventProcessor implements IEventProcessor {
     }
 
     private void handleCreateCommon(Path resolvedPath) {
-        var fileData = new FileData(resolvedPath);
-        var newTreeNode = new TreeFileNode(fileData);
+        var nodeData = new NodeData(resolvedPath);
+        var newTreeNode = new TreeFileNode(nodeData);
         treeBuilder.insertNewNode(newTreeNode);
     }
 }

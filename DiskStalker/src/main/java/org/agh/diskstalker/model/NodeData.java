@@ -5,18 +5,16 @@ import javafx.beans.property.SimpleLongProperty;
 import java.nio.file.Path;
 import java.util.Objects;
 
-//TODO: rename this to something more meaningful (ex. NodeData or sth like this)
-public class FileData {
+public class NodeData {
     private final Path path;
     private final boolean isDirectory;
     private final SimpleLongProperty sizeProperty;
 
-    public FileData(Path path) {
+    public NodeData(Path path) {
         this.path = path;
         var f = path.toFile();
         this.isDirectory = f.isDirectory();
         this.sizeProperty = new SimpleLongProperty(isFile() ? f.length() : 0);
-
     }
 
     public Path getPath() {
@@ -58,7 +56,7 @@ public class FileData {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        var fileData = (FileData) o;
-        return Objects.equals(path, fileData.path);
+        var nodeData = (NodeData) o;
+        return Objects.equals(path, nodeData.path);
     }
 }

@@ -1,7 +1,7 @@
 package org.agh.diskstalker.filesystem.scanner;
 
 import io.reactivex.rxjava3.core.ObservableEmitter;
-import org.agh.diskstalker.model.FileData;
+import org.agh.diskstalker.model.NodeData;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -13,10 +13,10 @@ import static java.nio.file.FileVisitResult.CONTINUE;
 import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
 
 public class FileVisitorEmitter extends SimpleFileVisitor<Path> {
-    private final ObservableEmitter<FileData> observer;
+    private final ObservableEmitter<NodeData> observer;
 
 
-    public FileVisitorEmitter(ObservableEmitter<FileData> observer) {
+    public FileVisitorEmitter(ObservableEmitter<NodeData> observer) {
         this.observer = observer;
     }
 
@@ -25,7 +25,7 @@ public class FileVisitorEmitter extends SimpleFileVisitor<Path> {
             return;
         }
 
-        observer.onNext(new FileData(path));
+        observer.onNext(new NodeData(path));
     }
 
     @Override

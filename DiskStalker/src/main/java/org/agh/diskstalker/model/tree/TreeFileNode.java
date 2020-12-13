@@ -1,15 +1,15 @@
 package org.agh.diskstalker.model.tree;
 
 import javafx.scene.control.TreeItem;
-import org.agh.diskstalker.model.FileData;
+import org.agh.diskstalker.model.NodeData;
 
 import java.util.Objects;
 import java.util.Optional;
 
 
-public class TreeFileNode extends TreeItem<FileData> {
-    public TreeFileNode(FileData fileData) {
-        super(fileData);
+public class TreeFileNode extends TreeItem<NodeData> {
+    public TreeFileNode(NodeData nodeData) {
+        super(nodeData);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class TreeFileNode extends TreeItem<FileData> {
         updateParentSize(node, value.getSize());
     }
 
-    private void updateParentSize(TreeItem<FileData> node, long deltaSize) {
+    private void updateParentSize(TreeItem<NodeData> node, long deltaSize) {
         Optional.ofNullable(node.getParent())
                 .ifPresent(parent -> {
                     Optional.ofNullable(parent.getValue())
@@ -66,9 +66,9 @@ public class TreeFileNode extends TreeItem<FileData> {
     }
 
     public void updateMe() {
-        var fileData = getValue();
-        var oldSize = fileData.getSize();
-        updateParentSize(this, fileData.updateFileSize() - oldSize);
+        var nodeData = getValue();
+        var oldSize = nodeData.getSize();
+        updateParentSize(this, nodeData.updateFileSize() - oldSize);
     }
 
     @Override

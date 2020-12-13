@@ -123,7 +123,7 @@
         </Text>
         <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Max directory size (MB)" wrappingWidth="133.0"
               GridPane.columnIndex="1" GridPane.rowIndex="4"/>
-        <TextField fx:id="directorySize" prefHeight="25.0" prefWidth="113.0" GridPane.columnIndex="1"
+        <TextField fx:id="maxSizeField" prefHeight="25.0" prefWidth="113.0" GridPane.columnIndex="1"
                    GridPane.rowIndex="5">
             <padding>
                 <Insets right="10.0"/>
