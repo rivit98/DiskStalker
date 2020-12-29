@@ -18,3 +18,4 @@ build/
 gradle-app.setting
 !gradle-wrapper.jar
 testDirs
+observed_folders.db
