@@ -5,6 +5,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjava3.subjects.SingleSubject;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleLongProperty;
 import org.agh.diskstalker.filesystem.dirwatcher.DirWatcher;
 import org.agh.diskstalker.filesystem.dirwatcher.IFilesystemWatcher;
@@ -24,7 +25,7 @@ public class ObservedFolder {
     private final IEventProcessor eventProcessor;
     private final TreeBuilder treeBuilder;
     private final SimpleLongProperty maximumSizeProperty = new SimpleLongProperty(0);
-    ;
+    private final SimpleBooleanProperty sizeExceededFlag = new SimpleBooleanProperty();
     private final PublishSubject<FolderEvent> eventStream = PublishSubject.create();
 
     public ObservedFolder(Path dirToWatch, long maxSize) {
@@ -33,6 +34,7 @@ public class ObservedFolder {
         this.treeBuilder = new TreeBuilder();
         this.eventProcessor = new EventProcessor(treeBuilder);
         setMaximumSizeProperty(maxSize);
+        this.sizeExceededFlag.set(false);
 
         scanDirectory();
     }
@@ -121,6 +123,14 @@ public class ObservedFolder {
 
     public Observable<FolderEvent> getEventStream() {
         return eventStream;
+    }
+
+    public SimpleBooleanProperty isSizeExceededFlag() {
+        return this.sizeExceededFlag;
+    }
+
+    public void setSizeExceededFlag(boolean sizeExceededFlag) {
+        this.sizeExceededFlag.set(sizeExceededFlag);
     }
 
     @Override

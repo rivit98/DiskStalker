@@ -20,7 +20,15 @@ public final class GraphicsFactory { //TODO: inject as singleton? :D
                     ).toString()
             );
 
-    public static ImageView getGraphic(boolean isDirectory) {
+    private static final Image FOLDER_IMAGE_RED =
+            new Image(
+                    Objects.requireNonNull(
+                            GraphicsFactory.class.getResource("/images/folder-red.png")
+                    ).toString()
+            );
+
+    public static ImageView getGraphic(boolean isDirectory, boolean sizeExceeded) {
+        if(isDirectory && sizeExceeded) return new ImageView(FOLDER_IMAGE_RED);
         return isDirectory ? new ImageView(FOLDER_IMAGE) : new ImageView(FILE_IMAGE);
     }
 }
