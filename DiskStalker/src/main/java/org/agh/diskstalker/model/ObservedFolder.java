@@ -24,8 +24,7 @@ public class ObservedFolder {
     private final IEventProcessor eventProcessor;
     private final TreeBuilder treeBuilder;
     private final SimpleLongProperty maximumSizeProperty = new SimpleLongProperty(0);
-    ;
-    private final PublishSubject<FolderEvent> eventStream = PublishSubject.create();
+    private final PublishSubject<ObservedFolderEvent> eventStream = PublishSubject.create();
 
     public ObservedFolder(Path dirToWatch, long maxSize) {
         this.dirToWatch = dirToWatch;
@@ -42,7 +41,7 @@ public class ObservedFolder {
     }
 
     private void errorHandler(Throwable t) {
-        eventStream.onNext(new FolderEvent(FolderEventType.ERROR, t.getClass().getCanonicalName()));
+        eventStream.onNext(new ObservedFolderErrorEvent(this, t.getClass().getCanonicalName()));
     }
 
     private void scanDirectory() {
@@ -51,10 +50,14 @@ public class ObservedFolder {
                 .scan(dirToWatch)
                 .subscribeOn(Schedulers.io())
                 .observeOn(JavaFxScheduler.platform())
-                .subscribe(treeBuilder::processnodeData,
+                .subscribe(treeBuilder::processNodeData,
                         this::errorHandler,
                         this::startMonitoring
                 );
+
+        treeBuilder.getRoot().subscribe(node -> {
+            eventStream.onNext(new ObservedFolderRootAvailableEvent(this, node));
+        });
     }
 
     private void processEvent(FilesystemEvent event){
@@ -65,7 +68,7 @@ public class ObservedFolder {
     }
 
     private void sendSizeChangedEvent(){
-        eventStream.onNext(new FolderEvent(FolderEventType.SIZE_CHANGED));
+        eventStream.onNext(new ObservedFolderSizeChangedEvent(this));
     }
 
     private void startMonitoring() {
@@ -81,10 +84,6 @@ public class ObservedFolder {
     public void destroy() {
         filesystemWatcher.stop();
         eventStream.onComplete();
-    }
-
-    public SingleSubject<TreeFileNode> getTree() {
-        return treeBuilder.getRoot();
     }
 
     public boolean containsNode(Path path) {
@@ -119,7 +118,7 @@ public class ObservedFolder {
         return maxSize > 0 && getSize() > maxSize;
     }
 
-    public Observable<FolderEvent> getEventStream() {
+    public Observable<ObservedFolderEvent> getEventStream() {
         return eventStream;
     }
 

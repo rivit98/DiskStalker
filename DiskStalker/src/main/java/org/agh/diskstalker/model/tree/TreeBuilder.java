@@ -13,7 +13,7 @@ public class TreeBuilder {
     private final SingleSubject<TreeFileNode> rootSubject = SingleSubject.create();
     private TreeFileNode root;
 
-    public void processnodeData(NodeData nodeData) {
+    public void processNodeData(NodeData nodeData) {
         var insertedNode = new TreeFileNode(nodeData);
         pathToTreeMap.put(nodeData.getPath(), insertedNode);
 

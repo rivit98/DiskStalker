@@ -12,27 +12,28 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.agh.diskstalker.application.StringToIntFormatter;
+import org.agh.diskstalker.cellFactories.PathColumnCellFactory;
+import org.agh.diskstalker.cellFactories.SizeColumnCellFactory;
 import org.agh.diskstalker.graphics.GraphicsFactory;
 import org.agh.diskstalker.model.NodeData;
 import org.agh.diskstalker.model.ObservedFolder;
-import org.agh.diskstalker.model.events.FolderEventType;
 import org.agh.diskstalker.model.tree.TreeFileNode;
-import org.agh.diskstalker.persistence.DatabaseCommand;
 import org.agh.diskstalker.persistence.DatabaseCommandExecutor;
+import org.agh.diskstalker.persistence.DatabaseCommandType;
 import org.agh.diskstalker.persistence.ObservedFolderDao;
 import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Component
 @FxmlView("/views/MainView.fxml")
 public class MainView {
-
-    private final List<ObservedFolder> folderList = new LinkedList<>();
     @FXML
     private TreeTableView<NodeData> locationTreeView;
     @FXML
@@ -43,6 +44,9 @@ public class MainView {
     private Button setSizeButton;
     @FXML
     private TextField maxSizeField;
+
+    private final List<ObservedFolder> folderList = new LinkedList<>();
+    private final DatabaseCommandExecutor executor = new DatabaseCommandExecutor();
 
     private void initializeTableTreeView() {
         createRoot();
@@ -58,23 +62,7 @@ public class MainView {
             return pathOptional.map(SimpleObjectProperty::new).orElseGet(SimpleObjectProperty::new);
         });
 
-        pathColumn.setCellFactory(ttc -> new TreeTableCell<>() {
-            @Override
-            protected void updateItem(Path item, boolean empty) {
-                super.updateItem(item, empty);
-                if (item != null) {
-                    if (!empty && item.getFileName() == null) {
-                        setText(item.toString());
-                    } else {
-                        setText(empty ? null : Objects.requireNonNull(item).getFileName().toString());
-                    }
-                    setGraphic(empty ? null : GraphicsFactory.getGraphic(item.toFile().isDirectory()));
-                } else {
-                    setText(null);
-                    setGraphic(null);
-                }
-            }
-        });
+        pathColumn.setCellFactory(ttc -> new PathColumnCellFactory());
 
         sizeColumn.setCellValueFactory(node -> {
             var sizePropertyOptional = Optional.ofNullable(node.getValue());
@@ -84,19 +72,9 @@ public class MainView {
         });
 
         sizeColumn.setCellFactory(ttc -> {
-            TreeTableCell<NodeData, Number> cell = new TreeTableCell<>() {
-                @Override
-                protected void updateItem(Number value, boolean empty) {
-                    super.updateItem(value, empty);
-                    if (value != null)
-                        setText(empty ? null : value.toString());
-                    else
-                        setText(null);
-                }
-            };
-            cell.pseudoClassStateChanged(PseudoClass.getPseudoClass("centered"), true);
-
-            return cell;
+            var cellFactory = new SizeColumnCellFactory();
+            cellFactory.pseudoClassStateChanged(PseudoClass.getPseudoClass("centered"), true);
+            return cellFactory;
         });
 
         locationTreeView.getColumns().add(pathColumn);
@@ -130,37 +108,15 @@ public class MainView {
         locationTreeView.getRoot().setExpanded(true);
     }
 
-    private void addToMainTree(TreeFileNode node) {
+    public void addToMainTree(ObservedFolder folder, TreeFileNode node) {
         locationTreeView.getRoot().getChildren().add(node);
+        folderList.add(folder);
     }
 
     private void addObservedFolder(ObservedFolder folder) {
-        folder.getTree()
-                .observeOn(JavaFxScheduler.platform())
-                .subscribe(treeFileNode -> {
-                    addToMainTree(treeFileNode);
-                    folderList.add(folder);
-                });
-
         folder.getEventStream()
-                .buffer(2, TimeUnit.SECONDS)
                 .observeOn(JavaFxScheduler.platform())
-                .subscribe(eventList -> {
-                    var uniqueEvents = new HashSet<FolderEventType>(eventList.size());
-                    eventList.removeIf(e -> !uniqueEvents.add(e.getEventType())); // filter duplicated events
-                    eventList.forEach(event -> {
-                        switch (event.getEventType()) {
-                            case ERROR -> { //TODO: error alert
-                                Alerts.genericErrorAlert(folder.getPath(), event.getMessage());
-                            }
-                            case SIZE_CHANGED -> {
-                                if (folder.isSizeLimitExceeded()) {
-                                    Alerts.sizeExceededAlert(folder.getPath().toString(), folder.getMaximumSize());
-                                }
-                            }
-                        }
-                    });
-                });
+                .subscribe(event -> event.dispatch(this));
     }
 
     private void initializeButtons() {
@@ -228,7 +184,8 @@ public class MainView {
             } else {
                 var folder = new ObservedFolder(selectedFolder.toPath());
                 addObservedFolder(folder);
-                new DatabaseCommandExecutor(folder, DatabaseCommand.SAVE).run();
+
+                executor.executeCommand(folder, DatabaseCommandType.SAVE);
             }
         });
     }
@@ -251,7 +208,7 @@ public class MainView {
 
         getObservedFolderFromTreePath(value.getPath()).ifPresent(observedFolder -> {
             observedFolder.setMaximumSizeProperty(maximumSize);
-            new DatabaseCommandExecutor(observedFolder, DatabaseCommand.UPDATE).run();
+            executor.executeCommand(observedFolder, DatabaseCommandType.UPDATE);
             Alerts.setMaxSizeAlert(value.getPath().toString(), maximumSize);
         });
     }
@@ -259,7 +216,7 @@ public class MainView {
     private void removeFolder(ObservedFolder folder, TreeItem<NodeData> treeItem) {
         var nodeToRemove = (TreeFileNode) treeItem;
         if (locationTreeView.getRoot().getChildren().contains(nodeToRemove)) { //we are removing main folder
-            new DatabaseCommandExecutor(folder, DatabaseCommand.DELETE).run();
+            executor.executeCommand(folder, DatabaseCommandType.DELETE);
             folder.destroy();
             locationTreeView.getRoot().getChildren().remove(nodeToRemove);
             folderList.remove(folder);
