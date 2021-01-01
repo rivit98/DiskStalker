@@ -73,7 +73,7 @@ public class MainView {
             return pathOptional.map(SimpleObjectProperty::new).orElseGet(SimpleObjectProperty::new);
         });
 
-        pathColumn.setCellFactory(ttc -> new PathColumnCellFactory());
+        pathColumn.setCellFactory(ttc -> new PathColumnCellFactory(this));
 
         sizeColumn.setCellValueFactory(node -> {
             var sizePropertyOptional = Optional.ofNullable(node.getValue());
@@ -279,20 +279,24 @@ public class MainView {
         }
     }
 
-    private Optional<ObservedFolder> getObservedFolderFromTreePath(Path searchedPath) {
+    public Optional<ObservedFolder> getObservedFolderFromTreePath(Path searchedPath) {
         return folderList.stream()
                 .filter(observedFolder -> observedFolder.containsNode(searchedPath))
                 .findFirst();
     }
 
-    private Optional<ObservedFolder> getObservedFolderFromSelection() {
+    public Optional<ObservedFolder> getObservedFolderFromSelection() {
         return Optional.ofNullable(locationTreeView.getSelectionModel().getSelectedItem())
                 .flatMap(item -> getObservedFolderFromTreePath(item.getValue().getPath()));
     }
 
-    private Optional<ObservedFolder> getObservedFolderFromTreeItem(TreeItem<NodeData> treeItem) {
+    public Optional<ObservedFolder> getObservedFolderFromTreeItem(TreeItem<NodeData> treeItem) {
         return Optional.ofNullable(treeItem)
                 .flatMap(item -> getObservedFolderFromTreePath(item.getValue().getPath()));
+    }
+
+    public TreeTableView<NodeData> getMainView() {
+        return locationTreeView;
     }
 
     public void onExit() {
