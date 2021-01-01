@@ -4,12 +4,15 @@ import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
+import javafx.util.converter.NumberStringConverter;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.agh.diskstalker.application.StringToIntFormatter;
 import org.agh.diskstalker.cellFactories.PathColumnCellFactory;
@@ -25,6 +28,7 @@ import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,16 +48,23 @@ public class MainView {
     private Button setSizeButton;
     @FXML
     private TextField maxSizeField;
+    @FXML
+    private Button deleteFromDiskButton;
 
     private final List<ObservedFolder> folderList = new LinkedList<>();
     private final DatabaseCommandExecutor executor = new DatabaseCommandExecutor();
 
-    private void initializeTableTreeView() {
+    private boolean checkIfRoot(TreeItem<NodeData> item) {
+        return item != null && item.getParent() != null;
+    }
+
+    private void prepareColumns() {
         createRoot();
         //todo: refactor this
         var pathColumn = new TreeTableColumn<NodeData, Path>("Name");
         var sizeColumn = new TreeTableColumn<NodeData, Number>("Size");
-        pathColumn.setPrefWidth(200); //todo: set proper width
+        pathColumn.setPrefWidth(242); //todo: set proper width
+        sizeColumn.setPrefWidth(123);
         pathColumn.setCellValueFactory(node -> {
             var pathOptional = Optional.ofNullable(node.getValue())
                     .flatMap(v -> Optional.ofNullable(v.getValue()))
@@ -79,6 +90,11 @@ public class MainView {
 
         locationTreeView.getColumns().add(pathColumn);
         locationTreeView.getColumns().add(sizeColumn);
+    }
+
+    private void initializeTableTreeView() {
+        createRoot();
+        prepareColumns();
     }
 
     @FXML
@@ -123,21 +139,32 @@ public class MainView {
         addButton.setOnAction(this::addButtonClicked);
         deleteButton.setOnAction(this::deleteButtonClicked);
         setSizeButton.setOnAction(this::setSizeButtonClicked);
+        deleteFromDiskButton.setOnAction(this::deleteFromDiskButtonClicked);
 
         var selectionModel = locationTreeView.getSelectionModel();
         var selectedItems = selectionModel.getSelectedItems();
 
+        deleteFromDiskButton.disableProperty().bind(Bindings.isEmpty(selectedItems));
+
         setSizeButton.disableProperty().bind(Bindings.createBooleanBinding(() -> { //todo: refactor this
             if (!selectedItems.isEmpty()) {
                 var selectedItem = selectionModel.getSelectedItem();
-                if (selectedItem != null && selectedItem.getParent() != null && !maxSizeField.getText().equals("")) {
+                if (checkIfRoot(selectedItem) && !maxSizeField.getText().equals("")) {
                     return selectedItem.getParent().getValue() != null;
                 }
             }
             return true;
         }, selectionModel.selectedItemProperty(), maxSizeField.textProperty()));//isEmpty(locationTreeView.getSelectionModel().getSelectedItems()));
 
-        deleteButton.disableProperty().bind(Bindings.isEmpty(selectedItems));
+        deleteButton.disableProperty().bind(Bindings.createBooleanBinding(() -> {
+            if(!selectedItems.isEmpty()) {
+                var selectedItem = selectionModel.getSelectedItem();
+                if (checkIfRoot(selectedItem)) {
+                    return selectedItem.getParent().getValue() != null;
+                }
+            }
+            return true;
+        }, selectionModel.selectedItemProperty()));//Bindings.isEmpty(selectedItems));
     }
 
     private void initializeSizeField() {
@@ -198,6 +225,33 @@ public class MainView {
             getObservedFolderFromTreePath(searchedPath).ifPresent(observedFolder -> { //should always be present
                 removeFolder(observedFolder, item);
             });
+        });
+    }
+
+    private void deleteFromDiskButtonClicked(ActionEvent actionEvent) {
+        Optional.ofNullable(locationTreeView.getSelectionModel().getSelectedItem()).ifPresent(item -> {
+            var searchedPath = item.getValue().getPath();
+            ButtonType res = Alerts.yesNoDeleteAlert(searchedPath);
+            if(res.equals(ButtonType.YES)) {
+                getObservedFolderFromTreePath(searchedPath).ifPresent(observedFolder -> { //should always be present
+                    try {
+                        var searchedFile = searchedPath.toFile();
+                        if (searchedFile.isDirectory()) {
+                            FileUtils.deleteDirectory(searchedFile);
+                            if(checkIfRoot(item)) {
+                                removeFolder(observedFolder, item);
+                            }
+                        } else {
+                            if (!searchedFile.delete()) {
+                                throw new IOException();
+                            }
+                        }
+                    } catch (IOException | IllegalArgumentException e) {
+                        Alerts.genericErrorAlert(searchedPath, "Cannot delete file");
+                        e.printStackTrace();
+                    }
+                });
+            }
         });
     }
 

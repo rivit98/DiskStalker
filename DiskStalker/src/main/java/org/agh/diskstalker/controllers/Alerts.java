@@ -42,6 +42,12 @@ public final class Alerts {
         Platform.runLater(newAlert::showAndWait);
     }
 
+    public static ButtonType yesNoDeleteAlert(Path path) {
+        var newAlert = new Alert(Alert.AlertType.CONFIRMATION, "Do you really want to delete: "
+                + path.getFileName() + "?", ButtonType.YES, ButtonType.NO);
+        return newAlert.showAndWait().orElse(ButtonType.NO);
+    }
+
     private static Alert createAlert(String information) {
         return createAlert(information, AlertType.WARNING);
     }

@@ -17,11 +17,25 @@ public class PathColumnCellFactory extends TreeTableCell<NodeData, Path> {
         } else {
             Optional.ofNullable(item.getFileName())
                     .ifPresentOrElse(
-                            fname -> setText(fname.toString()),
+                            fname ->
+                            {
+                                setText(fname.toString());
+//                                var observedFolder = getObservedFolderFromTreePath(item);
+//                                observedFolder.ifPresent(folder -> {
+//                                    setGraphic(empty ? null : GraphicsFactory.getGraphic(item.toFile().isDirectory(), folder.isSizeLimitExceeded()));
+//                        if(item.equals(folder.getPath())) {
+//                            folder.isSizeExceededFlag().addListener((observable, oldValue, newValue) -> {
+//                                setGraphic(empty ? null : GraphicsFactory.getGraphic(item.toFile().isDirectory(), folder.isSizeLimitExceeded()));
+//                            });
+//                        }
+                                    //graphicProperty().bind(Bindings.when(folder.isSizeExceededFlag()).then(GraphicsFactory.getGraphic(item.toFile().isDirectory(), folder.isSizeExceededFlag().getValue())).otherwise(GraphicsFactory.getGraphic(item.toFile().isDirectory(), folder.isSizeExceededFlag().getValue())));
+//                                });
+                            },
                             () -> setText(item.toString())
                     );
 
-            setGraphic(GraphicsFactory.getGraphic(item.toFile().isDirectory()));
+//            setGraphic(GraphicsFactory.getGraphic(item.toFile().isDirectory()), folder.isSizeLimitExceeded());
+            setGraphic(GraphicsFactory.getGraphic(item.toFile().isDirectory(), false));
         }
     }
 }

@@ -12,7 +12,15 @@ public class ObservedFolderSizeChangedEvent extends AbstractObservedFolderEvent 
     @Override
     public void dispatch(MainView view) {
         if (folder.isSizeLimitExceeded()) {
-            Alerts.sizeExceededAlert(folder.getPath().toString(), folder.getMaximumSize());
+            if(!folder.isSizeExceededFlag().getValue()) {
+                Alerts.sizeExceededAlert(folder.getPath().toString(), folder.getMaximumSize());
+                folder.setSizeExceededFlag(true);
+//                locationTreeView.refresh(); //TODO: change this
+            }
+        }
+        else {
+            folder.setSizeExceededFlag(false);
+//            locationTreeView.refresh(); //TODO: change this
         }
     }
 }
