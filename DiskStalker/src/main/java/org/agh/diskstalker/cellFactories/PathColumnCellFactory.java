@@ -21,29 +21,19 @@ public class PathColumnCellFactory extends TreeTableCell<NodeData, Path> {
         if (item == null || empty) {
             setText(null);
             setGraphic(null);
-        } else {
-            Optional.ofNullable(item.getFileName())
-                    .ifPresentOrElse(
-                            fname ->
-                            {
-                                setText(fname.toString());
-                                var observedFolder = mainView.getObservedFolderFromTreePath(item);
-                                observedFolder.ifPresent(folder -> {
-                                    setGraphic(GraphicsFactory.getGraphic(item.toFile().isDirectory(), folder.isSizeLimitExceeded()));
-//                        if(item.equals(folder.getPath())) {
-//                            folder.isSizeExceededFlag().addListener((observable, oldValue, newValue) -> {
-//                                setGraphic(empty ? null : GraphicsFactory.getGraphic(item.toFile().isDirectory(), folder.isSizeLimitExceeded()));
-//                            });
-//                        }
-                                    //graphicProperty().bind(Bindings.when(folder.isSizeExceededFlag()).then(GraphicsFactory.getGraphic(item.toFile().isDirectory(), folder.isSizeExceededFlag().getValue())).otherwise(GraphicsFactory.getGraphic(item.toFile().isDirectory(), folder.isSizeExceededFlag().getValue())));
-                                });
-                            },
-                            () -> setText(item.toString())
-                    );
-
-//            setGraphic(GraphicsFactory.getGraphic(item.toFile().isDirectory()), folder.isSizeLimitExceeded());
-//            System.out.println("set graphincs");;
-//            setGraphic(GraphicsFactory.getGraphic(item.toFile().isDirectory()));
+            return;
         }
+
+        Optional.ofNullable(item.getFileName())
+                .ifPresentOrElse(
+                        fileName -> {
+                            setText(fileName.toString());
+                            var observedFolder = mainView.getObservedFolderFromTreePath(item);
+                            observedFolder.ifPresent(folder -> {
+                                setGraphic(GraphicsFactory.getGraphic(item.toFile().isDirectory(), folder.isSizeLimitExceeded()));
+                            });
+                        },
+                        () -> setText(item.toString())
+                );
     }
 }

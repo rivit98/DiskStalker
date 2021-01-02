@@ -18,16 +18,4 @@ public class FilesystemEvent {
     public FilesystemEventType getEventType() {
         return type;
     }
-
-    public boolean isModifyEvent(){
-        return type == FilesystemEventType.FILE_MODIFIED || type == FilesystemEventType.DIR_MODIFIED;
-    }
-
-    public boolean isCreateEvent(){
-        return type == FilesystemEventType.FILE_CREATED || type == FilesystemEventType.DIR_CREATED;
-    }
-
-    public boolean isDeleteEvent(){
-        return type == FilesystemEventType.FILE_DELETED || type == FilesystemEventType.DIR_DELETED;
-    }
 }

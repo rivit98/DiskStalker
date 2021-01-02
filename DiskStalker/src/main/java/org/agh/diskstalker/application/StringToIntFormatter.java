@@ -1,7 +1,6 @@
 package org.agh.diskstalker.application;
 
 import javafx.scene.control.TextFormatter;
-import javafx.util.StringConverter;
 import javafx.util.converter.IntegerStringConverter;
 
 import java.util.function.UnaryOperator;

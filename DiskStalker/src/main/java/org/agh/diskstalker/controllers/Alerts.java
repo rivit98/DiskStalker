@@ -8,7 +8,7 @@ import org.apache.commons.io.FileUtils;
 
 import java.nio.file.Path;
 
-public final class Alerts {
+public class Alerts {
     private Alerts() {
     }
 

@@ -5,8 +5,6 @@ import javafx.scene.control.TreeTableCell;
 import org.agh.diskstalker.model.NodeData;
 import org.apache.commons.io.FileUtils;
 
-import java.nio.file.Path;
-
 public class SizeColumnCellFactory extends TreeTableCell<NodeData, Number> {
     public SizeColumnCellFactory() {
         pseudoClassStateChanged(PseudoClass.getPseudoClass("centered"), true);

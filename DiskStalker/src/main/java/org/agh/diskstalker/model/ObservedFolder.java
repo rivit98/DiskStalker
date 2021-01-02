@@ -64,9 +64,7 @@ public class ObservedFolder {
 
     private void processEvent(FilesystemEvent event) {
         eventProcessor.processEvent(event);
-        if (event.isModifyEvent() || event.isCreateEvent()) {  //TODO: how to do this better only with event processor
-            sendSizeChangedEvent();
-        }
+        sendSizeChangedEvent();
     }
 
     private void sendSizeChangedEvent() {
