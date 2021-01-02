@@ -58,7 +58,7 @@ public class ObservedFolderDao {
             while (rs.next()) {
                 var path = Path.of(rs.getString("path"));
                 var maxSize = rs.getInt("max_size");
-                if (Files.exists(path) && Files.isDirectory(path)) {
+                if (Files.isDirectory(path)) {
                     resultList.add(new ObservedFolder(path, maxSize));
                 } else {
                     var delete = "DELETE FROM observedFolders WHERE path = (?);";
