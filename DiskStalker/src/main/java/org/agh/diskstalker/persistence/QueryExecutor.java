@@ -8,10 +8,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
 
-public final class QueryExecutor {
+public class QueryExecutor {
 
     private static final Logger LOGGER = Logger.getGlobal();
-    private static Lock lock = new ReentrantLock();
 
     static {
         try {
@@ -32,12 +31,10 @@ public final class QueryExecutor {
     }
 
     public static int createAndObtainId(final String insertSql, Object... args) throws SQLException {
-        lock.lock();
         PreparedStatement statement = ConnectionProvider.getConnection().prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
         mapParams(statement, args);
         statement.execute();
         try (final ResultSet resultSet = statement.getGeneratedKeys()) {
-            lock.unlock();
             return readIdFromResultSet(resultSet);
         }
     }
@@ -47,32 +44,24 @@ public final class QueryExecutor {
     }
 
     public static void create(final String insertSql, Object... args) throws SQLException {
-        lock.lock();
         PreparedStatement ps = ConnectionProvider.getConnection().prepareStatement(insertSql);
         mapParams(ps, args);
         ps.execute();
-        lock.unlock();
     }
 
     public static ResultSet read(final String sql, Object... args) throws SQLException {
-        lock.lock();
         PreparedStatement ps = ConnectionProvider.getConnection().prepareStatement(sql);
         mapParams(ps, args);
-        final ResultSet resultSet = ps.executeQuery();
-        lock.unlock();
-        return resultSet;
+        return ps.executeQuery();
     }
 
     public static void delete(final String sql, Object... args) throws SQLException {
-        lock.lock();
         PreparedStatement ps = ConnectionProvider.getConnection().prepareStatement(sql);
         mapParams(ps, args);
         ps.executeUpdate();
-        lock.unlock();
     }
 
     public static void executeUpdate(final String sql, Object... args) throws SQLException {
-        lock.lock();
         ConnectionProvider.getConnection().setAutoCommit(false);
 
         PreparedStatement ps = ConnectionProvider.getConnection().prepareStatement(sql);
@@ -81,7 +70,6 @@ public final class QueryExecutor {
 
         ConnectionProvider.getConnection().commit();
         ConnectionProvider.getConnection().setAutoCommit(true);
-        lock.unlock();
     }
 
     public static void mapParams(PreparedStatement ps, Object... args) throws SQLException {
