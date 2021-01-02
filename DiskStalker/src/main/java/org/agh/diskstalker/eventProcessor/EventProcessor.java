@@ -1,6 +1,7 @@
-package org.agh.diskstalker.model.events;
+package org.agh.diskstalker.eventProcessor;
 
 import org.agh.diskstalker.model.NodeData;
+import org.agh.diskstalker.model.events.filesystemEvents.FilesystemEvent;
 import org.agh.diskstalker.model.tree.TreeBuilder;
 import org.agh.diskstalker.model.tree.TreeFileNode;
 

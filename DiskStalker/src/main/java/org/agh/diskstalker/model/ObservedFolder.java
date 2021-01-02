@@ -6,10 +6,16 @@ import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleLongProperty;
+import org.agh.diskstalker.eventProcessor.EventProcessor;
+import org.agh.diskstalker.eventProcessor.IEventProcessor;
 import org.agh.diskstalker.filesystem.dirwatcher.DirWatcher;
 import org.agh.diskstalker.filesystem.dirwatcher.IFilesystemWatcher;
 import org.agh.diskstalker.filesystem.scanner.FileTreeScanner;
-import org.agh.diskstalker.model.events.*;
+import org.agh.diskstalker.model.events.filesystemEvents.FilesystemEvent;
+import org.agh.diskstalker.model.events.observedFolderEvents.ObservedFolderErrorEvent;
+import org.agh.diskstalker.model.events.observedFolderEvents.ObservedFolderEvent;
+import org.agh.diskstalker.model.events.observedFolderEvents.ObservedFolderRootAvailableEvent;
+import org.agh.diskstalker.model.events.observedFolderEvents.ObservedFolderSizeChangedEvent;
 import org.agh.diskstalker.model.tree.TreeBuilder;
 
 import java.nio.file.Path;

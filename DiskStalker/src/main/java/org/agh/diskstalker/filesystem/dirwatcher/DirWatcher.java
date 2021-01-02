@@ -2,8 +2,8 @@ package org.agh.diskstalker.filesystem.dirwatcher;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
-import org.agh.diskstalker.model.events.FilesystemEvent;
-import org.agh.diskstalker.model.events.FilesystemEventType;
+import org.agh.diskstalker.model.events.filesystemEvents.FilesystemEvent;
+import org.agh.diskstalker.model.events.filesystemEvents.FilesystemEventType;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
 

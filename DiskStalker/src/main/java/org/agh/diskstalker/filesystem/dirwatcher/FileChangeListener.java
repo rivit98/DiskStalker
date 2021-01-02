@@ -1,6 +1,6 @@
 package org.agh.diskstalker.filesystem.dirwatcher;
 
-import org.agh.diskstalker.model.events.FilesystemEventType;
+import org.agh.diskstalker.model.events.filesystemEvents.FilesystemEventType;
 import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
 
 import java.io.File;

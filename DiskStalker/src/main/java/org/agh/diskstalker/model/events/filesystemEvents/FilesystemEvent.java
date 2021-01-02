@@ -1,4 +1,4 @@
-package org.agh.diskstalker.model.events;
+package org.agh.diskstalker.model.events.filesystemEvents;
 
 import java.nio.file.Path;
 
