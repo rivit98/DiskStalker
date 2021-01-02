@@ -1,23 +1,17 @@
 package org.agh.diskstalker.controllers;
 
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ObservableValue;
-import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
-import javafx.util.StringConverter;
-import javafx.util.converter.NumberStringConverter;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.agh.diskstalker.application.StringToIntFormatter;
 import org.agh.diskstalker.cellFactories.PathColumnCellFactory;
 import org.agh.diskstalker.cellFactories.SizeColumnCellFactory;
-import org.agh.diskstalker.graphics.GraphicsFactory;
 import org.agh.diskstalker.model.NodeData;
 import org.agh.diskstalker.model.ObservedFolder;
 import org.agh.diskstalker.model.tree.TreeFileNode;
@@ -32,7 +26,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Component
@@ -52,70 +45,19 @@ public class MainView {
     private Button deleteFromDiskButton;
 
     private final List<ObservedFolder> folderList = new LinkedList<>();
-    private final DatabaseCommandExecutor executor = new DatabaseCommandExecutor();
-
-    private boolean checkIfRoot(TreeItem<NodeData> item) {
-        return item != null && item.getParent() != null;
-    }
-
-    private void prepareColumns() {
-        createRoot();
-        //todo: refactor this
-        var pathColumn = new TreeTableColumn<NodeData, Path>("Name");
-        var sizeColumn = new TreeTableColumn<NodeData, Number>("Size");
-        pathColumn.setPrefWidth(242); //todo: set proper width
-        sizeColumn.setPrefWidth(123);
-        pathColumn.setCellValueFactory(node -> {
-            var pathOptional = Optional.ofNullable(node.getValue())
-                    .flatMap(v -> Optional.ofNullable(v.getValue()))
-                    .map(NodeData::getPath);
-
-            return pathOptional.map(SimpleObjectProperty::new).orElseGet(SimpleObjectProperty::new);
-        });
-
-        pathColumn.setCellFactory(ttc -> new PathColumnCellFactory(this));
-
-        sizeColumn.setCellValueFactory(node -> {
-            var sizePropertyOptional = Optional.ofNullable(node.getValue());
-            return sizePropertyOptional
-                    .map(nodeData -> nodeData.getValue().sizePropertyProperty())
-                    .orElse(null);
-        });
-
-        sizeColumn.setCellFactory(ttc -> {
-            var cellFactory = new SizeColumnCellFactory();
-            cellFactory.pseudoClassStateChanged(PseudoClass.getPseudoClass("centered"), true);
-            return cellFactory;
-        });
-
-        locationTreeView.getColumns().add(pathColumn);
-        locationTreeView.getColumns().add(sizeColumn);
-    }
-
-    private void initializeTableTreeView() {
-        createRoot();
-        prepareColumns();
-    }
+    private final DatabaseCommandExecutor commandExecutor = new DatabaseCommandExecutor();
 
     @FXML
     public void initialize() {
         initializeTableTreeView();
         initializeButtons();
         initializeSizeField();
-        loadSavedSettings();
+        loadSavedFolders();
     }
 
-    private void loadSavedSettings() {
-        ObservedFolderDao.getAll()
-                .forEach(observedFolder -> {
-                    addObservedFolder(observedFolder);
-                    try {
-                        //TODO: loading many folders from db causes exceptions in rx (temporary sol)
-                        Thread.sleep(10);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                });
+    private void initializeTableTreeView() {
+        createRoot();
+        prepareColumns();
     }
 
     private void createRoot() {
@@ -124,15 +66,32 @@ public class MainView {
         locationTreeView.getRoot().setExpanded(true);
     }
 
-    public void addToMainTree(ObservedFolder folder, TreeFileNode node) {
-        locationTreeView.getRoot().getChildren().add(node);
-        folderList.add(folder);
-    }
+    private void prepareColumns() {
+        //todo: refactor this
+        var pathColumn = new TreeTableColumn<NodeData, Path>("Name");
+        var sizeColumn = new TreeTableColumn<NodeData, Number>("Size");
+        pathColumn.setPrefWidth(242); //todo: set proper width
+        sizeColumn.setPrefWidth(123);
 
-    private void addObservedFolder(ObservedFolder folder) {
-        folder.getEventStream()
-                .observeOn(JavaFxScheduler.platform())
-                .subscribe(event -> event.dispatch(this));
+        pathColumn.setCellFactory(ttc -> new PathColumnCellFactory(this));
+        sizeColumn.setCellFactory(ttc -> new SizeColumnCellFactory());
+
+        pathColumn.setCellValueFactory(node -> {
+            var pathOptional = Optional.ofNullable(node.getValue())
+                    .flatMap(v -> Optional.ofNullable(v.getValue()))
+                    .map(NodeData::getPath);
+
+            return pathOptional.map(SimpleObjectProperty::new).orElseGet(SimpleObjectProperty::new);
+        });
+
+        sizeColumn.setCellValueFactory(node -> {
+            var sizePropertyOptional = Optional.ofNullable(node.getValue());
+            return sizePropertyOptional
+                    .map(nodeData -> nodeData.getValue().sizePropertyProperty())
+                    .orElse(null);
+        });
+
+        locationTreeView.getColumns().addAll(List.of(pathColumn, sizeColumn));
     }
 
     private void initializeButtons() {
@@ -157,7 +116,7 @@ public class MainView {
         }, selectionModel.selectedItemProperty(), maxSizeField.textProperty()));//isEmpty(locationTreeView.getSelectionModel().getSelectedItems()));
 
         deleteButton.disableProperty().bind(Bindings.createBooleanBinding(() -> {
-            if(!selectedItems.isEmpty()) {
+            if (!selectedItems.isEmpty()) {
                 var selectedItem = selectionModel.getSelectedItem();
                 if (checkIfRoot(selectedItem)) {
                     return selectedItem.getParent().getValue() != null;
@@ -168,7 +127,7 @@ public class MainView {
     }
 
     private void initializeSizeField() {
-        maxSizeField.setTextFormatter(new StringToIntFormatter().getFormatter());
+        maxSizeField.setTextFormatter(new StringToIntFormatter());
 
         locationTreeView
                 .getSelectionModel()
@@ -192,7 +151,21 @@ public class MainView {
                         maxSizeField.setText(String.valueOf(newObservedFolder.getMaximumSize() / FileUtils.ONE_MB));
                     }));
                 });
+    }
 
+    private void loadSavedFolders() { //FIXME: restoring folders take long time
+        ObservedFolderDao.getAll().forEach(this::observeFolderEvents);
+    }
+
+    public void addToMainTree(ObservedFolder folder, TreeFileNode node) {
+        locationTreeView.getRoot().getChildren().add(node);
+        folderList.add(folder);
+    }
+
+    private void observeFolderEvents(ObservedFolder folder) {
+        folder.getEventStream()
+                .observeOn(JavaFxScheduler.platform())
+                .subscribe(event -> event.dispatch(this));
     }
 
     private void addButtonClicked(ActionEvent actionEvent) {
@@ -202,55 +175,58 @@ public class MainView {
 
         var selectedFolderOptional = Optional.ofNullable(directoryChooser.showDialog(new Stage()));
         selectedFolderOptional.ifPresent(selectedFolder -> {
-            var rootChildren = locationTreeView.getRoot().getChildren().stream()
-                    .filter(children -> children.getValue().getPath().equals(selectedFolder.toPath()))
-                    .findFirst();
+            var samePathExists = locationTreeView.getRoot().getChildren().stream()
+                    .anyMatch(children -> children.getValue().getPath().equals(selectedFolder.toPath()));
 
-            if (rootChildren.isPresent()) {
+            if (samePathExists) {
                 Alerts.tryingToAddSameFolderToObservedAlert();
             } else {
                 var folder = new ObservedFolder(selectedFolder.toPath());
-                addObservedFolder(folder);
+                observeFolderEvents(folder);
 
-                executor.executeCommand(folder, DatabaseCommandType.SAVE);
+                commandExecutor.executeCommand(folder, DatabaseCommandType.SAVE);
             }
         });
     }
 
     private void deleteButtonClicked(ActionEvent actionEvent) {
-        Optional.ofNullable(locationTreeView.getSelectionModel().getSelectedItem()).ifPresent(item -> {
-            Platform.runLater(() -> maxSizeField.setText(""));
+        Optional.ofNullable(
+                locationTreeView.getSelectionModel().getSelectedItem()
+        ).ifPresent(item -> {
             var searchedPath = item.getValue().getPath();
-
             getObservedFolderFromTreePath(searchedPath).ifPresent(observedFolder -> { //should always be present
                 removeFolder(observedFolder, item);
+                maxSizeField.clear();
             });
         });
     }
 
     private void deleteFromDiskButtonClicked(ActionEvent actionEvent) {
-        Optional.ofNullable(locationTreeView.getSelectionModel().getSelectedItem()).ifPresent(item -> {
-            var searchedPath = item.getValue().getPath();
-            ButtonType res = Alerts.yesNoDeleteAlert(searchedPath);
-            if(res.equals(ButtonType.YES)) {
-                getObservedFolderFromTreePath(searchedPath).ifPresent(observedFolder -> { //should always be present
-                    try {
-                        var searchedFile = searchedPath.toFile();
-                        if (searchedFile.isDirectory()) {
-                            FileUtils.deleteDirectory(searchedFile);
-                            if(checkIfRoot(item)) {
-                                removeFolder(observedFolder, item);
-                            }
-                        } else {
-                            if (!searchedFile.delete()) {
-                                throw new IOException();
-                            }
+        Optional.ofNullable(
+                locationTreeView.getSelectionModel().getSelectedItem()
+        ).ifPresent(item -> {
+            var nodeData = item.getValue();
+            var searchedPath = nodeData.getPath();
+            var res = Alerts.yesNoDeleteAlert(searchedPath);
+            if (res.equals(ButtonType.YES)) {
+                try {
+                    var searchedFile = searchedPath.toFile();
+                    if (nodeData.isDirectory()) {
+                        FileUtils.deleteDirectory(searchedFile);
+                        if (isMainFolder(item)) {
+                            getObservedFolderFromTreePath(searchedPath).ifPresent(observedFolder -> {
+                                removeMainFolder(observedFolder, item);
+                            });
                         }
-                    } catch (IOException | IllegalArgumentException e) {
-                        Alerts.genericErrorAlert(searchedPath, "Cannot delete file");
-                        e.printStackTrace();
+                    } else {
+                        if (!searchedFile.delete()) {
+                            throw new IOException();
+                        }
                     }
-                });
+                } catch (IOException | IllegalArgumentException e) {
+                    Alerts.genericErrorAlert(searchedPath, "Cannot delete file");
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -262,21 +238,28 @@ public class MainView {
 
         getObservedFolderFromTreePath(value.getPath()).ifPresent(observedFolder -> {
             observedFolder.setMaximumSizeProperty(maximumSize);
-            executor.executeCommand(observedFolder, DatabaseCommandType.UPDATE);
+            commandExecutor.executeCommand(observedFolder, DatabaseCommandType.UPDATE);
             Alerts.setMaxSizeAlert(value.getPath().toString(), maximumSize);
         });
     }
 
     private void removeFolder(ObservedFolder folder, TreeItem<NodeData> treeItem) {
-        var nodeToRemove = (TreeFileNode) treeItem;
-        if (locationTreeView.getRoot().getChildren().contains(nodeToRemove)) { //we are removing main folder
-            executor.executeCommand(folder, DatabaseCommandType.DELETE);
-            folder.destroy();
-            locationTreeView.getRoot().getChildren().remove(nodeToRemove);
-            folderList.remove(folder);
+        if (isMainFolder(treeItem)) {
+            removeMainFolder(folder, treeItem);
         } else {
-            nodeToRemove.deleteMe();
+            ((TreeFileNode) treeItem).deleteMe();
         }
+    }
+
+    private boolean isMainFolder(TreeItem<NodeData> node){
+        return locationTreeView.getRoot().getChildren().contains(node);
+    }
+
+    private void removeMainFolder(ObservedFolder folder, TreeItem<NodeData> nodeToRemove){
+        folder.destroy();
+        locationTreeView.getRoot().getChildren().remove(nodeToRemove);
+        folderList.remove(folder);
+        commandExecutor.executeCommand(folder, DatabaseCommandType.DELETE);
     }
 
     public Optional<ObservedFolder> getObservedFolderFromTreePath(Path searchedPath) {
@@ -297,6 +280,10 @@ public class MainView {
 
     public TreeTableView<NodeData> getMainView() {
         return locationTreeView;
+    }
+
+    private boolean checkIfRoot(TreeItem<NodeData> item) {
+        return item != null && item.getParent() != null;
     }
 
     public void onExit() {

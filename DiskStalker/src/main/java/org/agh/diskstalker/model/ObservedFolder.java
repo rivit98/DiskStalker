@@ -3,7 +3,6 @@ package org.agh.diskstalker.model;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.PublishSubject;
-import io.reactivex.rxjava3.subjects.SingleSubject;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleLongProperty;
@@ -12,7 +11,6 @@ import org.agh.diskstalker.filesystem.dirwatcher.IFilesystemWatcher;
 import org.agh.diskstalker.filesystem.scanner.FileTreeScanner;
 import org.agh.diskstalker.model.events.*;
 import org.agh.diskstalker.model.tree.TreeBuilder;
-import org.agh.diskstalker.model.tree.TreeFileNode;
 
 import java.nio.file.Path;
 import java.util.Objects;
@@ -44,16 +42,17 @@ public class ObservedFolder {
     }
 
     private void errorHandler(Throwable t) {
+        t.printStackTrace();
         eventStream.onNext(new ObservedFolderErrorEvent(this, t.getClass().getCanonicalName()));
     }
 
     private void scanDirectory() {
-        var scanner = new FileTreeScanner();
-        scanner
-                .scan(dirToWatch)
+        new FileTreeScanner(dirToWatch)
+                .scan()
                 .subscribeOn(Schedulers.io())
                 .observeOn(JavaFxScheduler.platform())
-                .subscribe(treeBuilder::processNodeData,
+                .subscribe(
+                        treeBuilder::processNodeData,
                         this::errorHandler,
                         this::startMonitoring
                 );
@@ -63,14 +62,14 @@ public class ObservedFolder {
         });
     }
 
-    private void processEvent(FilesystemEvent event){
+    private void processEvent(FilesystemEvent event) {
         eventProcessor.processEvent(event);
-        if (event.isModifyEvent() || event.isCreateEvent()) {
+        if (event.isModifyEvent() || event.isCreateEvent()) {  //TODO: how to do this better only with event processor
             sendSizeChangedEvent();
         }
     }
 
-    private void sendSizeChangedEvent(){
+    private void sendSizeChangedEvent() {
         eventStream.onNext(new ObservedFolderSizeChangedEvent(this));
     }
 
@@ -79,7 +78,8 @@ public class ObservedFolder {
                 .start()
                 .subscribeOn(Schedulers.io())
                 .observeOn(JavaFxScheduler.platform())
-                .subscribe(this::processEvent, //TODO: how to do this better only with eventsprocessor
+                .subscribe(
+                        this::processEvent,
                         this::errorHandler
                 );
     }
@@ -126,7 +126,7 @@ public class ObservedFolder {
     }
 
     public SimpleBooleanProperty isSizeExceededFlag() {
-        return this.sizeExceededFlag;
+        return sizeExceededFlag;
     }
 
     public void setSizeExceededFlag(boolean sizeExceededFlag) {
