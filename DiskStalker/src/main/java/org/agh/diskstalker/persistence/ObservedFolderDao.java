@@ -8,14 +8,12 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ObservedFolderDao {
-
-    //TODO: check if folder exists?
-    protected static void save(ObservedFolder observedFolder) {
+public class ObservedFolderDao implements IObservedFolderDao { // TODO: make methods non-static
+    @Override
+    public void save(ObservedFolder observedFolder) {
         var path = observedFolder.getPath().toString();
-
-        String insertIntoDB = "INSERT INTO observedFolders (path, max_size) VALUES (?, ?);";
-        Object[] args = {path, 0};
+        var insertIntoDB = "INSERT INTO observedFolders (path, max_size, limit_exceeded) VALUES (?, ?, ?);";
+        Object[] args = {path, 0, observedFolder.isSizeLimitExceeded()};
 
         try {
             QueryExecutor.createAndObtainId(insertIntoDB, args);
@@ -24,11 +22,12 @@ public class ObservedFolderDao {
         }
     }
 
-    protected static void update(ObservedFolder observedFolder) {
+    @Override
+    public void update(ObservedFolder observedFolder) {
         var path = observedFolder.getPath().toString();
         var maxSize = observedFolder.getMaximumSize();
-        var updateDB = "UPDATE observedFolders SET max_size = (?) WHERE path = (?);";
-        Object[] args = {maxSize, path};
+        var updateDB = "UPDATE observedFolders SET max_size = (?), limit_exceeded = (?) WHERE path = (?);";
+        Object[] args = {maxSize, observedFolder.isSizeLimitExceeded(), path};
 
         try {
             QueryExecutor.executeUpdate(updateDB, args);
@@ -37,7 +36,8 @@ public class ObservedFolderDao {
         }
     }
 
-    protected static void delete(ObservedFolder observedFolder) {
+    @Override
+    public void delete(ObservedFolder observedFolder) {
         var path = observedFolder.getPath().toString();
         var deleteObservedFolder = "DELETE FROM observedFolders WHERE path = (?);";
         Object[] args = {path};
@@ -49,17 +49,18 @@ public class ObservedFolderDao {
         }
     }
 
-    //TODO: size to observed folder? - to return here maxSize effectively
-    public static List<ObservedFolder> getAll() {
+    @Override
+    public List<ObservedFolder> getAll() {
         var findObservedFolders = "SELECT * FROM observedFolders;";
 
         var resultList = new LinkedList<ObservedFolder>();
         try (var rs = QueryExecutor.read(findObservedFolders)) {
             while (rs.next()) {
                 var path = Path.of(rs.getString("path"));
-                var maxSize = rs.getInt("max_size");
-                if (Files.exists(path) && Files.isDirectory(path)) {
-                    resultList.add(new ObservedFolder(path, maxSize));
+                if (Files.isDirectory(path)) {
+                    var folder = new ObservedFolder(path, rs.getInt("max_size"));
+                    folder.setSizeExceeded(rs.getInt("limit_exceeded") == 1);
+                    resultList.add(folder);
                 } else {
                     var delete = "DELETE FROM observedFolders WHERE path = (?);";
                     Object[] args = {path.toString()};

@@ -3,16 +3,20 @@ package org.agh.diskstalker.model;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.PublishSubject;
-import io.reactivex.rxjava3.subjects.SingleSubject;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleLongProperty;
+import org.agh.diskstalker.eventProcessor.EventProcessor;
+import org.agh.diskstalker.eventProcessor.IEventProcessor;
 import org.agh.diskstalker.filesystem.dirwatcher.DirWatcher;
 import org.agh.diskstalker.filesystem.dirwatcher.IFilesystemWatcher;
 import org.agh.diskstalker.filesystem.scanner.FileTreeScanner;
-import org.agh.diskstalker.model.events.*;
+import org.agh.diskstalker.model.events.filesystemEvents.FilesystemEvent;
+import org.agh.diskstalker.model.events.observedFolderEvents.ObservedFolderErrorEvent;
+import org.agh.diskstalker.model.events.observedFolderEvents.ObservedFolderEvent;
+import org.agh.diskstalker.model.events.observedFolderEvents.ObservedFolderRootAvailableEvent;
+import org.agh.diskstalker.model.events.observedFolderEvents.ObservedFolderSizeChangedEvent;
 import org.agh.diskstalker.model.tree.TreeBuilder;
-import org.agh.diskstalker.model.tree.TreeFileNode;
 
 import java.nio.file.Path;
 import java.util.Objects;
@@ -24,9 +28,9 @@ public class ObservedFolder {
     private final IFilesystemWatcher filesystemWatcher;
     private final IEventProcessor eventProcessor;
     private final TreeBuilder treeBuilder;
-    private final SimpleLongProperty maximumSizeProperty = new SimpleLongProperty(0);
-    private final SimpleBooleanProperty sizeExceededFlag = new SimpleBooleanProperty();
-    private final PublishSubject<FolderEvent> eventStream = PublishSubject.create();
+    private final SimpleLongProperty maximumSizeProperty = new SimpleLongProperty(0); //TODO: this might be just long
+    private final SimpleBooleanProperty sizeExceededProperty = new SimpleBooleanProperty();
+    private final PublishSubject<ObservedFolderEvent> eventStream = PublishSubject.create();
 
     public ObservedFolder(Path dirToWatch, long maxSize) {
         this.dirToWatch = dirToWatch;
@@ -34,7 +38,7 @@ public class ObservedFolder {
         this.treeBuilder = new TreeBuilder();
         this.eventProcessor = new EventProcessor(treeBuilder);
         setMaximumSizeProperty(maxSize);
-        this.sizeExceededFlag.set(false);
+        this.sizeExceededProperty.set(false);
 
         scanDirectory();
     }
@@ -44,30 +48,33 @@ public class ObservedFolder {
     }
 
     private void errorHandler(Throwable t) {
-        eventStream.onNext(new FolderEvent(FolderEventType.ERROR, t.getClass().getCanonicalName()));
+        t.printStackTrace();
+        eventStream.onNext(new ObservedFolderErrorEvent(this, t.getClass().getCanonicalName()));
     }
 
     private void scanDirectory() {
-        var scanner = new FileTreeScanner();
-        scanner
-                .scan(dirToWatch)
+        treeBuilder.getRoot().subscribe(node -> {
+            eventStream.onNext(new ObservedFolderRootAvailableEvent(this, node));
+        });
+
+        new FileTreeScanner(dirToWatch)
+                .scan()
                 .subscribeOn(Schedulers.io())
                 .observeOn(JavaFxScheduler.platform())
-                .subscribe(treeBuilder::processnodeData,
+                .subscribe(
+                        treeBuilder::processNodeData,
                         this::errorHandler,
                         this::startMonitoring
                 );
     }
 
-    private void processEvent(FilesystemEvent event){
+    private void processEvent(FilesystemEvent event) {
         eventProcessor.processEvent(event);
-        if (event.isModifyEvent() || event.isCreateEvent()) {
-            sendSizeChangedEvent();
-        }
+        sendSizeChangedEvent();
     }
 
-    private void sendSizeChangedEvent(){
-        eventStream.onNext(new FolderEvent(FolderEventType.SIZE_CHANGED));
+    private void sendSizeChangedEvent() {
+        eventStream.onNext(new ObservedFolderSizeChangedEvent(this));
     }
 
     private void startMonitoring() {
@@ -75,7 +82,8 @@ public class ObservedFolder {
                 .start()
                 .subscribeOn(Schedulers.io())
                 .observeOn(JavaFxScheduler.platform())
-                .subscribe(this::processEvent, //TODO: how to do this better only with eventsprocessor
+                .subscribe(
+                        this::processEvent,
                         this::errorHandler
                 );
     }
@@ -83,10 +91,6 @@ public class ObservedFolder {
     public void destroy() {
         filesystemWatcher.stop();
         eventStream.onComplete();
-    }
-
-    public SingleSubject<TreeFileNode> getTree() {
-        return treeBuilder.getRoot();
     }
 
     public boolean containsNode(Path path) {
@@ -103,7 +107,7 @@ public class ObservedFolder {
 
     public void setMaximumSizeProperty(long value) {
         maximumSizeProperty.set(value);
-        sendSizeChangedEvent();
+        sendSizeChangedEvent(); // force check size check
     }
 
     public Long getMaximumSize() {
@@ -121,21 +125,16 @@ public class ObservedFolder {
         return maxSize > 0 && getSize() > maxSize;
     }
 
-    public Observable<FolderEvent> getEventStream() {
+    public Observable<ObservedFolderEvent> getEventStream() {
         return eventStream;
     }
 
-    public SimpleBooleanProperty isSizeExceededFlag() {
-        return this.sizeExceededFlag;
+    public SimpleBooleanProperty getSizeExceededProperty() {
+        return sizeExceededProperty;
     }
 
-    public void setSizeExceededFlag(boolean sizeExceededFlag) {
-        this.sizeExceededFlag.set(sizeExceededFlag);
-    }
-
-    @Override
-    public String toString() {
-        return dirToWatch.toString();
+    public void setSizeExceeded(boolean sizeExceededFlag) {
+        sizeExceededProperty.set(sizeExceededFlag);
     }
 
     @Override

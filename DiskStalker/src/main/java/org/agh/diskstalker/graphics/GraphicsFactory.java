@@ -31,4 +31,8 @@ public final class GraphicsFactory { //TODO: inject as singleton? :D
         if(isDirectory && sizeExceeded) return new ImageView(FOLDER_IMAGE_RED);
         return isDirectory ? new ImageView(FOLDER_IMAGE) : new ImageView(FILE_IMAGE);
     }
+
+    public static ImageView getGraphic(boolean isDirectory) {
+        return getGraphic(isDirectory, false);
+    }
 }

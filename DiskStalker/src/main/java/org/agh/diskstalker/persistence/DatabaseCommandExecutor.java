@@ -1,24 +1,20 @@
 package org.agh.diskstalker.persistence;
 
-import org.agh.diskstalker.model.ObservedFolder;
+import org.agh.diskstalker.persistence.command.CommandResult;
+import org.agh.diskstalker.persistence.command.IObservedFolderCommand;
 
-//TODO: rewrite this to be async
-//TODO: maybe use Executors with blockingqueue
-public class DatabaseCommandExecutor implements Runnable {
-    ObservedFolder observedFolder;
-    DatabaseCommand command;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-    public DatabaseCommandExecutor(ObservedFolder observedFolder, DatabaseCommand command) {
-        this.observedFolder = observedFolder;
-        this.command = command;
+public class DatabaseCommandExecutor {
+    private final ExecutorService executor = Executors.newSingleThreadExecutor(); //tODO: shutdown it on appclose
+
+    public CompletableFuture<CommandResult> executeCommand(IObservedFolderCommand command) {
+        return CompletableFuture.supplyAsync(command, executor);
     }
 
-    @Override
-    public void run() {
-        switch (command) {
-            case SAVE -> ObservedFolderDao.save(observedFolder);
-            case DELETE -> ObservedFolderDao.delete(observedFolder);
-            case UPDATE -> ObservedFolderDao.update(observedFolder);
-        }
+    public void stop(){
+        executor.shutdown();
     }
 }
