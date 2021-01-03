@@ -12,8 +12,8 @@ public class ObservedFolderDao implements IObservedFolderDao { // TODO: make met
     @Override
     public void save(ObservedFolder observedFolder) {
         var path = observedFolder.getPath().toString();
-        var insertIntoDB = "INSERT INTO observedFolders (path, max_size) VALUES (?, ?);";
-        Object[] args = {path, 0};
+        var insertIntoDB = "INSERT INTO observedFolders (path, max_size, limit_exceeded) VALUES (?, ?, ?);";
+        Object[] args = {path, 0, observedFolder.isSizeLimitExceeded()};
 
         try {
             QueryExecutor.createAndObtainId(insertIntoDB, args);
@@ -26,8 +26,8 @@ public class ObservedFolderDao implements IObservedFolderDao { // TODO: make met
     public void update(ObservedFolder observedFolder) {
         var path = observedFolder.getPath().toString();
         var maxSize = observedFolder.getMaximumSize();
-        var updateDB = "UPDATE observedFolders SET max_size = (?) WHERE path = (?);";
-        Object[] args = {maxSize, path};
+        var updateDB = "UPDATE observedFolders SET max_size = (?), limit_exceeded = (?) WHERE path = (?);";
+        Object[] args = {maxSize, observedFolder.isSizeLimitExceeded(), path};
 
         try {
             QueryExecutor.executeUpdate(updateDB, args);
@@ -58,8 +58,9 @@ public class ObservedFolderDao implements IObservedFolderDao { // TODO: make met
             while (rs.next()) {
                 var path = Path.of(rs.getString("path"));
                 if (Files.isDirectory(path)) {
-                    var maxSize = rs.getInt("max_size");
-                    resultList.add(new ObservedFolder(path, maxSize));
+                    var folder = new ObservedFolder(path, rs.getInt("max_size"));
+                    folder.setSizeExceeded(rs.getInt("limit_exceeded") == 1);
+                    resultList.add(folder);
                 } else {
                     var delete = "DELETE FROM observedFolders WHERE path = (?);";
                     Object[] args = {path.toString()};

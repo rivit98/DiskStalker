@@ -15,7 +15,8 @@ public class QueryExecutor {
             create("CREATE TABLE IF NOT EXISTS observedFolders (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "path VARCHAR(1024) NOT NULL, " +
-                    "max_size INT NOT NULL" +
+                    "max_size INT NOT NULL, " +
+                    "limit_exceeded INT NOT NULL" +
                     ");");
 
         } catch (SQLException e) {
@@ -25,7 +26,6 @@ public class QueryExecutor {
     }
 
     private QueryExecutor() {
-        throw new UnsupportedOperationException();
     }
 
     public static int createAndObtainId(final String insertSql, Object... args) throws SQLException {

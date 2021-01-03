@@ -29,7 +29,7 @@ public class ObservedFolder {
     private final IEventProcessor eventProcessor;
     private final TreeBuilder treeBuilder;
     private final SimpleLongProperty maximumSizeProperty = new SimpleLongProperty(0); //TODO: this might be just long
-    private final SimpleBooleanProperty sizeExceededFlag = new SimpleBooleanProperty();
+    private final SimpleBooleanProperty sizeExceededProperty = new SimpleBooleanProperty();
     private final PublishSubject<ObservedFolderEvent> eventStream = PublishSubject.create();
 
     public ObservedFolder(Path dirToWatch, long maxSize) {
@@ -38,7 +38,7 @@ public class ObservedFolder {
         this.treeBuilder = new TreeBuilder();
         this.eventProcessor = new EventProcessor(treeBuilder);
         setMaximumSizeProperty(maxSize);
-        this.sizeExceededFlag.set(false);
+        this.sizeExceededProperty.set(false);
 
         scanDirectory();
     }
@@ -129,12 +129,12 @@ public class ObservedFolder {
         return eventStream;
     }
 
-    public SimpleBooleanProperty isSizeExceededFlag() {
-        return sizeExceededFlag;
+    public SimpleBooleanProperty getSizeExceededProperty() {
+        return sizeExceededProperty;
     }
 
-    public void setSizeExceededFlag(boolean sizeExceededFlag) {
-        this.sizeExceededFlag.set(sizeExceededFlag);
+    public void setSizeExceeded(boolean sizeExceededFlag) {
+        sizeExceededProperty.set(sizeExceededFlag);
     }
 
     @Override
