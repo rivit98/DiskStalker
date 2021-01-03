@@ -15,12 +15,10 @@ public class DirWatcher implements IFilesystemWatcher {
     private final long pollingInterval = 1700;
 
     public DirWatcher(Path path) {
-        monitor = new FileAlterationMonitor(pollingInterval);
         var listener = new FileChangeListener(this);
-
         var observer = new FileAlterationObserver(path.toFile());
         observer.addListener(listener);
-        monitor.addObserver(observer);
+        monitor = new FileAlterationMonitor(pollingInterval, observer);
     }
 
     @Override

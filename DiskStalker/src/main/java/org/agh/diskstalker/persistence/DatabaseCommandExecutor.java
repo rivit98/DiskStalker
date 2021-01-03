@@ -1,21 +1,20 @@
 package org.agh.diskstalker.persistence;
 
-import org.agh.diskstalker.model.ObservedFolder;
+import org.agh.diskstalker.persistence.command.CommandResult;
+import org.agh.diskstalker.persistence.command.IObservedFolderCommand;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 public class DatabaseCommandExecutor {
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final ExecutorService executor = Executors.newSingleThreadExecutor(); //tODO: shutdown it on appclose
 
-    public Future<?> executeCommand(ObservedFolder folder, DatabaseCommandType type) {
-        return executor.submit(() -> {
-            switch (type) {
-                case SAVE -> ObservedFolderDao.save(folder);
-                case DELETE -> ObservedFolderDao.delete(folder);
-                case UPDATE -> ObservedFolderDao.update(folder);
-            }
-        });
+    public CompletableFuture<CommandResult> executeCommand(IObservedFolderCommand command) {
+        return CompletableFuture.supplyAsync(command, executor);
+    }
+
+    public void stop(){
+        executor.shutdown();
     }
 }

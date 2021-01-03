@@ -17,8 +17,10 @@ import org.agh.diskstalker.model.NodeData;
 import org.agh.diskstalker.model.ObservedFolder;
 import org.agh.diskstalker.model.tree.TreeFileNode;
 import org.agh.diskstalker.persistence.DatabaseCommandExecutor;
-import org.agh.diskstalker.persistence.DatabaseCommandType;
-import org.agh.diskstalker.persistence.ObservedFolderDao;
+import org.agh.diskstalker.persistence.command.DeleteObservedFolderCommand;
+import org.agh.diskstalker.persistence.command.GetAllObservedFolderCommand;
+import org.agh.diskstalker.persistence.command.SaveObservedFolderCommand;
+import org.agh.diskstalker.persistence.command.UpdateObservedFolderCommand;
 import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
 
@@ -154,7 +156,10 @@ public class MainView {
     }
 
     private void loadSavedFolders() { //FIXME: restoring folders take long time
-        ObservedFolderDao.getAll().forEach(this::observeFolderEvents);
+        commandExecutor.executeCommand(new GetAllObservedFolderCommand())
+                .thenAccept(folders -> {
+                    folders.getFolderList().forEach(this::observeFolderEvents);
+                });
     }
 
     public void addToMainTree(ObservedFolder folder, TreeFileNode node) {
@@ -184,7 +189,7 @@ public class MainView {
                 var folder = new ObservedFolder(selectedFolder.toPath());
                 observeFolderEvents(folder);
 
-                commandExecutor.executeCommand(folder, DatabaseCommandType.SAVE);
+                commandExecutor.executeCommand(new SaveObservedFolderCommand(folder));
             }
         });
     }
@@ -238,7 +243,7 @@ public class MainView {
 
         folderList.getObservedFolderFromTreePath(value.getPath()).ifPresent(observedFolder -> {
             observedFolder.setMaximumSizeProperty(maximumSize);
-            commandExecutor.executeCommand(observedFolder, DatabaseCommandType.UPDATE);
+            commandExecutor.executeCommand(new UpdateObservedFolderCommand(observedFolder));
             Alerts.setMaxSizeAlert(value.getPath().toString(), maximumSize);
         });
     }
@@ -251,22 +256,22 @@ public class MainView {
         }
     }
 
-    private boolean isMainFolder(TreeItem<NodeData> node){
+    private boolean isMainFolder(TreeItem<NodeData> node) {
         return locationTreeView.getRoot().getChildren().contains(node);
     }
 
-    private void removeMainFolder(ObservedFolder folder, TreeItem<NodeData> nodeToRemove){
+    private void removeMainFolder(ObservedFolder folder, TreeItem<NodeData> nodeToRemove) {
         folder.destroy();
         locationTreeView.getRoot().getChildren().remove(nodeToRemove);
         folderList.get().remove(folder);
-        commandExecutor.executeCommand(folder, DatabaseCommandType.DELETE);
+        commandExecutor.executeCommand(new DeleteObservedFolderCommand(folder));
     }
 
     public TreeTableView<NodeData> getMainView() {
         return locationTreeView;
     }
 
-    public FolderList getFolderList(){
+    public FolderList getFolderList() {
         return folderList;
     }
 
@@ -276,6 +281,7 @@ public class MainView {
 
     public void onExit() {
         //TODO: debug, why app closes so long, probably DB connection needs to be closed
+        commandExecutor.stop();
         folderList.get().forEach(ObservedFolder::destroy);
     }
 }
