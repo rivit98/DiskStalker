@@ -53,6 +53,10 @@ public class ObservedFolder {
     }
 
     private void scanDirectory() {
+        treeBuilder.getRoot().subscribe(node -> {
+            eventStream.onNext(new ObservedFolderRootAvailableEvent(this, node));
+        });
+
         new FileTreeScanner(dirToWatch)
                 .scan()
                 .subscribeOn(Schedulers.io())
@@ -62,10 +66,6 @@ public class ObservedFolder {
                         this::errorHandler,
                         this::startMonitoring
                 );
-
-        treeBuilder.getRoot().subscribe(node -> {
-            eventStream.onNext(new ObservedFolderRootAvailableEvent(this, node));
-        });
     }
 
     private void processEvent(FilesystemEvent event) {

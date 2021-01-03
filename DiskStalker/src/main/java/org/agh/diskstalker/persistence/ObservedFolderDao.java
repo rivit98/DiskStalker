@@ -9,12 +9,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class ObservedFolderDao {
-
-    //TODO: check if folder exists?
-    protected static void save(ObservedFolder observedFolder) {
+    public static void save(ObservedFolder observedFolder) {
         var path = observedFolder.getPath().toString();
-
-        String insertIntoDB = "INSERT INTO observedFolders (path, max_size) VALUES (?, ?);";
+        var insertIntoDB = "INSERT INTO observedFolders (path, max_size) VALUES (?, ?);";
         Object[] args = {path, 0};
 
         try {
@@ -24,7 +21,7 @@ public class ObservedFolderDao {
         }
     }
 
-    protected static void update(ObservedFolder observedFolder) {
+    public static void update(ObservedFolder observedFolder) {
         var path = observedFolder.getPath().toString();
         var maxSize = observedFolder.getMaximumSize();
         var updateDB = "UPDATE observedFolders SET max_size = (?) WHERE path = (?);";
@@ -37,7 +34,7 @@ public class ObservedFolderDao {
         }
     }
 
-    protected static void delete(ObservedFolder observedFolder) {
+    public static void delete(ObservedFolder observedFolder) {
         var path = observedFolder.getPath().toString();
         var deleteObservedFolder = "DELETE FROM observedFolders WHERE path = (?);";
         Object[] args = {path};
@@ -49,7 +46,6 @@ public class ObservedFolderDao {
         }
     }
 
-    //TODO: size to observed folder? - to return here maxSize effectively
     public static List<ObservedFolder> getAll() {
         var findObservedFolders = "SELECT * FROM observedFolders;";
 
@@ -57,8 +53,8 @@ public class ObservedFolderDao {
         try (var rs = QueryExecutor.read(findObservedFolders)) {
             while (rs.next()) {
                 var path = Path.of(rs.getString("path"));
-                var maxSize = rs.getInt("max_size");
                 if (Files.isDirectory(path)) {
+                    var maxSize = rs.getInt("max_size");
                     resultList.add(new ObservedFolder(path, maxSize));
                 } else {
                     var delete = "DELETE FROM observedFolders WHERE path = (?);";

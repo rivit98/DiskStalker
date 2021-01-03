@@ -9,9 +9,10 @@ import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import net.rgielen.fxweaver.core.FxmlView;
-import org.agh.diskstalker.application.StringToIntFormatter;
 import org.agh.diskstalker.cellFactories.PathColumnCellFactory;
 import org.agh.diskstalker.cellFactories.SizeColumnCellFactory;
+import org.agh.diskstalker.formatters.StringToIntFormatter;
+import org.agh.diskstalker.model.FolderList;
 import org.agh.diskstalker.model.NodeData;
 import org.agh.diskstalker.model.ObservedFolder;
 import org.agh.diskstalker.model.tree.TreeFileNode;
@@ -24,7 +25,6 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,8 +44,8 @@ public class MainView {
     @FXML
     private Button deleteFromDiskButton;
 
-    private final List<ObservedFolder> folderList = new LinkedList<>();
     private final DatabaseCommandExecutor commandExecutor = new DatabaseCommandExecutor();
+    private FolderList folderList = new FolderList();
 
     @FXML
     public void initialize() {
@@ -133,8 +133,8 @@ public class MainView {
                 .getSelectionModel()
                 .selectedItemProperty()
                 .addListener((observable, oldTreeItem, newTreeItem) -> {
-                    var oldFolder = getObservedFolderFromTreeItem(oldTreeItem);
-                    var newFolder = getObservedFolderFromTreeItem(newTreeItem);
+                    var oldFolder = folderList.getObservedFolderFromTreeItem(oldTreeItem);
+                    var newFolder = folderList.getObservedFolderFromTreeItem(newTreeItem);
 
                     oldFolder.ifPresentOrElse(oldObservedFolder -> {
                         newFolder.ifPresent(newObservedFolder -> {
@@ -159,10 +159,10 @@ public class MainView {
 
     public void addToMainTree(ObservedFolder folder, TreeFileNode node) {
         locationTreeView.getRoot().getChildren().add(node);
-        folderList.add(folder);
+        folderList.get().add(folder);
     }
 
-    private void observeFolderEvents(ObservedFolder folder) {
+    private void observeFolderEvents(ObservedFolder folder) { //TODO: this might be problematic, we should subscribe folder before scanner starts
         folder.getEventStream()
                 .observeOn(JavaFxScheduler.platform())
                 .subscribe(event -> event.dispatch(this));
@@ -194,7 +194,7 @@ public class MainView {
                 locationTreeView.getSelectionModel().getSelectedItem()
         ).ifPresent(item -> {
             var searchedPath = item.getValue().getPath();
-            getObservedFolderFromTreePath(searchedPath).ifPresent(observedFolder -> { //should always be present
+            folderList.getObservedFolderFromTreePath(searchedPath).ifPresent(observedFolder -> { //should always be present
                 removeFolder(observedFolder, item);
                 maxSizeField.clear();
             });
@@ -214,7 +214,7 @@ public class MainView {
                     if (nodeData.isDirectory()) {
                         FileUtils.deleteDirectory(searchedFile);
                         if (isMainFolder(item)) {
-                            getObservedFolderFromTreePath(searchedPath).ifPresent(observedFolder -> {
+                            folderList.getObservedFolderFromTreePath(searchedPath).ifPresent(observedFolder -> {
                                 removeMainFolder(observedFolder, item);
                             });
                         }
@@ -236,7 +236,7 @@ public class MainView {
         var selectedTreeItem = locationTreeView.getSelectionModel().getSelectedItem();
         var value = selectedTreeItem.getValue();
 
-        getObservedFolderFromTreePath(value.getPath()).ifPresent(observedFolder -> {
+        folderList.getObservedFolderFromTreePath(value.getPath()).ifPresent(observedFolder -> {
             observedFolder.setMaximumSizeProperty(maximumSize);
             commandExecutor.executeCommand(observedFolder, DatabaseCommandType.UPDATE);
             Alerts.setMaxSizeAlert(value.getPath().toString(), maximumSize);
@@ -258,28 +258,16 @@ public class MainView {
     private void removeMainFolder(ObservedFolder folder, TreeItem<NodeData> nodeToRemove){
         folder.destroy();
         locationTreeView.getRoot().getChildren().remove(nodeToRemove);
-        folderList.remove(folder);
+        folderList.get().remove(folder);
         commandExecutor.executeCommand(folder, DatabaseCommandType.DELETE);
-    }
-
-    public Optional<ObservedFolder> getObservedFolderFromTreePath(Path searchedPath) {
-        return folderList.stream()
-                .filter(observedFolder -> observedFolder.containsNode(searchedPath))
-                .findFirst();
-    }
-
-    public Optional<ObservedFolder> getObservedFolderFromSelection() {
-        return Optional.ofNullable(locationTreeView.getSelectionModel().getSelectedItem())
-                .flatMap(item -> getObservedFolderFromTreePath(item.getValue().getPath()));
-    }
-
-    public Optional<ObservedFolder> getObservedFolderFromTreeItem(TreeItem<NodeData> treeItem) {
-        return Optional.ofNullable(treeItem)
-                .flatMap(item -> getObservedFolderFromTreePath(item.getValue().getPath()));
     }
 
     public TreeTableView<NodeData> getMainView() {
         return locationTreeView;
+    }
+
+    public FolderList getFolderList(){
+        return folderList;
     }
 
     private boolean checkIfRoot(TreeItem<NodeData> item) {
@@ -288,6 +276,6 @@ public class MainView {
 
     public void onExit() {
         //TODO: debug, why app closes so long, probably DB connection needs to be closed
-        folderList.forEach(ObservedFolder::destroy);
+        folderList.get().forEach(ObservedFolder::destroy);
     }
 }

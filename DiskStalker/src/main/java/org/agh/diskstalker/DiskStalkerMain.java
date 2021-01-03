@@ -9,8 +9,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
-public
-class DiskStalkerMain {
+public class DiskStalkerMain {
     public static void main(String[] args) {
         Application.launch(DiskStalkerSpringBootstrap.class, args);
     }

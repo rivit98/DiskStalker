@@ -28,10 +28,11 @@ public class PathColumnCellFactory extends TreeTableCell<NodeData, Path> {
                 .ifPresentOrElse(
                         fileName -> {
                             setText(fileName.toString());
-                            var observedFolder = mainView.getObservedFolderFromTreePath(item);
-                            observedFolder.ifPresent(folder -> {
-                                setGraphic(GraphicsFactory.getGraphic(item.toFile().isDirectory(), folder.isSizeLimitExceeded()));
-                            });
+                            mainView.getFolderList()
+                                    .getObservedFolderFromTreePath(item)
+                                    .ifPresent(folder -> {
+                                        setGraphic(GraphicsFactory.getGraphic(item.toFile().isDirectory(), folder.isSizeLimitExceeded()));
+                                    });
                         },
                         () -> setText(item.toString())
                 );
