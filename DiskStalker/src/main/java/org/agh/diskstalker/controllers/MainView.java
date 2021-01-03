@@ -116,7 +116,7 @@ public class MainView {
         }, selectionModel.selectedItemProperty(), maxSizeField.textProperty()));//isEmpty(locationTreeView.getSelectionModel().getSelectedItems()));
 
         deleteButton.disableProperty().bind(Bindings.createBooleanBinding(() -> {
-            if (!selectedItems.isEmpty()) {
+            if (!selectedItems.isEmpty()) { //FIXME: after deleting one element, other becomes selected in view but selectedItems is empty
                 var selectedItem = selectionModel.getSelectedItem();
                 if (checkIfRoot(selectedItem)) {
                     return selectedItem.getParent().getValue() != null;
