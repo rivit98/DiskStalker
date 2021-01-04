@@ -30,7 +30,7 @@
       <RowConstraints />
     </rowConstraints>
     <children>
-        <TabPane fx:id="tabPane" prefHeight="400.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" GridPane.columnSpan="2" GridPane.rowIndex="1" GridPane.rowSpan="8">
+        <TabPane prefHeight="400.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" GridPane.columnSpan="2" GridPane.rowIndex="1" GridPane.rowSpan="8">
             <tabs>
                 <Tab text="Space">
                     <content>
@@ -77,6 +77,8 @@
                         </GridPane>
                     </content>
                 </Tab>
+                <fx:include fx:id="fileTypeView" source="FileTypeView.fxml"/>
+                <fx:include fx:id="fileSizeView" source="FileSizeView.fxml"/>
             </tabs>
         </TabPane>
         <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Observed directories" textAlignment="CENTER" wrappingWidth="467.0" GridPane.rowIndex="1">
