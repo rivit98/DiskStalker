@@ -14,4 +14,8 @@ public class CommandResult {
     public void setFolderList(List<ObservedFolder> folderList) {
         this.folderList = folderList;
     }
+
+    public static CommandResult empty(){
+        return new CommandResult();
+    }
 }

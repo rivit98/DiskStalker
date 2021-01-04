@@ -12,6 +12,6 @@ public class SaveObservedFolderCommand extends AbstractObservedFolderCommand{
     @Override
     public CommandResult get() {
         observedFolderDao.save(observedFolder);
-        return new CommandResult();
+        return CommandResult.empty();
     }
 }

@@ -6,6 +6,6 @@ public class ConnectToDbCommand extends AbstractObservedFolderCommand{
     @Override
     public CommandResult get() {
         ConnectionProvider.init("jdbc:sqlite:observed_folders.db");
-        return new CommandResult();
+        return CommandResult.empty();
     }
 }

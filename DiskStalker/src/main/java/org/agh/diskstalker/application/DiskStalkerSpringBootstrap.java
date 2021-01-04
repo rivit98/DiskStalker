@@ -25,7 +25,7 @@ public class DiskStalkerSpringBootstrap extends Application {
 
     @Override
     public void stop() throws Exception {
-        this.context.close();
+        context.close();
         Platform.exit();
     }
 }

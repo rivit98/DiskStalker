@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ObservedFolderDao implements IObservedFolderDao { // TODO: make methods non-static
+public class ObservedFolderDao implements IObservedFolderDao {
     @Override
     public void save(ObservedFolder observedFolder) {
         var path = observedFolder.getPath().toString();

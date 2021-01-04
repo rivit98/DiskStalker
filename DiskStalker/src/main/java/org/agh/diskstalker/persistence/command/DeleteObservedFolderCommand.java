@@ -12,6 +12,6 @@ public class DeleteObservedFolderCommand extends AbstractObservedFolderCommand {
     @Override
     public CommandResult get() {
         observedFolderDao.delete(observedFolder);
-        return new CommandResult();
+        return CommandResult.empty();
     }
 }
