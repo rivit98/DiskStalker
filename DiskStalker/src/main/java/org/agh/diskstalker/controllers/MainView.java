@@ -108,7 +108,7 @@ public class MainView {
         setSizeButton.disableProperty().bind(Bindings.createBooleanBinding(() -> { //todo: refactor this
             if (!selectedItems.isEmpty()) {
                 var selectedItem = selectionModel.getSelectedItem();
-                if (checkIfRoot(selectedItem) && !maxSizeField.getText().equals("")) {
+                if (isMainFolder(selectedItem) && !maxSizeField.getText().equals("")) {
                     return selectedItem.getParent().getValue() != null;
                 }
             }
@@ -118,7 +118,7 @@ public class MainView {
         stopObserveButton.disableProperty().bind(Bindings.createBooleanBinding(() -> {
             if (!selectedItems.isEmpty()) { //FIXME: after deleting one element, other becomes selected in view but selectedItems is empty
                 var selectedItem = selectionModel.getSelectedItem();
-                if (checkIfRoot(selectedItem)) {
+                if (isMainFolder(selectedItem)) {
                     return selectedItem.getParent().getValue() != null;
                 }
             }
@@ -271,10 +271,6 @@ public class MainView {
 
     public FolderList getFolderList() {
         return folderList;
-    }
-
-    private boolean checkIfRoot(TreeItem<NodeData> item) {
-        return item != null && item.getParent() != null;
     }
 
     public void onExit() {
