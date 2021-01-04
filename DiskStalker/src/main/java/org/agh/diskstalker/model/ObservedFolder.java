@@ -6,6 +6,7 @@ import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.property.SimpleStringProperty;
 import org.agh.diskstalker.eventProcessor.EventProcessor;
 import org.agh.diskstalker.eventProcessor.IEventProcessor;
 import org.agh.diskstalker.filesystem.dirwatcher.DirWatcher;
@@ -31,6 +32,7 @@ public class ObservedFolder {
     private final SimpleLongProperty maximumSizeProperty = new SimpleLongProperty(0); //TODO: this might be just long
     private final SimpleBooleanProperty sizeExceededProperty = new SimpleBooleanProperty();
     private final PublishSubject<ObservedFolderEvent> eventStream = PublishSubject.create();
+    private final SimpleStringProperty name;
 
     public ObservedFolder(Path dirToWatch, long maxSize) {
         this.dirToWatch = dirToWatch;
@@ -39,6 +41,7 @@ public class ObservedFolder {
         this.eventProcessor = new EventProcessor(treeBuilder);
         setMaximumSizeProperty(maxSize);
         this.sizeExceededProperty.set(false);
+        this.name = new SimpleStringProperty(dirToWatch.getFileName().toString());
 
         scanDirectory();
     }
@@ -143,5 +146,9 @@ public class ObservedFolder {
         if (o == null || getClass() != o.getClass()) return false;
         ObservedFolder that = (ObservedFolder) o;
         return Objects.equals(dirToWatch, that.dirToWatch);
+    }
+
+    public String getName() {
+        return name.get();
     }
 }

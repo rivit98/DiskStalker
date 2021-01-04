@@ -5,6 +5,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
@@ -31,6 +32,8 @@ import java.util.Optional;
 @FxmlView("/views/MainView.fxml")
 public class MainView {
     @FXML
+    private TabPane tabPane;
+    @FXML
     private TreeTableView<NodeData> locationTreeView;
     @FXML
     private Button addButton;
@@ -50,6 +53,7 @@ public class MainView {
     public void initialize() {
         commandExecutor.executeCommand(new ConnectToDbCommand());
         initializeTableTreeView();
+        initializeTabs();
         initializeButtons();
         initializeSizeField();
         loadSavedFolders();
@@ -64,6 +68,28 @@ public class MainView {
         locationTreeView.setRoot(new TreeItem<>());
         locationTreeView.setShowRoot(false);
         locationTreeView.getRoot().setExpanded(true);
+    }
+
+    private void initializeTabs() {
+        try {
+            var loader = new FXMLLoader();
+            loader.setLocation(this.getClass().getResource("/views/FileTypeView.fxml"));
+            var loaded = loader.load();
+            var controller = (FileTypeView) loader.getController();
+            tabPane.getTabs().add((Tab) loaded);
+
+            var loader2 = new FXMLLoader();
+            loader2.setLocation(this.getClass().getResource("/views/FileSizeView.fxml"));
+            var loaded2 = loader2.load();
+            var controller2 = (FileSizeView) loader2.getController();
+            tabPane.getTabs().add((Tab) loaded2);
+
+            controller.prepareTable(folderList);
+            controller2.prepareTable(folderList);
+
+        } catch (IOException e) {
+            System.out.println("Cannot load fxml files");
+        }
     }
 
     private void prepareColumns() {

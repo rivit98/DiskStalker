@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<Tab text="File type" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.agh.diskstalker.controllers.FileTypeView">
+    <content>
+        <GridPane>
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="468.0" minWidth="10.0" prefWidth="467.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="295.0" minWidth="10.0" prefWidth="133.0" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints maxHeight="118.0" minHeight="10.0" prefHeight="53.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="298.0" minHeight="10.0" prefHeight="34.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="233.0" minHeight="10.0" prefHeight="35.5" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="164.0" minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="144.0" minHeight="10.0" prefHeight="38.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="117.0" minHeight="10.0" prefHeight="27.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="139.0" minHeight="10.0" prefHeight="31.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="165.5" minHeight="10.0" prefHeight="34.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="117.5" minHeight="10.0" prefHeight="94.5" vgrow="SOMETIMES" />
+            </rowConstraints>
+            <children>
+                <TableView fx:id="tableViewType" prefHeight="254.0" prefWidth="412.0" GridPane.rowIndex="1" GridPane.rowSpan="8">
+                    <GridPane.margin>
+                        <Insets bottom="50.0" left="50.0" right="50.0" />
+                    </GridPane.margin>
+                </TableView>
+                <Button fx:id="showTypes" mnemonicParsing="false" prefHeight="25.0" prefWidth="124.0" text="Show number of files by type" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            </children>
+        </GridPane>
+    </content>
+</Tab>
