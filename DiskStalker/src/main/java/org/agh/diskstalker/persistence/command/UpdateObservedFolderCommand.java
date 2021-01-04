@@ -12,6 +12,6 @@ public class UpdateObservedFolderCommand extends AbstractObservedFolderCommand {
     @Override
     public CommandResult get() {
         observedFolderDao.update(observedFolder);
-        return new CommandResult();
+        return CommandResult.empty();
     }
 }

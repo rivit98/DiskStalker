@@ -20,10 +20,6 @@ class PrimaryStageInitializer implements ApplicationListener<StageReadyEvent> {
 
     private final FxWeaver fxWeaver;
 
-    static { //TODO: where am I supposed to put this? :D
-        ConnectionProvider.init("jdbc:sqlite:observed_folders.db");
-    }
-
     @Autowired
     public PrimaryStageInitializer(FxWeaver fxWeaver) {
         this.fxWeaver = fxWeaver;
@@ -51,11 +47,6 @@ class PrimaryStageInitializer implements ApplicationListener<StageReadyEvent> {
 
         primaryStage.setOnCloseRequest(event -> {
             controller.onExit();
-            try {
-                ConnectionProvider.close();
-            } catch (SQLException exception) {
-                exception.printStackTrace();
-            }
         });
     }
 }

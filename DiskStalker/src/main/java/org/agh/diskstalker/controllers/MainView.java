@@ -17,10 +17,7 @@ import org.agh.diskstalker.model.NodeData;
 import org.agh.diskstalker.model.ObservedFolder;
 import org.agh.diskstalker.model.tree.TreeFileNode;
 import org.agh.diskstalker.persistence.DatabaseCommandExecutor;
-import org.agh.diskstalker.persistence.command.DeleteObservedFolderCommand;
-import org.agh.diskstalker.persistence.command.GetAllObservedFolderCommand;
-import org.agh.diskstalker.persistence.command.SaveObservedFolderCommand;
-import org.agh.diskstalker.persistence.command.UpdateObservedFolderCommand;
+import org.agh.diskstalker.persistence.command.*;
 import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
 
@@ -38,7 +35,7 @@ public class MainView {
     @FXML
     private Button addButton;
     @FXML
-    private Button deleteButton;
+    private Button stopObserveButton;
     @FXML
     private Button setSizeButton;
     @FXML
@@ -51,6 +48,7 @@ public class MainView {
 
     @FXML
     public void initialize() {
+        commandExecutor.executeCommand(new ConnectToDbCommand());
         initializeTableTreeView();
         initializeButtons();
         initializeSizeField();
@@ -98,7 +96,7 @@ public class MainView {
 
     private void initializeButtons() {
         addButton.setOnAction(this::addButtonClicked);
-        deleteButton.setOnAction(this::deleteButtonClicked);
+        stopObserveButton.setOnAction(this::stopObservingButtonClicked);
         setSizeButton.setOnAction(this::setSizeButtonClicked);
         deleteFromDiskButton.setOnAction(this::deleteFromDiskButtonClicked);
 
@@ -110,22 +108,22 @@ public class MainView {
         setSizeButton.disableProperty().bind(Bindings.createBooleanBinding(() -> { //todo: refactor this
             if (!selectedItems.isEmpty()) {
                 var selectedItem = selectionModel.getSelectedItem();
-                if (checkIfRoot(selectedItem) && !maxSizeField.getText().equals("")) {
+                if (isMainFolder(selectedItem) && !maxSizeField.getText().equals("")) {
                     return selectedItem.getParent().getValue() != null;
                 }
             }
             return true;
         }, selectionModel.selectedItemProperty(), maxSizeField.textProperty()));//isEmpty(locationTreeView.getSelectionModel().getSelectedItems()));
 
-        deleteButton.disableProperty().bind(Bindings.createBooleanBinding(() -> {
+        stopObserveButton.disableProperty().bind(Bindings.createBooleanBinding(() -> {
             if (!selectedItems.isEmpty()) { //FIXME: after deleting one element, other becomes selected in view but selectedItems is empty
                 var selectedItem = selectionModel.getSelectedItem();
-                if (checkIfRoot(selectedItem)) {
+                if (isMainFolder(selectedItem)) {
                     return selectedItem.getParent().getValue() != null;
                 }
             }
             return true;
-        }, selectionModel.selectedItemProperty()));//Bindings.isEmpty(selectedItems));
+        }, selectionModel.selectedItemProperty()));
     }
 
     private void initializeSizeField() {
@@ -194,7 +192,7 @@ public class MainView {
         });
     }
 
-    private void deleteButtonClicked(ActionEvent actionEvent) {
+    private void stopObservingButtonClicked(ActionEvent actionEvent) {
         Optional.ofNullable(
                 locationTreeView.getSelectionModel().getSelectedItem()
         ).ifPresent(item -> {
@@ -273,10 +271,6 @@ public class MainView {
 
     public FolderList getFolderList() {
         return folderList;
-    }
-
-    private boolean checkIfRoot(TreeItem<NodeData> item) {
-        return item != null && item.getParent() != null;
     }
 
     public void onExit() {

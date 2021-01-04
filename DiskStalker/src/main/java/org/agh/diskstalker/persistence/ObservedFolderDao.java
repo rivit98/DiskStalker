@@ -8,12 +8,12 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ObservedFolderDao implements IObservedFolderDao { // TODO: make methods non-static
+public class ObservedFolderDao implements IObservedFolderDao {
     @Override
     public void save(ObservedFolder observedFolder) {
         var path = observedFolder.getPath().toString();
         var insertIntoDB = "INSERT INTO observedFolders (path, max_size, limit_exceeded) VALUES (?, ?, ?);";
-        Object[] args = {path, 0, observedFolder.isSizeLimitExceeded()};
+        Object[] args = {path, 0, observedFolder.isSizeLimitExceeded() ? 1 : 0};
 
         try {
             QueryExecutor.createAndObtainId(insertIntoDB, args);
@@ -27,7 +27,7 @@ public class ObservedFolderDao implements IObservedFolderDao { // TODO: make met
         var path = observedFolder.getPath().toString();
         var maxSize = observedFolder.getMaximumSize();
         var updateDB = "UPDATE observedFolders SET max_size = (?), limit_exceeded = (?) WHERE path = (?);";
-        Object[] args = {maxSize, observedFolder.isSizeLimitExceeded(), path};
+        Object[] args = {maxSize, observedFolder.isSizeLimitExceeded() ? 1 : 0, path};
 
         try {
             QueryExecutor.executeUpdate(updateDB, args);
