@@ -105,22 +105,20 @@ public class MainView {
 
         deleteFromDiskButton.disableProperty().bind(Bindings.isEmpty(selectedItems));
 
-        setSizeButton.disableProperty().bind(Bindings.createBooleanBinding(() -> { //todo: refactor this
-            if (!selectedItems.isEmpty()) {
-                var selectedItem = selectionModel.getSelectedItem();
+        setSizeButton.disableProperty().bind(Bindings.createBooleanBinding(() -> {
+            var selectedItem = selectionModel.getSelectedItem();
+            if (selectedItem != null) {
                 if (isMainFolder(selectedItem) && !maxSizeField.getText().equals("")) {
-                    return selectedItem.getParent().getValue() != null;
+                    return !isMainFolder(selectedItem);
                 }
             }
             return true;
         }, selectionModel.selectedItemProperty(), maxSizeField.textProperty()));//isEmpty(locationTreeView.getSelectionModel().getSelectedItems()));
 
         stopObserveButton.disableProperty().bind(Bindings.createBooleanBinding(() -> {
-            if (!selectedItems.isEmpty()) { //FIXME: after deleting one element, other becomes selected in view but selectedItems is empty
-                var selectedItem = selectionModel.getSelectedItem();
-                if (isMainFolder(selectedItem)) {
-                    return selectedItem.getParent().getValue() != null;
-                }
+            var selectedItem = selectionModel.getSelectedItem();
+            if (selectedItem != null) {
+                return !isMainFolder(selectedItem);
             }
             return true;
         }, selectionModel.selectedItemProperty()));
@@ -261,6 +259,9 @@ public class MainView {
     private void removeMainFolder(ObservedFolder folder, TreeItem<NodeData> nodeToRemove) {
         folder.destroy();
         locationTreeView.getRoot().getChildren().remove(nodeToRemove);
+        if(locationTreeView.getRoot().getChildren().size() == 0) {
+            locationTreeView.getSelectionModel().clearSelection();
+        }
         folderList.get().remove(folder);
         commandExecutor.executeCommand(new DeleteObservedFolderCommand(folder));
     }
