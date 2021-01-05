@@ -251,7 +251,7 @@ public class MainView {
     private void removeMainFolder(ObservedFolder folder, TreeItem<NodeData> nodeToRemove) {
         folder.destroy();
         locationTreeView.getRoot().getChildren().remove(nodeToRemove);
-        if(locationTreeView.getRoot().getChildren().size() == 0) {
+        if(locationTreeView.getRoot().getChildren().isEmpty()) {
             locationTreeView.getSelectionModel().clearSelection();
         }
         folderList.get().remove(folder);
