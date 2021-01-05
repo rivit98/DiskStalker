@@ -1,16 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TreeTableView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
-<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="600.0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.agh.diskstalker.controllers.MainView">
+
+<GridPane maxHeight="500.0" maxWidth="800.0" minHeight="500.0" minWidth="800.0" prefHeight="500.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.agh.diskstalker.controllers.MainView">
     <columnConstraints>
         <ColumnConstraints hgrow="SOMETIMES" maxWidth="490.0" minWidth="10.0" prefWidth="467.0" />
         <ColumnConstraints hgrow="SOMETIMES" maxWidth="292.0" minWidth="10.0" prefWidth="133.0" />
     </columnConstraints>
     <rowConstraints>
+        <RowConstraints />
         <RowConstraints maxHeight="106.0" minHeight="10.0" prefHeight="85.0" vgrow="SOMETIMES" />
         <RowConstraints maxHeight="87.0" minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
         <RowConstraints maxHeight="94.0" minHeight="10.0" prefHeight="31.599999999999994" vgrow="SOMETIMES" />
@@ -19,103 +27,80 @@
         <RowConstraints maxHeight="217.0" minHeight="6.0" prefHeight="26.599999999999994" vgrow="SOMETIMES" />
         <RowConstraints maxHeight="217.0" minHeight="6.0" prefHeight="35.400000000000006" vgrow="SOMETIMES" />
         <RowConstraints maxHeight="217.0" minHeight="10.0" prefHeight="137.0" vgrow="SOMETIMES" />
-        <RowConstraints />
+      <RowConstraints />
     </rowConstraints>
     <children>
-        <TabPane prefHeight="400.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" GridPane.columnSpan="2" GridPane.rowSpan="8">
+        <TabPane fx:id="tabPane" maxHeight="500.0" maxWidth="800.0" minHeight="500.0" minWidth="800.0" prefHeight="500.0" prefWidth="800.0" tabClosingPolicy="UNAVAILABLE" GridPane.columnSpan="2" GridPane.rowIndex="1" GridPane.rowSpan="8">
             <tabs>
-                <Tab text="Space">
+                <Tab fx:id="main" text="Space">
                     <content>
                         <GridPane>
                             <columnConstraints>
-                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="468.0" minWidth="10.0" prefWidth="467.0" />
-                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="295.0" minWidth="10.0" prefWidth="133.0" />
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="617.3333740234375" minWidth="10.0" prefWidth="604.0" />
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="295.0" minWidth="10.0" prefWidth="195.66666666666663" />
                             </columnConstraints>
                             <rowConstraints>
-                                <RowConstraints maxHeight="118.0" minHeight="10.0" prefHeight="60.0" vgrow="SOMETIMES" />
-                                <RowConstraints maxHeight="298.0" minHeight="10.0" prefHeight="296.0" vgrow="SOMETIMES" />
-                                <RowConstraints maxHeight="73.0" minHeight="10.0" prefHeight="14.0" vgrow="SOMETIMES" />
+                                <RowConstraints maxHeight="118.0" minHeight="10.0" prefHeight="53.33335367838542" vgrow="SOMETIMES" />
+                                <RowConstraints maxHeight="298.0" minHeight="10.0" prefHeight="33.99997965494792" vgrow="SOMETIMES" />
+                                <RowConstraints maxHeight="233.33334859212238" minHeight="10.0" prefHeight="35.66668701171875" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="164.3333028157552" minHeight="10.0" prefHeight="32.33333333333334" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="143.99995930989581" minHeight="10.0" prefHeight="38.33333333333334" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="117.33329772949216" minHeight="10.0" prefHeight="27.000025431315095" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="138.99999491373697" minHeight="10.0" prefHeight="31.000025431315095" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="165.33333333333331" minHeight="10.0" prefHeight="34.33332316080731" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="117.33329772949216" minHeight="10.0" prefHeight="94.66667683919269" vgrow="SOMETIMES" />
                             </rowConstraints>
                             <children>
-                                <TreeTableView fx:id="locationTreeView" prefHeight="254.0" prefWidth="412.0" GridPane.rowIndex="1">
+                          <TextField fx:id="maxSizeField" prefHeight="25.0" prefWidth="125.0" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                              <padding>
+                                  <Insets right="10.0" />
+                              </padding>
+                              <GridPane.margin>
+                                  <Insets left="30.0" right="30.0" />
+                              </GridPane.margin>
+                          </TextField>
+                                <TreeTableView fx:id="locationTreeView" GridPane.rowIndex="1" GridPane.rowSpan="8">
                                     <GridPane.margin>
-                                        <Insets left="50.0" right="50.0" />
+                                        <Insets bottom="30.0" left="20.0" right="20.0" />
                                     </GridPane.margin>
                                 </TreeTableView>
+                          <Button fx:id="addButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="125.0" text="Add" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                           <GridPane.margin>
+                              <Insets left="35.0" />
+                           </GridPane.margin></Button>
+                                <Button fx:id="stopObserveButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="125.0" text="Delete from list" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                           <GridPane.margin>
+                              <Insets left="35.0" />
+                           </GridPane.margin></Button>
+                          <Button fx:id="deleteFromDiskButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="125.0" text="Delete from disk" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                           <GridPane.margin>
+                              <Insets left="35.0" />
+                           </GridPane.margin></Button>
+                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Max directory size (MB)" wrappingWidth="133.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                           <GridPane.margin>
+                              <Insets left="35.0" />
+                           </GridPane.margin></Text>
+                          <Button fx:id="setSizeButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="125.0" text="Set size" GridPane.columnIndex="1" GridPane.rowIndex="7">
+                              <GridPane.margin>
+                                  <Insets left="35.0" />
+                              </GridPane.margin>
+                          </Button>
+                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Observed directories" textAlignment="CENTER" wrappingWidth="527.0000305175781">
+                              <font>
+                                  <Font name="Javanese Text" size="25.0" />
+                              </font>
+                              <GridPane.margin>
+                                  <Insets />
+                              </GridPane.margin>
+                          </Text>
                             </children>
                         </GridPane>
                     </content>
                 </Tab>
-                <Tab text="File size">
-                    <content>
-                        <GridPane>
-                            <columnConstraints>
-                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="468.0" minWidth="10.0" prefWidth="467.0" />
-                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="295.0" minWidth="10.0" prefWidth="133.0" />
-                            </columnConstraints>
-                            <rowConstraints>
-                                <RowConstraints maxHeight="118.0" minHeight="10.0" prefHeight="60.0" vgrow="SOMETIMES" />
-                                <RowConstraints maxHeight="298.0" minHeight="10.0" prefHeight="296.0" vgrow="SOMETIMES" />
-                                <RowConstraints maxHeight="73.0" minHeight="10.0" prefHeight="14.0" vgrow="SOMETIMES" />
-                            </rowConstraints>
-                            <children>
-                                <TreeTableView fx:id="locationTreeView1" prefHeight="254.0" prefWidth="412.0" GridPane.rowIndex="1">
-                                    <GridPane.margin>
-                                        <Insets left="50.0" right="50.0" />
-                                    </GridPane.margin>
-                                </TreeTableView>
-                            </children>
-                        </GridPane>
-                    </content>
-                </Tab>
-                <Tab text="File type">
-                    <content>
-                        <GridPane>
-                            <columnConstraints>
-                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="468.0" minWidth="10.0" prefWidth="467.0" />
-                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="295.0" minWidth="10.0" prefWidth="133.0" />
-                            </columnConstraints>
-                            <rowConstraints>
-                                <RowConstraints maxHeight="118.0" minHeight="10.0" prefHeight="60.0" vgrow="SOMETIMES" />
-                                <RowConstraints maxHeight="298.0" minHeight="10.0" prefHeight="296.0" vgrow="SOMETIMES" />
-                                <RowConstraints maxHeight="73.0" minHeight="10.0" prefHeight="14.0" vgrow="SOMETIMES" />
-                            </rowConstraints>
-                            <children>
-                                <TreeTableView fx:id="locationTreeView11" prefHeight="254.0" prefWidth="412.0" GridPane.rowIndex="1">
-                                    <GridPane.margin>
-                                        <Insets left="50.0" right="50.0" />
-                                    </GridPane.margin>
-                                </TreeTableView>
-                            </children>
-                        </GridPane>
-                    </content>
-                </Tab>
+                <fx:include fx:id="fileTypeView" source="FileTypeView.fxml"/>
+                <fx:include fx:id="fileSizeView" source="FileSizeView.fxml"/>
+                <fx:include fx:id="fileModificationDateView" source="FileModificationDateView.fxml"/>
             </tabs>
         </TabPane>
-        <Button fx:id="addButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="124.0" text="Add" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-        <Button fx:id="stopObserveButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="124.0" text="Delete from list" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-        <Button fx:id="deleteFromDiskButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="124.0" text="Delete from disk" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Observed directories" textAlignment="CENTER" wrappingWidth="467.0">
-            <font>
-                <Font name="Javanese Text" size="25.0" />
-            </font>
-            <GridPane.margin>
-                <Insets top="45.0" />
-            </GridPane.margin>
-        </Text>
-        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Max directory size (MB)" wrappingWidth="133.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-        <TextField fx:id="maxSizeField" prefHeight="25.0" prefWidth="113.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
-            <padding>
-                <Insets right="10.0" />
-            </padding>
-            <GridPane.margin>
-                <Insets right="7.0" />
-            </GridPane.margin>
-        </TextField>
-        <Button fx:id="setSizeButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="79.0" text="Set size" GridPane.columnIndex="1" GridPane.rowIndex="6">
-            <GridPane.margin>
-                <Insets left="23.0" right="23.0" />
-            </GridPane.margin>
-        </Button>
     </children>
 </GridPane>

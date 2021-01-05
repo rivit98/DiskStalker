@@ -33,6 +33,7 @@ public class EventProcessor implements IEventProcessor {
 
     private void handleModifyEventFile(Path resolvedPath) {
         var modifiedNode = treeBuilder.getPathToTreeMap().get(resolvedPath);
+        modifiedNode.getValue().setModificationDate();
         modifiedNode.updateMe();
     }
 
@@ -47,6 +48,7 @@ public class EventProcessor implements IEventProcessor {
     private void handleDeleteEventCommon(Path resolvedPath) {
         var affectedNode = treeBuilder.getPathToTreeMap().remove(resolvedPath);
         treeBuilder.removeMappedDirsRecursively(affectedNode);
+        treeBuilder.decrementTypeCounter(affectedNode.getValue());
         affectedNode.deleteMe();
     }
 
@@ -60,7 +62,9 @@ public class EventProcessor implements IEventProcessor {
 
     private void handleCreateCommon(Path resolvedPath) {
         var nodeData = new NodeData(resolvedPath);
+        nodeData.setModificationDate();
         var newTreeNode = new TreeFileNode(nodeData);
         treeBuilder.insertNewNode(newTreeNode);
+        treeBuilder.addNewNodeType(nodeData);
     }
 }

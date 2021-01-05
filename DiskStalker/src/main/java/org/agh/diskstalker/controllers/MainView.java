@@ -32,6 +32,8 @@ import java.util.Optional;
 @FxmlView("/views/MainView.fxml")
 public class MainView {
     @FXML
+    private TabPane tabPane;
+    @FXML
     private TreeTableView<NodeData> locationTreeView;
     @FXML
     private Button addButton;
@@ -43,6 +45,12 @@ public class MainView {
     private TextField maxSizeField;
     @FXML
     private Button deleteFromDiskButton;
+    @FXML
+    private FileSizeView fileSizeViewController;
+    @FXML
+    private FileTypeView fileTypeViewController;
+    @FXML
+    private FileModificationDateView fileModificationDateViewController;
 
     private final DatabaseCommandExecutor commandExecutor = new DatabaseCommandExecutor();
     private final FolderList folderList = new FolderList();
@@ -51,9 +59,27 @@ public class MainView {
     public void initialize() {
         commandExecutor.executeCommand(new ConnectToDbCommand());
         initializeTableTreeView();
+        initializeTabs();
         initializeButtons();
         initializeSizeField();
         loadSavedFolders();
+        setStatisticsLoading();
+    }
+
+    private void setStatisticsLoading() {
+        tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
+            if(newTab.getId().equals("fileTypeView")) {
+                var thread = new Thread(() -> {
+                    folderList.get().forEach(ObservedFolder::createTypeStatistics);
+                });
+                thread.start();
+            } else if(newTab.getId().equals("fileModificationDateView")) {
+                var thread = new Thread(() -> {
+                    folderList.get().forEach(ObservedFolder::createDateModificationStatistics);
+                });
+                thread.start();
+            }
+        });
     }
 
     private void initializeTableTreeView() {
@@ -67,11 +93,18 @@ public class MainView {
         locationTreeView.getRoot().setExpanded(true);
     }
 
+    private void initializeTabs() {
+        fileSizeViewController.prepareTableViewSizeNames(folderList);
+        fileTypeViewController.prepareTableViewTypeNames(folderList);
+        fileModificationDateViewController.prepareTableViewModificationDateNames(folderList);
+    }
+
     private void prepareColumns() {
         var pathColumn = new TreeTableColumn<NodeData, Path>("Name");
         var sizeColumn = new TreeTableColumn<NodeData, Number>("Size");
-        pathColumn.setPrefWidth(242);
-        sizeColumn.setPrefWidth(123);
+
+        pathColumn.setPrefWidth(370);
+        sizeColumn.setPrefWidth(192);
 
         pathColumn.setCellFactory(ttc -> new PathColumnCellFactory(this));
         sizeColumn.setCellFactory(ttc -> new SizeColumnCellFactory());
@@ -87,7 +120,7 @@ public class MainView {
         sizeColumn.setCellValueFactory(node -> {
             var sizePropertyOptional = Optional.ofNullable(node.getValue());
             return sizePropertyOptional
-                    .map(nodeData -> nodeData.getValue().sizePropertyProperty())
+                    .map(nodeData -> nodeData.getValue().getSizeProperty())
                     .orElse(null);
         });
 
