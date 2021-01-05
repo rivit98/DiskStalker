@@ -3,7 +3,10 @@ package org.agh.diskstalker.model;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Objects;
 
 public class NodeData {
@@ -11,7 +14,8 @@ public class NodeData {
     private final boolean isDirectory;
     private final SimpleLongProperty sizeProperty;
     private final SimpleStringProperty nameProperty;
-    private SimpleStringProperty modificationProperty;
+    private SimpleStringProperty modificationDateProperty;
+    private String type;
 
     public NodeData(Path path) {
         this.path = path;
@@ -41,12 +45,31 @@ public class NodeData {
         return nameProperty.get();
     }
 
-    public String getModification(){
-        return modificationProperty.get();
+    public String getModificationDate(){
+        return modificationDateProperty.get();
     }
 
-    public void setModificationDateProperty(String modificationDateProperty) {
-        this.modificationProperty = new SimpleStringProperty(modificationDateProperty);
+    public void setModificationDate() {
+        try{
+            BasicFileAttributes attributes = Files.readAttributes(path, BasicFileAttributes.class);
+            var date = attributes.lastModifiedTime().toString()
+                    .replace("T", " ")
+                    .replace("Z", " ");
+            if(date.contains(".")) {
+                date = date.split("\\.")[0];
+            }
+            modificationDateProperty = new SimpleStringProperty(date);
+        } catch(IOException e) {
+            System.out.println("Cannot load last modification date of file " + path);
+        }
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getType() {
+        return type;
     }
 
     public long getSize() {

@@ -17,7 +17,6 @@ import org.agh.diskstalker.model.events.observedFolderEvents.ObservedFolderError
 import org.agh.diskstalker.model.events.observedFolderEvents.ObservedFolderEvent;
 import org.agh.diskstalker.model.events.observedFolderEvents.ObservedFolderRootAvailableEvent;
 import org.agh.diskstalker.model.events.observedFolderEvents.ObservedFolderSizeChangedEvent;
-import org.agh.diskstalker.model.statisctics.Statistics;
 import org.agh.diskstalker.model.tree.TreeBuilder;
 
 import java.nio.file.Path;
@@ -34,13 +33,11 @@ public class ObservedFolder {
     private final SimpleBooleanProperty sizeExceededProperty = new SimpleBooleanProperty();
     private final PublishSubject<ObservedFolderEvent> eventStream = PublishSubject.create();
     private final SimpleStringProperty name;
-    private Statistics statistics;
 
     public ObservedFolder(Path dirToWatch, long maxSize) {
         this.dirToWatch = dirToWatch;
         this.filesystemWatcher = new DirWatcher(dirToWatch);
         this.treeBuilder = new TreeBuilder();
-        statistics = new Statistics(treeBuilder);
         this.eventProcessor = new EventProcessor(treeBuilder);
         setMaximumSizeProperty(maxSize);
         this.sizeExceededProperty.set(false);
@@ -155,22 +152,16 @@ public class ObservedFolder {
         return name.get();
     }
 
-    public Statistics getStatistics() {
-        return statistics;
-    }
-
     public void createTypeStatistics() {
-        var types = Optional.ofNullable(statistics.getTypes());
-        types.ifPresentOrElse(val -> {} , statistics::createTypeStatistics);
-    }
-
-    public void createSizeStatistics() {
-        var sizes = Optional.ofNullable(statistics.getSizes());
-        sizes.ifPresentOrElse(val -> {} , statistics::createSizeStatistics);
+        var types = Optional.ofNullable(treeBuilder.getTypeStatistics());
+        types.ifPresentOrElse(val -> {} , treeBuilder::setTypeStatistics);
     }
 
     public void createDateModificationStatistics() {
-        var modificationDates = Optional.ofNullable(statistics.getModificationDates());
-        modificationDates.ifPresentOrElse(val -> {} , statistics::createModificationDateStatistics);
+        treeBuilder.getPathToTreeMap().forEach((key, val) -> val.getValue().setModificationDate());
+    }
+
+    public TreeBuilder getTreeBuilder() {
+        return treeBuilder;
     }
 }

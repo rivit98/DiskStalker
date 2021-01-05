@@ -23,19 +23,20 @@ public class FileTypeView {
     @FXML
     public void initialize() {
         setSelectionModelListener();
+        prepareTableViewType();
     }
 
     private void setSelectionModelListener() {
         tableViewTypeNames.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if(newValue != null) {
-                tableViewType.setItems(newValue.getStatistics().getTypes());
+                tableViewType.setItems(newValue.getTreeBuilder().getTypeStatistics());
             } else {
                 tableViewType.setItems(null);
             }
         });
     }
 
-    protected void prepareTables(FolderList folders) {
+    protected void prepareTableViewTypeNames(FolderList folders) {
         TableColumn<ObservedFolder, ImageView> iconColumn = new TableColumn<>("");
         TableColumn<ObservedFolder, String> nameColumn = new TableColumn<>("Directory name");
         iconColumn.setPrefWidth(23);
@@ -48,15 +49,15 @@ public class FileTypeView {
 
         iconColumn.setCellValueFactory(imageview -> new SimpleObjectProperty<>(GraphicsFactory.getGraphic(true)));
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+    }
 
+    private void prepareTableViewType() {
         TableColumn<Type, Integer> quantityColumn = new TableColumn<>("Numer of files");
         TableColumn<Type, String> typeColumn = new TableColumn<>("File type");
         quantityColumn.setPrefWidth(150);
         typeColumn.setPrefWidth(289);
 
-        tableViewType.getColumns().add(quantityColumn);
-        tableViewType.getColumns().add(typeColumn);
-
+        tableViewType.getColumns().addAll(quantityColumn, typeColumn);
 
         quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         typeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));

@@ -66,15 +66,10 @@ public class MainView {
     }
 
     private void setStatisticsLoading() {
-        tabPane.getSelectionModel().selectedItemProperty().addListener((obsevable, oldTab, newTab) -> {
+        tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
             if(newTab.getId().equals("fileTypeView")) {
                 var thread = new Thread(() -> {
                     folderList.get().forEach(ObservedFolder::createTypeStatistics);
-                });
-                thread.start();
-            } else if(newTab.getId().equals("fileSizeView")) {
-                var thread = new Thread(() -> {
-                    folderList.get().forEach(ObservedFolder::createSizeStatistics);
                 });
                 thread.start();
             } else if(newTab.getId().equals("fileModificationDateView")) {
@@ -98,9 +93,9 @@ public class MainView {
     }
 
     private void initializeTabs() {
-        fileSizeViewController.prepareTables(folderList);
-        fileTypeViewController.prepareTables(folderList);
-        fileModificationDateViewController.prepareTables(folderList);
+        fileSizeViewController.prepareTableViewSizeNames(folderList);
+        fileTypeViewController.prepareTableViewTypeNames(folderList);
+        fileModificationDateViewController.prepareTableViewModificationDateNames(folderList);
     }
 
     private void prepareColumns() {
@@ -147,7 +142,7 @@ public class MainView {
                 if (isMainFolder(selectedItem) && !maxSizeField.getText().equals("")) {
                     return selectedItem.getParent().getValue() != null;
                 }
-            } 
+            }
             return true;
         }, selectionModel.selectedItemProperty(), maxSizeField.textProperty()));//isEmpty(locationTreeView.getSelectionModel().getSelectedItems()));
 

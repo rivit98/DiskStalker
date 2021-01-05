@@ -23,4 +23,6 @@ public class Type {
     public void increment() {
         quantity.set(quantity.getValue() + 1);
     }
+
+    public void decrement() {quantity.set(quantity.getValue() - 1);}
 }
