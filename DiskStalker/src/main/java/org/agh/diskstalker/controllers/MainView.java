@@ -134,16 +134,22 @@ public class MainView {
                     var oldFolder = folderList.getObservedFolderFromTreeItem(oldTreeItem);
                     var newFolder = folderList.getObservedFolderFromTreeItem(newTreeItem);
 
-                    oldFolder.ifPresentOrElse(oldObservedFolder -> newFolder.ifPresent(newObservedFolder -> {
-                        if (!oldObservedFolder.equals(newObservedFolder)) {
-                            Platform.runLater(() -> maxSizeField.setText(String.valueOf(newObservedFolder.getMaximumSize() / FileUtils.ONE_MB)));
-                            // this won't work because:
-                            // 1) unbind removes all listeners
-                            // 2) bind prevents inputting value
-//                            directorySize.textProperty().unbind();
-//                            directorySize.textProperty().bind(newObservedFolder.getMaximumSizeProperty().asString());
-                        }
-                    }), () -> newFolder.ifPresent(newObservedFolder -> maxSizeField.setText(String.valueOf(newObservedFolder.getMaximumSize() / FileUtils.ONE_MB))));
+                    oldFolder.ifPresentOrElse(oldObservedFolder -> {
+                        newFolder.ifPresent(newObservedFolder -> {
+                            if (!oldObservedFolder.equals(newObservedFolder)) {
+                                Platform.runLater(() ->
+                                        maxSizeField.setText(String.valueOf(newObservedFolder.getMaximumSize() / FileUtils.ONE_MB)));
+                                // this won't work because:
+                                // 1) unbind removes all listeners
+                                // 2) bind prevents inputting value
+//                              directorySize.textProperty().unbind();
+//                              directorySize.textProperty().bind(newObservedFolder.getMaximumSizeProperty().asString());
+                            }
+                        });
+                    }, () -> newFolder.ifPresent(newObservedFolder -> {
+                        Platform.runLater(() ->
+                                maxSizeField.setText(String.valueOf(newObservedFolder.getMaximumSize() / FileUtils.ONE_MB)));
+                    }));
                 });
     }
 
