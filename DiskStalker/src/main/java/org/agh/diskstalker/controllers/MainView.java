@@ -30,7 +30,6 @@ import java.util.Optional;
 @Component
 @FxmlView("/views/MainView.fxml")
 public class MainView {
-    public Tab fileModificationDateView;
     @FXML
     private TabPane tabPane;
     @FXML
@@ -148,9 +147,7 @@ public class MainView {
                 if (isMainFolder(selectedItem) && !maxSizeField.getText().equals("")) {
                     return selectedItem.getParent().getValue() != null;
                 }
-            } else {
-                selectionModel.clearSelection();
-            }
+            } 
             return true;
         }, selectionModel.selectedItemProperty(), maxSizeField.textProperty()));//isEmpty(locationTreeView.getSelectionModel().getSelectedItems()));
 
