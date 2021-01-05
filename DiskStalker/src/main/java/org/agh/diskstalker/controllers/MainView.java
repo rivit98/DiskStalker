@@ -1,6 +1,7 @@
 package org.agh.diskstalker.controllers;
 
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
@@ -52,7 +53,7 @@ public class MainView {
     private FileModificationDateView fileModificationDateViewController;
 
     private final DatabaseCommandExecutor commandExecutor = new DatabaseCommandExecutor();
-    private FolderList folderList = new FolderList();
+    private final FolderList folderList = new FolderList();
 
     @FXML
     public void initialize() {
@@ -99,10 +100,10 @@ public class MainView {
     }
 
     private void prepareColumns() {
-        //todo: refactor this
         var pathColumn = new TreeTableColumn<NodeData, Path>("Name");
         var sizeColumn = new TreeTableColumn<NodeData, Number>("Size");
-        pathColumn.setPrefWidth(370); //todo: set proper width
+
+        pathColumn.setPrefWidth(370);
         sizeColumn.setPrefWidth(192);
 
         pathColumn.setCellFactory(ttc -> new PathColumnCellFactory(this));
@@ -133,25 +134,24 @@ public class MainView {
         deleteFromDiskButton.setOnAction(this::deleteFromDiskButtonClicked);
 
         var selectionModel = locationTreeView.getSelectionModel();
-        var selectedItems = selectionModel.getSelectedItems();
-        deleteFromDiskButton.disableProperty().bind(Bindings.isEmpty(selectedItems));
 
-        setSizeButton.disableProperty().bind(Bindings.createBooleanBinding(() -> { //todo: refactor this
-            if (!selectedItems.isEmpty()) {
-                var selectedItem = selectionModel.getSelectedItem();
-                if (isMainFolder(selectedItem) && !maxSizeField.getText().equals("")) {
-                    return selectedItem.getParent().getValue() != null;
-                }
+        deleteFromDiskButton.disableProperty().bind(Bindings.createBooleanBinding(() -> {
+            var selectedItem = selectionModel.getSelectedItem();
+            return selectedItem == null;
+        }, selectionModel.selectedItemProperty()));
+
+        setSizeButton.disableProperty().bind(Bindings.createBooleanBinding(() -> {
+            var selectedItem = selectionModel.getSelectedItem();
+            if (selectedItem != null) {
+                return !isMainFolder(selectedItem) || maxSizeField.getText().equals("");
             }
             return true;
-        }, selectionModel.selectedItemProperty(), maxSizeField.textProperty()));//isEmpty(locationTreeView.getSelectionModel().getSelectedItems()));
+        }, selectionModel.selectedItemProperty(), maxSizeField.textProperty()));
 
         stopObserveButton.disableProperty().bind(Bindings.createBooleanBinding(() -> {
-            if (!selectedItems.isEmpty()) { //FIXME: after deleting one element, other becomes selected in view but selectedItems is empty
-                var selectedItem = selectionModel.getSelectedItem();
-                if (isMainFolder(selectedItem)) {
-                    return selectedItem.getParent().getValue() != null;
-                }
+            var selectedItem = selectionModel.getSelectedItem();
+            if (selectedItem != null) {
+                return !isMainFolder(selectedItem);
             }
             return true;
         }, selectionModel.selectedItemProperty()));
@@ -170,16 +170,18 @@ public class MainView {
                     oldFolder.ifPresentOrElse(oldObservedFolder -> {
                         newFolder.ifPresent(newObservedFolder -> {
                             if (!oldObservedFolder.equals(newObservedFolder)) {
-                                maxSizeField.setText(String.valueOf(newObservedFolder.getMaximumSize() / FileUtils.ONE_MB));
+                                Platform.runLater(() ->
+                                        maxSizeField.setText(String.valueOf(newObservedFolder.getMaximumSize() / FileUtils.ONE_MB)));
                                 // this won't work because:
                                 // 1) unbind removes all listeners
                                 // 2) bind prevents inputting value
-//                            directorySize.textProperty().unbind();
-//                            directorySize.textProperty().bind(newObservedFolder.getMaximumSizeProperty().asString());
+//                              directorySize.textProperty().unbind();
+//                              directorySize.textProperty().bind(newObservedFolder.getMaximumSizeProperty().asString());
                             }
                         });
                     }, () -> newFolder.ifPresent(newObservedFolder -> {
-                        maxSizeField.setText(String.valueOf(newObservedFolder.getMaximumSize() / FileUtils.ONE_MB));
+                        Platform.runLater(() ->
+                                maxSizeField.setText(String.valueOf(newObservedFolder.getMaximumSize() / FileUtils.ONE_MB)));
                     }));
                 });
     }
@@ -292,6 +294,9 @@ public class MainView {
     private void removeMainFolder(ObservedFolder folder, TreeItem<NodeData> nodeToRemove) {
         folder.destroy();
         locationTreeView.getRoot().getChildren().remove(nodeToRemove);
+        if(locationTreeView.getRoot().getChildren().isEmpty()) {
+            locationTreeView.getSelectionModel().clearSelection();
+        }
         folderList.get().remove(folder);
         commandExecutor.executeCommand(new DeleteObservedFolderCommand(folder));
     }
