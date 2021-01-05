@@ -13,6 +13,7 @@ import org.agh.diskstalker.graphics.GraphicsFactory;
 import org.agh.diskstalker.model.FolderList;
 import org.agh.diskstalker.model.ObservedFolder;
 import org.agh.diskstalker.model.tree.TreeFileNode;
+import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
@@ -61,8 +62,8 @@ public class FileSizeView {
     }
 
     private void prepareTableViewSize() {
-        TableColumn<Map.Entry<Path, TreeFileNode>, Long> sizeColumn = new TableColumn<>("Size(B)");
-        sizeColumn.setCellValueFactory(val -> new SimpleObjectProperty<>(val.getValue().getValue().getValue().getSize()));
+        TableColumn<Map.Entry<Path, TreeFileNode>, String> sizeColumn = new TableColumn<>("Size");
+        sizeColumn.setCellValueFactory(val -> new SimpleStringProperty(FileUtils.byteCountToDisplaySize(val.getValue().getValue().getValue().getSize())));
 
         TableColumn<Map.Entry<Path, TreeFileNode>, String> nameColumn = new TableColumn<>("Name");
         nameColumn.setCellValueFactory(val -> new SimpleStringProperty(val.getValue().getValue().getValue().getName()));
