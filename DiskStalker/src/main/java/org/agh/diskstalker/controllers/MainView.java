@@ -155,7 +155,9 @@ public class MainView {
 
     private void loadSavedFolders() { //FIXME: restoring folders take long time
         commandExecutor.executeCommand(new GetAllObservedFolderCommand())
-                .thenAccept(folders -> folders.getFolderList().forEach(this::observeFolderEvents));
+                .thenAccept(folders -> {
+                    folders.getFolderList().forEach(this::observeFolderEvents);
+                });
     }
 
     public void addToMainTree(ObservedFolder folder, TreeFileNode node) {
@@ -215,7 +217,9 @@ public class MainView {
                     if (nodeData.isDirectory()) {
                         FileUtils.deleteDirectory(searchedFile);
                         if (isMainFolder(item)) {
-                            folderList.getObservedFolderFromTreePath(searchedPath).ifPresent(observedFolder -> removeMainFolder(observedFolder, item));
+                            folderList.getObservedFolderFromTreePath(searchedPath).ifPresent(observedFolder -> {
+                                removeMainFolder(observedFolder, item);
+                            });
                         }
                     } else {
                         if (!searchedFile.delete()) {
