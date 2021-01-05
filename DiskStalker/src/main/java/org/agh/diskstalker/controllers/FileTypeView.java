@@ -9,33 +9,56 @@ import net.rgielen.fxweaver.core.FxmlView;
 import org.agh.diskstalker.graphics.GraphicsFactory;
 import org.agh.diskstalker.model.FolderList;
 import org.agh.diskstalker.model.ObservedFolder;
+import org.agh.diskstalker.model.statisctics.Type;
 import org.springframework.stereotype.Component;
 
 @Component
 @FxmlView("/views/FileTypeView.fxml")
 public class FileTypeView {
     @FXML
-    private TableView<ObservedFolder> tableViewType;
+    private TableView<ObservedFolder> tableViewTypeNames;
     @FXML
-    private Button showTypes;
+    private TableView<Type> tableViewType;
 
     @FXML
     public void initialize() {
+        setSelectionModelListener();
     }
 
-    protected void prepareTable(FolderList folders) {
+    private void setSelectionModelListener() {
+        tableViewTypeNames.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if(newValue != null) {
+                tableViewType.setItems(newValue.getStatistics().getTypes());
+            } else {
+                tableViewType.setItems(null);
+            }
+        });
+    }
+
+    protected void prepareTables(FolderList folders) {
         TableColumn<ObservedFolder, ImageView> iconColumn = new TableColumn<>("");
         TableColumn<ObservedFolder, String> nameColumn = new TableColumn<>("Directory name");
         iconColumn.setPrefWidth(23);
-        nameColumn.setPrefWidth(342);
+        nameColumn.setPrefWidth(253);
 
-        tableViewType.getColumns().add(iconColumn);
-        tableViewType.getColumns().add(nameColumn);
+        tableViewTypeNames.getColumns().add(iconColumn);
+        tableViewTypeNames.getColumns().add(nameColumn);
 
-        tableViewType.setItems(folders.get());
+        tableViewTypeNames.setItems(folders.get());
 
         iconColumn.setCellValueFactory(imageview -> new SimpleObjectProperty<>(GraphicsFactory.getGraphic(true)));
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
 
+        TableColumn<Type, Integer> quantityColumn = new TableColumn<>("Numer of files");
+        TableColumn<Type, String> typeColumn = new TableColumn<>("File type");
+        quantityColumn.setPrefWidth(150);
+        typeColumn.setPrefWidth(289);
+
+        tableViewType.getColumns().add(quantityColumn);
+        tableViewType.getColumns().add(typeColumn);
+
+
+        quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        typeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
     }
 }

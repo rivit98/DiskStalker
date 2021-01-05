@@ -30,6 +30,9 @@ import java.util.Optional;
 @Component
 @FxmlView("/views/MainView.fxml")
 public class MainView {
+    public Tab fileModificationDateView;
+    @FXML
+    private TabPane tabPane;
     @FXML
     private TreeTableView<NodeData> locationTreeView;
     @FXML
@@ -46,6 +49,8 @@ public class MainView {
     private FileSizeView fileSizeViewController;
     @FXML
     private FileTypeView fileTypeViewController;
+    @FXML
+    private FileModificationDateView fileModificationDateViewController;
 
     private final DatabaseCommandExecutor commandExecutor = new DatabaseCommandExecutor();
     private FolderList folderList = new FolderList();
@@ -58,6 +63,28 @@ public class MainView {
         initializeButtons();
         initializeSizeField();
         loadSavedFolders();
+        setStatisticsLoading();
+    }
+
+    private void setStatisticsLoading() {
+        tabPane.getSelectionModel().selectedItemProperty().addListener((obsevable, oldTab, newTab) -> {
+            if(newTab.getId().equals("fileTypeView")) {
+                var thread = new Thread(() -> {
+                    folderList.get().forEach(ObservedFolder::createTypeStatistics);
+                });
+                thread.start();
+            } else if(newTab.getId().equals("fileSizeView")) {
+                var thread = new Thread(() -> {
+                    folderList.get().forEach(ObservedFolder::createSizeStatistics);
+                });
+                thread.start();
+            } else if(newTab.getId().equals("fileModificationDateView")) {
+                var thread = new Thread(() -> {
+                    folderList.get().forEach(ObservedFolder::createDateModificationStatistics);
+                });
+                thread.start();
+            }
+        });
     }
 
     private void initializeTableTreeView() {
@@ -72,16 +99,17 @@ public class MainView {
     }
 
     private void initializeTabs() {
-        fileSizeViewController.prepareTable(folderList);
-        fileTypeViewController.prepareTable(folderList);
+        fileSizeViewController.prepareTables(folderList);
+        fileTypeViewController.prepareTables(folderList);
+        fileModificationDateViewController.prepareTables(folderList);
     }
 
     private void prepareColumns() {
         //todo: refactor this
         var pathColumn = new TreeTableColumn<NodeData, Path>("Name");
         var sizeColumn = new TreeTableColumn<NodeData, Number>("Size");
-        pathColumn.setPrefWidth(242); //todo: set proper width
-        sizeColumn.setPrefWidth(123);
+        pathColumn.setPrefWidth(370); //todo: set proper width
+        sizeColumn.setPrefWidth(192);
 
         pathColumn.setCellFactory(ttc -> new PathColumnCellFactory(this));
         sizeColumn.setCellFactory(ttc -> new SizeColumnCellFactory());
@@ -97,7 +125,7 @@ public class MainView {
         sizeColumn.setCellValueFactory(node -> {
             var sizePropertyOptional = Optional.ofNullable(node.getValue());
             return sizePropertyOptional
-                    .map(nodeData -> nodeData.getValue().sizePropertyProperty())
+                    .map(nodeData -> nodeData.getValue().getSizeProperty())
                     .orElse(null);
         });
 
@@ -112,7 +140,6 @@ public class MainView {
 
         var selectionModel = locationTreeView.getSelectionModel();
         var selectedItems = selectionModel.getSelectedItems();
-
         deleteFromDiskButton.disableProperty().bind(Bindings.isEmpty(selectedItems));
 
         setSizeButton.disableProperty().bind(Bindings.createBooleanBinding(() -> { //todo: refactor this
@@ -121,6 +148,8 @@ public class MainView {
                 if (isMainFolder(selectedItem) && !maxSizeField.getText().equals("")) {
                     return selectedItem.getParent().getValue() != null;
                 }
+            } else {
+                selectionModel.clearSelection();
             }
             return true;
         }, selectionModel.selectedItemProperty(), maxSizeField.textProperty()));//isEmpty(locationTreeView.getSelectionModel().getSelectedItems()));

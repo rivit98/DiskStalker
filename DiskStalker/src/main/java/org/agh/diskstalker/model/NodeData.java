@@ -1,6 +1,7 @@
 package org.agh.diskstalker.model;
 
 import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.property.SimpleStringProperty;
 
 import java.nio.file.Path;
 import java.util.Objects;
@@ -9,12 +10,15 @@ public class NodeData {
     private final Path path;
     private final boolean isDirectory;
     private final SimpleLongProperty sizeProperty;
+    private final SimpleStringProperty nameProperty;
+    private SimpleStringProperty modificationProperty;
 
     public NodeData(Path path) {
         this.path = path;
         var f = path.toFile();
         this.isDirectory = f.isDirectory();
         this.sizeProperty = new SimpleLongProperty(isFile() ? f.length() : 0);
+        this.nameProperty = new SimpleStringProperty(path.getFileName().toString());
     }
 
     public Path getPath() {
@@ -29,8 +33,20 @@ public class NodeData {
         return !isDirectory;
     }
 
-    public SimpleLongProperty sizePropertyProperty() {
+    public SimpleLongProperty getSizeProperty() {
         return sizeProperty;
+    }
+
+    public String getName() {
+        return nameProperty.get();
+    }
+
+    public String getModification(){
+        return modificationProperty.get();
+    }
+
+    public void setModificationDateProperty(String modificationDateProperty) {
+        this.modificationProperty = new SimpleStringProperty(modificationDateProperty);
     }
 
     public long getSize() {
