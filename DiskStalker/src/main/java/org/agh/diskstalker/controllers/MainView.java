@@ -1,6 +1,7 @@
 package org.agh.diskstalker.controllers;
 
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
@@ -44,7 +45,7 @@ public class MainView {
     private Button deleteFromDiskButton;
 
     private final DatabaseCommandExecutor commandExecutor = new DatabaseCommandExecutor();
-    private FolderList folderList = new FolderList();
+    private final FolderList folderList = new FolderList();
 
     @FXML
     public void initialize() {
@@ -67,10 +68,9 @@ public class MainView {
     }
 
     private void prepareColumns() {
-        //todo: refactor this
         var pathColumn = new TreeTableColumn<NodeData, Path>("Name");
         var sizeColumn = new TreeTableColumn<NodeData, Number>("Size");
-        pathColumn.setPrefWidth(242); //todo: set proper width
+        pathColumn.setPrefWidth(242);
         sizeColumn.setPrefWidth(123);
 
         pathColumn.setCellFactory(ttc -> new PathColumnCellFactory(this));
@@ -101,19 +101,19 @@ public class MainView {
         deleteFromDiskButton.setOnAction(this::deleteFromDiskButtonClicked);
 
         var selectionModel = locationTreeView.getSelectionModel();
-        var selectedItems = selectionModel.getSelectedItems();
 
-        deleteFromDiskButton.disableProperty().bind(Bindings.isEmpty(selectedItems));
+        deleteFromDiskButton.disableProperty().bind(Bindings.createBooleanBinding(() -> {
+            var selectedItem = selectionModel.getSelectedItem();
+            return selectedItem == null;
+        }, selectionModel.selectedItemProperty()));
 
         setSizeButton.disableProperty().bind(Bindings.createBooleanBinding(() -> {
             var selectedItem = selectionModel.getSelectedItem();
             if (selectedItem != null) {
-                if (isMainFolder(selectedItem) && !maxSizeField.getText().equals("")) {
-                    return !isMainFolder(selectedItem);
-                }
+                return !isMainFolder(selectedItem) || maxSizeField.getText().equals("");
             }
             return true;
-        }, selectionModel.selectedItemProperty(), maxSizeField.textProperty()));//isEmpty(locationTreeView.getSelectionModel().getSelectedItems()));
+        }, selectionModel.selectedItemProperty(), maxSizeField.textProperty()));
 
         stopObserveButton.disableProperty().bind(Bindings.createBooleanBinding(() -> {
             var selectedItem = selectionModel.getSelectedItem();
@@ -134,28 +134,22 @@ public class MainView {
                     var oldFolder = folderList.getObservedFolderFromTreeItem(oldTreeItem);
                     var newFolder = folderList.getObservedFolderFromTreeItem(newTreeItem);
 
-                    oldFolder.ifPresentOrElse(oldObservedFolder -> {
-                        newFolder.ifPresent(newObservedFolder -> {
-                            if (!oldObservedFolder.equals(newObservedFolder)) {
-                                maxSizeField.setText(String.valueOf(newObservedFolder.getMaximumSize() / FileUtils.ONE_MB));
-                                // this won't work because:
-                                // 1) unbind removes all listeners
-                                // 2) bind prevents inputting value
+                    oldFolder.ifPresentOrElse(oldObservedFolder -> newFolder.ifPresent(newObservedFolder -> {
+                        if (!oldObservedFolder.equals(newObservedFolder)) {
+                            Platform.runLater(() -> maxSizeField.setText(String.valueOf(newObservedFolder.getMaximumSize() / FileUtils.ONE_MB)));
+                            // this won't work because:
+                            // 1) unbind removes all listeners
+                            // 2) bind prevents inputting value
 //                            directorySize.textProperty().unbind();
 //                            directorySize.textProperty().bind(newObservedFolder.getMaximumSizeProperty().asString());
-                            }
-                        });
-                    }, () -> newFolder.ifPresent(newObservedFolder -> {
-                        maxSizeField.setText(String.valueOf(newObservedFolder.getMaximumSize() / FileUtils.ONE_MB));
-                    }));
+                        }
+                    }), () -> newFolder.ifPresent(newObservedFolder -> maxSizeField.setText(String.valueOf(newObservedFolder.getMaximumSize() / FileUtils.ONE_MB))));
                 });
     }
 
     private void loadSavedFolders() { //FIXME: restoring folders take long time
         commandExecutor.executeCommand(new GetAllObservedFolderCommand())
-                .thenAccept(folders -> {
-                    folders.getFolderList().forEach(this::observeFolderEvents);
-                });
+                .thenAccept(folders -> folders.getFolderList().forEach(this::observeFolderEvents));
     }
 
     public void addToMainTree(ObservedFolder folder, TreeFileNode node) {
@@ -215,9 +209,7 @@ public class MainView {
                     if (nodeData.isDirectory()) {
                         FileUtils.deleteDirectory(searchedFile);
                         if (isMainFolder(item)) {
-                            folderList.getObservedFolderFromTreePath(searchedPath).ifPresent(observedFolder -> {
-                                removeMainFolder(observedFolder, item);
-                            });
+                            folderList.getObservedFolderFromTreePath(searchedPath).ifPresent(observedFolder -> removeMainFolder(observedFolder, item));
                         }
                     } else {
                         if (!searchedFile.delete()) {
