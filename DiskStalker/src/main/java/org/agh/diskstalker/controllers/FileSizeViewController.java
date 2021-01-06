@@ -34,17 +34,17 @@ public class FileSizeViewController extends AbstractTabController {
 
         @Override
         public int compare(String s1, String s2) {
-            var size1 = s1.split(" ")[1];
-            var size2 = s2.split(" ")[1];
+            var firstSize = s1.split(" ");
+            var secondSize = s2.split(" ");
 
-            var val1 = comparingMap.get(size1);
-            var val2 = comparingMap.get(size2);
+            var val1 = comparingMap.get(firstSize[1]);
+            var val2 = comparingMap.get(secondSize[1]);
 
             if(val1 < val2) {
                 return 1;
-            } else if(val1.equals(val2)) {
-                var res = Long.parseLong(s1.split(" ")[0]);
-                var res2 = Long.parseLong(s2.split(" ")[0]);
+            } else if(val1 == val2) {
+                var res = Long.parseLong(firstSize[0]);
+                var res2 = Long.parseLong(secondSize[0]);
                 return Long.compare(res2, res);
             } else return -1;
         }
