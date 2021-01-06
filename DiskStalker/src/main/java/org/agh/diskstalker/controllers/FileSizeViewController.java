@@ -11,6 +11,7 @@ import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -43,6 +44,6 @@ public class FileSizeViewController extends AbstractTabController {
         sizeColumn.setPrefWidth(120);
         nameColumn.setPrefWidth(319);
 
-        dataTableView.getColumns().addAll(sizeColumn, nameColumn);
+        dataTableView.getColumns().addAll(List.of(sizeColumn, nameColumn));
     }
 }

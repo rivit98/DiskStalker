@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -68,13 +69,9 @@ public class MainViewController {
     private void setStatisticsLoading() {
         tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
             if(newTab.getId().equals("fileTypeView")) {
-                new Thread(() -> {
-                    folderList.get().forEach(ObservedFolder::createTypeStatistics);
-                }).start();
+                folderList.get().forEach(folder -> new Thread(folder::createTypeStatistics).start());
             } else if(newTab.getId().equals("fileModificationDateView")) {
-                new Thread(() -> {
-                    folderList.get().forEach(ObservedFolder::createDateModificationStatistics);
-                }).start();
+                folderList.get().forEach(folder -> new Thread(folder::createDateModificationStatistics).start());
             }
         });
     }
@@ -121,7 +118,7 @@ public class MainViewController {
                     .orElse(null);
         });
 
-        locationTreeView.getColumns().addAll(pathColumn, sizeColumn);
+        locationTreeView.getColumns().addAll(List.of(pathColumn, sizeColumn));
     }
 
     private void initializeButtons() {

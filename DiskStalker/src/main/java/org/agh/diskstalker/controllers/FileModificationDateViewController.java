@@ -11,6 +11,7 @@ import org.agh.diskstalker.model.tree.TreeFileNode;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -42,6 +43,6 @@ public class FileModificationDateViewController extends AbstractTabController {
         dateColumn.setPrefWidth(170);
         nameColumn.setPrefWidth(269);
 
-        dataTableView.getColumns().addAll(dateColumn, nameColumn);
+        dataTableView.getColumns().addAll(List.of(dateColumn, nameColumn));
     }
 }
