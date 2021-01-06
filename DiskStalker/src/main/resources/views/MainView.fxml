@@ -64,11 +64,11 @@
                                         <Insets bottom="30.0" left="20.0" right="20.0" />
                                     </GridPane.margin>
                                 </TreeTableView>
-                          <Button fx:id="addButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="125.0" text="Add" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                          <Button fx:id="addButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="125.0" text="Start observing" GridPane.columnIndex="1" GridPane.rowIndex="1">
                            <GridPane.margin>
                               <Insets left="35.0" />
                            </GridPane.margin></Button>
-                                <Button fx:id="stopObserveButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="125.0" text="Delete from list" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                <Button fx:id="stopObserveButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="125.0" text="Stop observing" GridPane.columnIndex="1" GridPane.rowIndex="2">
                            <GridPane.margin>
                               <Insets left="35.0" />
                            </GridPane.margin></Button>
