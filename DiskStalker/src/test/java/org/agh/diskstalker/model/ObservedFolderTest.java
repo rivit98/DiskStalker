@@ -33,7 +33,7 @@ public class ObservedFolderTest {
     @Test
     public void setMaximumSize() {
         //given
-        long maxSize = 15;
+        var maxSize = 15L;
 
         //when
         folder.setMaximumSize(maxSize);
@@ -45,8 +45,8 @@ public class ObservedFolderTest {
     @Test
     public void isSizeLimitExceeded() {
         //given
-        long maxSize = 2;
-        long exceededSize = 5;
+        var maxSize = 2L;
+        var exceededSize = 5L;
         folder.setMaximumSize(maxSize);
         NodeData nodeData = new NodeData(path);
         nodeData.modifySize(exceededSize);
