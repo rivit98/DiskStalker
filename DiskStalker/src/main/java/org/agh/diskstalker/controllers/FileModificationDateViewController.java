@@ -28,7 +28,7 @@ public class FileModificationDateViewController extends AbstractTabController {
                 dataTableView.setItems(items);
                 dataTableView.getItems().removeIf(val -> val.getValue().getValue().isDirectory());
             } else {
-                dataTableView.setItems(null);
+                dataTableView.getItems().clear();
             }
         });
     }

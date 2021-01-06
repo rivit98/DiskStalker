@@ -29,7 +29,7 @@ public class FileSizeViewController extends AbstractTabController {
                 dataTableView.getItems().removeIf(val -> val.getValue().getValue().isDirectory());
 
             } else {
-                dataTableView.setItems(null);
+                dataTableView.getItems().clear();
             }
         });
     }
