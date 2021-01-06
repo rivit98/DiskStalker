@@ -42,7 +42,7 @@ public class ObservedFolder {
         this.treeBuilder = new TreeBuilder();
         this.filesTypeStatistics = new FilesTypeStatistics(treeBuilder.getPathToTreeMap());
         this.eventProcessor = new EventProcessor(treeBuilder, filesTypeStatistics);
-        setMaximumSizeProperty(maxSize);
+        setMaximumSize(maxSize);
         this.sizeExceededProperty.set(false);
         this.name = new SimpleStringProperty(dirToWatch.getFileName().toString());
 
