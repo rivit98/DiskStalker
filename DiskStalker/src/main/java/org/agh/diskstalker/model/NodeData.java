@@ -61,6 +61,7 @@ public class NodeData {
             modificationDateProperty = new SimpleStringProperty(date);
         } catch(IOException e) {
             System.out.println("Cannot load last modification date of file " + path);
+            modificationDateProperty = new SimpleStringProperty("NO DATA");
         }
     }
 

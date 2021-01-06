@@ -16,8 +16,16 @@ public class Type {
         return type.get();
     }
 
+    public SimpleStringProperty getTypeProperty() {
+        return type;
+    }
+
     public int getQuantity() {
         return quantity.get();
+    }
+
+    public SimpleIntegerProperty getQuantityProperty() {
+        return quantity;
     }
 
     public void increment() {

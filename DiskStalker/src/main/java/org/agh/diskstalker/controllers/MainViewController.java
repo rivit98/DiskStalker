@@ -30,7 +30,7 @@ import java.util.Optional;
 
 @Component
 @FxmlView("/views/MainView.fxml")
-public class MainView {
+public class MainViewController {
     @FXML
     private TabPane tabPane;
     @FXML
@@ -46,11 +46,11 @@ public class MainView {
     @FXML
     private Button deleteFromDiskButton;
     @FXML
-    private FileSizeView fileSizeViewController;
+    private AbstractTabController fileSizeViewController;
     @FXML
-    private FileTypeView fileTypeViewController;
+    private AbstractTabController fileTypeViewController;
     @FXML
-    private FileModificationDateView fileModificationDateViewController;
+    private AbstractTabController fileModificationDateViewController;
 
     private final DatabaseCommandExecutor commandExecutor = new DatabaseCommandExecutor();
     private final FolderList folderList = new FolderList();
@@ -69,15 +69,9 @@ public class MainView {
     private void setStatisticsLoading() {
         tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
             if(newTab.getId().equals("fileTypeView")) {
-                var thread = new Thread(() -> {
-                    folderList.get().forEach(ObservedFolder::createTypeStatistics);
-                });
-                thread.start();
+                folderList.get().forEach(folder -> new Thread(folder::createTypeStatistics).start());
             } else if(newTab.getId().equals("fileModificationDateView")) {
-                var thread = new Thread(() -> {
-                    folderList.get().forEach(ObservedFolder::createDateModificationStatistics);
-                });
-                thread.start();
+                folderList.get().forEach(folder -> new Thread(folder::createDateModificationStatistics).start());
             }
         });
     }
@@ -94,9 +88,9 @@ public class MainView {
     }
 
     private void initializeTabs() {
-        fileSizeViewController.prepareTableViewSizeNames(folderList);
-        fileTypeViewController.prepareTableViewTypeNames(folderList);
-        fileModificationDateViewController.prepareTableViewModificationDateNames(folderList);
+        fileSizeViewController.prepareTabController(folderList);
+        fileTypeViewController.prepareTabController(folderList);
+        fileModificationDateViewController.prepareTabController(folderList);
     }
 
     private void prepareColumns() {
@@ -133,6 +127,10 @@ public class MainView {
         setSizeButton.setOnAction(this::setSizeButtonClicked);
         deleteFromDiskButton.setOnAction(this::deleteFromDiskButtonClicked);
 
+        setRulesForDisablingButtons();
+    }
+
+    private void setRulesForDisablingButtons() {
         var selectionModel = locationTreeView.getSelectionModel();
 
         deleteFromDiskButton.disableProperty().bind(Bindings.createBooleanBinding(() -> {

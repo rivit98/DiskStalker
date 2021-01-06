@@ -17,6 +17,7 @@ import org.agh.diskstalker.model.events.observedFolderEvents.ObservedFolderError
 import org.agh.diskstalker.model.events.observedFolderEvents.ObservedFolderEvent;
 import org.agh.diskstalker.model.events.observedFolderEvents.ObservedFolderRootAvailableEvent;
 import org.agh.diskstalker.model.events.observedFolderEvents.ObservedFolderSizeChangedEvent;
+import org.agh.diskstalker.model.statisctics.FilesTypeStatistics;
 import org.agh.diskstalker.model.tree.TreeBuilder;
 
 import java.nio.file.Path;
@@ -33,13 +34,15 @@ public class ObservedFolder {
     private final SimpleBooleanProperty sizeExceededProperty = new SimpleBooleanProperty();
     private final PublishSubject<ObservedFolderEvent> eventStream = PublishSubject.create();
     private final SimpleStringProperty name;
+    private final FilesTypeStatistics filesTypeStatistics;
 
     public ObservedFolder(Path dirToWatch, long maxSize) {
         this.dirToWatch = dirToWatch;
         this.filesystemWatcher = new DirWatcher(dirToWatch);
         this.treeBuilder = new TreeBuilder();
-        this.eventProcessor = new EventProcessor(treeBuilder);
-        this.maximumSize = maxSize;
+        this.filesTypeStatistics = new FilesTypeStatistics(treeBuilder.getPathToTreeMap());
+        this.eventProcessor = new EventProcessor(treeBuilder, filesTypeStatistics);
+        setMaximumSize(maxSize);
         this.sizeExceededProperty.set(false);
         this.name = new SimpleStringProperty(dirToWatch.getFileName().toString());
 
@@ -149,12 +152,17 @@ public class ObservedFolder {
     }
 
     public void createTypeStatistics() {
-        var types = Optional.ofNullable(treeBuilder.getTypeStatistics());
-        types.ifPresentOrElse(val -> {} , treeBuilder::setTypeStatistics);
+        if(!filesTypeStatistics.isStatisticsSet()) {
+            filesTypeStatistics.setTypeStatistics();
+        }
     }
 
     public void createDateModificationStatistics() {
         treeBuilder.getPathToTreeMap().forEach((key, val) -> val.getValue().setModificationDate());
+    }
+
+    public FilesTypeStatistics getFilesTypeStatistics() {
+        return filesTypeStatistics;
     }
 
     public TreeBuilder getTreeBuilder() {

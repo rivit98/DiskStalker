@@ -1,7 +1,7 @@
 package org.agh.diskstalker.model.events.observedFolderEvents;
 
 import org.agh.diskstalker.controllers.Alerts;
-import org.agh.diskstalker.controllers.MainView;
+import org.agh.diskstalker.controllers.MainViewController;
 import org.agh.diskstalker.model.ObservedFolder;
 
 public class ObservedFolderErrorEvent extends AbstractObservedFolderEvent{
@@ -13,7 +13,7 @@ public class ObservedFolderErrorEvent extends AbstractObservedFolderEvent{
     }
 
     @Override
-    public void dispatch(MainView view) {
+    public void dispatch(MainViewController mainViewController) {
         Alerts.genericErrorAlert(super.folder.getPath(), message);
     }
 }
