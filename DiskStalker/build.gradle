@@ -18,6 +18,7 @@ repositories {
     maven {
         url "https://dl.bintray.com/speljohan/rxjavafx-mirror"
     }
+    jcenter()
 }
 
 test {
@@ -41,6 +42,8 @@ javafx {
 dependencies {
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.0'
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.7.0'
+    testCompile "org.mockito:mockito-core:2.+"
+    testCompile group: 'org.hamcrest', name: 'hamcrest', version: '2.1'
 
     implementation group: 'io.reactivex.rxjava3', name: 'rxjava', version: '3.0.7'
     implementation group: 'io.reactivex.rxjava3', name: 'rxjavafx', version: '3.0.1'

@@ -273,7 +273,7 @@ public class MainView {
         var value = selectedTreeItem.getValue();
 
         folderList.getObservedFolderFromTreePath(value.getPath()).ifPresent(observedFolder -> {
-            observedFolder.setMaximumSizeProperty(maximumSize);
+            observedFolder.setMaximumSize(maximumSize);
             commandExecutor.executeCommand(new UpdateObservedFolderCommand(observedFolder));
             Alerts.setMaxSizeAlert(value.getPath().toString(), maximumSize);
         });
