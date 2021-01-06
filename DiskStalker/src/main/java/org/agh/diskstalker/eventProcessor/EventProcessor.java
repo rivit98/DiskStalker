@@ -2,6 +2,7 @@ package org.agh.diskstalker.eventProcessor;
 
 import org.agh.diskstalker.model.NodeData;
 import org.agh.diskstalker.model.events.filesystemEvents.FilesystemEvent;
+import org.agh.diskstalker.model.statisctics.FilesTypeStatistics;
 import org.agh.diskstalker.model.tree.TreeBuilder;
 import org.agh.diskstalker.model.tree.TreeFileNode;
 
@@ -9,9 +10,11 @@ import java.nio.file.Path;
 
 public class EventProcessor implements IEventProcessor {
     private final TreeBuilder treeBuilder;
+    private final FilesTypeStatistics filesTypeStatistics;
 
-    public EventProcessor(TreeBuilder treeBuilder) {
+    public EventProcessor(TreeBuilder treeBuilder, FilesTypeStatistics filesTypeStatistics) {
         this.treeBuilder = treeBuilder;
+        this.filesTypeStatistics = filesTypeStatistics;
     }
 
     @Override
@@ -48,7 +51,7 @@ public class EventProcessor implements IEventProcessor {
     private void handleDeleteEventCommon(Path resolvedPath) {
         var affectedNode = treeBuilder.getPathToTreeMap().remove(resolvedPath);
         treeBuilder.removeMappedDirsRecursively(affectedNode);
-        treeBuilder.decrementTypeCounter(affectedNode.getValue());
+        filesTypeStatistics.decrementTypeCounter(affectedNode.getValue());
         affectedNode.deleteMe();
     }
 
@@ -65,6 +68,6 @@ public class EventProcessor implements IEventProcessor {
         nodeData.setModificationDate();
         var newTreeNode = new TreeFileNode(nodeData);
         treeBuilder.insertNewNode(newTreeNode);
-        treeBuilder.addNewNodeType(nodeData);
+        filesTypeStatistics.addNewNodeType(nodeData);
     }
 }

@@ -25,7 +25,6 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -69,15 +68,13 @@ public class MainViewController {
     private void setStatisticsLoading() {
         tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
             if(newTab.getId().equals("fileTypeView")) {
-                var thread = new Thread(() -> {
+                new Thread(() -> {
                     folderList.get().forEach(ObservedFolder::createTypeStatistics);
-                });
-                thread.start();
+                }).start();
             } else if(newTab.getId().equals("fileModificationDateView")) {
-                var thread = new Thread(() -> {
+                new Thread(() -> {
                     folderList.get().forEach(ObservedFolder::createDateModificationStatistics);
-                });
-                thread.start();
+                }).start();
             }
         });
     }
@@ -124,7 +121,7 @@ public class MainViewController {
                     .orElse(null);
         });
 
-        locationTreeView.getColumns().addAll(List.of(pathColumn, sizeColumn));
+        locationTreeView.getColumns().addAll(pathColumn, sizeColumn);
     }
 
     private void initializeButtons() {
@@ -133,6 +130,10 @@ public class MainViewController {
         setSizeButton.setOnAction(this::setSizeButtonClicked);
         deleteFromDiskButton.setOnAction(this::deleteFromDiskButtonClicked);
 
+        setRulesForDisablingButtons();
+    }
+
+    private void setRulesForDisablingButtons() {
         var selectionModel = locationTreeView.getSelectionModel();
 
         deleteFromDiskButton.disableProperty().bind(Bindings.createBooleanBinding(() -> {

@@ -16,7 +16,7 @@ public class FileTypeViewController extends AbstractTabController {
     protected void setSelectionModelListener() {
         foldersTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if(newValue != null) {
-                dataTableView.setItems(newValue.getTreeBuilder().getTypeStatistics());
+                dataTableView.setItems(newValue.getFilesTypeStatistics().getTypeStatistics());
             } else {
                 dataTableView.setItems(null);
             }
