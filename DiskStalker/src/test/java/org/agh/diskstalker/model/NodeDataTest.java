@@ -14,7 +14,7 @@ public class NodeDataTest {
 
     @BeforeEach
     public void setUp() {
-        Path path = Mockito.mock(Path.class);
+        var path = Mockito.mock(Path.class);
         Mockito.when(path.toFile()).thenReturn(Mockito.mock(File.class));
         Mockito.when(path.getFileName()).thenReturn(Mockito.mock(Path.class));
         nodeData = new NodeData(path);
@@ -23,7 +23,7 @@ public class NodeDataTest {
     @Test
     public void updateFileSize() {
         //given
-        long newSize = 21;
+        var newSize = 21L;
         Mockito.when(nodeData.getActualSize()).thenReturn(newSize);
 
         //when then
@@ -33,7 +33,7 @@ public class NodeDataTest {
     @Test
     public void modifySize() {
         //given
-        long newSize = 14;
+        var newSize = 14L;
 
         //when
         nodeData.modifySize(newSize);
