@@ -4,20 +4,20 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.agh.diskstalker.model.tree.TreeFileNode;
+import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 import java.util.Map;
 
 @Component
-@FxmlView("/views/FileModificationDateView.fxml")
-public class FileModificationDateView extends AbstractTabController {
+@FxmlView("/views/FileSizeView.fxml")
+public class FileSizeViewController extends AbstractTabController {
     @FXML
-    private TableView<Map.Entry<Path, TreeFileNode>> dataTableView;
+    private TableView<Map.Entry<Path,TreeFileNode>> dataTableView;
 
     protected void setSelectionModelListener() {
         foldersTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -26,6 +26,7 @@ public class FileModificationDateView extends AbstractTabController {
                 ObservableList<Map.Entry<Path, TreeFileNode>> items = FXCollections.observableArrayList(map.entrySet());
                 dataTableView.setItems(items);
                 dataTableView.getItems().removeIf(val -> val.getValue().getValue().isDirectory());
+
             } else {
                 dataTableView.setItems(null);
             }
@@ -33,15 +34,15 @@ public class FileModificationDateView extends AbstractTabController {
     }
 
     protected void prepareDataTableView() {
-        TableColumn<Map.Entry<Path, TreeFileNode>, String> dateColumn = new TableColumn<>("Modification date");
-        dateColumn.setCellValueFactory(val -> new SimpleStringProperty(val.getValue().getValue().getValue().getModificationDate()));
+        TableColumn<Map.Entry<Path, TreeFileNode>, String> sizeColumn = new TableColumn<>("Size");
+        sizeColumn.setCellValueFactory(val -> new SimpleStringProperty(FileUtils.byteCountToDisplaySize(val.getValue().getValue().getValue().getSize())));
 
         TableColumn<Map.Entry<Path, TreeFileNode>, String> nameColumn = new TableColumn<>("Name");
         nameColumn.setCellValueFactory(val -> new SimpleStringProperty(val.getValue().getValue().getValue().getName()));
 
-        dateColumn.setPrefWidth(170);
-        nameColumn.setPrefWidth(269);
+        sizeColumn.setPrefWidth(120);
+        nameColumn.setPrefWidth(319);
 
-        dataTableView.getColumns().addAll(dateColumn, nameColumn);
+        dataTableView.getColumns().addAll(sizeColumn, nameColumn);
     }
 }

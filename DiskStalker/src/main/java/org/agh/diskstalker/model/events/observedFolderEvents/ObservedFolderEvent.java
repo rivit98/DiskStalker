@@ -1,7 +1,7 @@
 package org.agh.diskstalker.model.events.observedFolderEvents;
 
-import org.agh.diskstalker.controllers.MainView;
+import org.agh.diskstalker.controllers.MainViewController;
 
 public interface ObservedFolderEvent {
-    void dispatch(MainView view);
+    void dispatch(MainViewController mainViewController);
 }

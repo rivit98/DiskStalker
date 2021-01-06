@@ -1,7 +1,7 @@
 package org.agh.diskstalker.cellFactories;
 
 import javafx.scene.control.TreeTableCell;
-import org.agh.diskstalker.controllers.MainView;
+import org.agh.diskstalker.controllers.MainViewController;
 import org.agh.diskstalker.graphics.GraphicsFactory;
 import org.agh.diskstalker.model.NodeData;
 
@@ -9,10 +9,10 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 public class PathColumnCellFactory extends TreeTableCell<NodeData, Path> {
-    private final MainView mainView;
+    private final MainViewController mainViewController;
 
-    public PathColumnCellFactory(MainView mainView) {
-        this.mainView = mainView;
+    public PathColumnCellFactory(MainViewController mainViewController) {
+        this.mainViewController = mainViewController;
     }
 
     @Override
@@ -28,7 +28,7 @@ public class PathColumnCellFactory extends TreeTableCell<NodeData, Path> {
                 .ifPresentOrElse(
                         fileName -> {
                             setText(fileName.toString());
-                            mainView.getFolderList()
+                            mainViewController.getFolderList()
                                     .getObservedFolderFromTreePath(item)
                                     .ifPresent(folder -> {
                                         setGraphic(GraphicsFactory.getGraphic(item.toFile().isDirectory(), folder.isSizeLimitExceeded()));

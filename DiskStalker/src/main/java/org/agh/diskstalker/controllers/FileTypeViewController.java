@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @FxmlView("/views/FileTypeView.fxml")
-public class FileTypeView extends AbstractTabController{
+public class FileTypeViewController extends AbstractTabController {
     @FXML
     private TableView<Type> dataTableView;
 

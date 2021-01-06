@@ -30,7 +30,7 @@ import java.util.Optional;
 
 @Component
 @FxmlView("/views/MainView.fxml")
-public class MainView {
+public class MainViewController {
     @FXML
     private TabPane tabPane;
     @FXML

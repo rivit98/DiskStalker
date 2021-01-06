@@ -1,6 +1,6 @@
 package org.agh.diskstalker.model.events.observedFolderEvents;
 
-import org.agh.diskstalker.controllers.MainView;
+import org.agh.diskstalker.controllers.MainViewController;
 import org.agh.diskstalker.model.ObservedFolder;
 import org.agh.diskstalker.model.tree.TreeFileNode;
 
@@ -13,7 +13,7 @@ public class ObservedFolderRootAvailableEvent extends AbstractObservedFolderEven
     }
 
     @Override
-    public void dispatch(MainView view) {
-        view.addToMainTree(folder, nodeDataTreeItem);
+    public void dispatch(MainViewController mainViewController) {
+        mainViewController.addToMainTree(folder, nodeDataTreeItem);
     }
 }

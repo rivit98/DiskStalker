@@ -4,14 +4,11 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import net.rgielen.fxweaver.core.FxWeaver;
-import org.agh.diskstalker.controllers.MainView;
-import org.agh.diskstalker.persistence.ConnectionProvider;
+import org.agh.diskstalker.controllers.MainViewController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
-
-import java.sql.SQLException;
 
 @Component
 class PrimaryStageInitializer implements ApplicationListener<StageReadyEvent> {
@@ -28,7 +25,7 @@ class PrimaryStageInitializer implements ApplicationListener<StageReadyEvent> {
     @Override
     public void onApplicationEvent(StageReadyEvent event) {
         var stage = event.getStage();
-        var fxControllerAndView = fxWeaver.load(MainView.class);
+        var fxControllerAndView = fxWeaver.load(MainViewController.class);
         var controller = fxControllerAndView.getController();
         fxControllerAndView.getView().ifPresent(view -> {
             var scene = new Scene((Parent) view);
@@ -41,7 +38,7 @@ class PrimaryStageInitializer implements ApplicationListener<StageReadyEvent> {
         });
     }
 
-    private void configureStage(Stage primaryStage, MainView controller) {
+    private void configureStage(Stage primaryStage, MainViewController controller) {
         primaryStage.setResizable(false);
         primaryStage.setTitle(applicationTitle);
 

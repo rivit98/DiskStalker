@@ -7,7 +7,7 @@
 <?import javafx.scene.text.Font?>
 
 
-<Tab text="Modification date" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1" fx:controller="org.agh.diskstalker.controllers.FileModificationDateView">
+<Tab text="Modification date" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1" fx:controller="org.agh.diskstalker.controllers.FileModificationDateViewController">
     <content>
         <GridPane>
             <columnConstraints>
