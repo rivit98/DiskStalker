@@ -30,7 +30,7 @@ public class ObservedFolder {
     private final IFilesystemWatcher filesystemWatcher;
     private final IEventProcessor eventProcessor;
     private final TreeBuilder treeBuilder;
-    private final SimpleLongProperty maximumSizeProperty = new SimpleLongProperty(0); //TODO: this might be just long
+    private long maximumSize;
     private final SimpleBooleanProperty sizeExceededProperty = new SimpleBooleanProperty();
     private final PublishSubject<ObservedFolderEvent> eventStream = PublishSubject.create();
     private final SimpleStringProperty name;
@@ -107,17 +107,13 @@ public class ObservedFolder {
         return dirToWatch;
     }
 
-    public SimpleLongProperty getMaximumSizeProperty() {
-        return maximumSizeProperty;
-    }
-
-    public void setMaximumSizeProperty(long value) {
-        maximumSizeProperty.set(value);
+    public void setMaximumSize(long value) {
+        maximumSize = value;
         sendSizeChangedEvent(); // force check size check
     }
 
     public Long getMaximumSize() {
-        return maximumSizeProperty.getValue();
+        return maximumSize;
     }
 
     public Long getSize() {
@@ -127,7 +123,7 @@ public class ObservedFolder {
     }
 
     public boolean isSizeLimitExceeded() {
-        var maxSize = getMaximumSize();
+        var maxSize = this.getMaximumSize();
         return maxSize > 0 && getSize() > maxSize;
     }
 
