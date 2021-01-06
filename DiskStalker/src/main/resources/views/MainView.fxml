@@ -76,7 +76,7 @@
                            <GridPane.margin>
                               <Insets left="35.0" />
                            </GridPane.margin></Button>
-                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Max directory size (MB)" wrappingWidth="133.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                          <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Max directory size (MB)" wrappingWidth="133.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
                            <GridPane.margin>
                               <Insets left="35.0" />
                            </GridPane.margin></Text>
@@ -85,9 +85,9 @@
                                   <Insets left="35.0" />
                               </GridPane.margin>
                           </Button>
-                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Observed directories" textAlignment="CENTER" wrappingWidth="527.0">
+                          <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Observed directories" textAlignment="CENTER" wrappingWidth="527.0">
                               <font>
-                                  <Font name="Javanese Text" size="25.0" />
+                                  <Font name="Times New Roman Bold" size="25.0" />
                               </font>
                               <GridPane.margin>
                                   <Insets />
@@ -97,9 +97,9 @@
                         </GridPane>
                     </content>
                 </Tab>
-                <fx:include fx:id="fileTypeView" source="FileTypeView.fxml"/>
-                <fx:include fx:id="fileSizeView" source="FileSizeView.fxml"/>
-                <fx:include fx:id="fileModificationDateView" source="FileModificationDateView.fxml"/>
+                <fx:include fx:id="fileTypeView" source="FileTypeView.fxml" />
+                <fx:include fx:id="fileSizeView" source="FileSizeView.fxml" />
+                <fx:include fx:id="fileModificationDateView" source="FileModificationDateView.fxml" />
             </tabs>
         </TabPane>
     </children>

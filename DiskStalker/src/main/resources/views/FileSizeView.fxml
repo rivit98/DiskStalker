@@ -35,14 +35,14 @@
                 <GridPane.margin><Insets bottom="30.0" left="20.0" right="20.0" />
                 </GridPane.margin>
             </TableView>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Observed directories" textAlignment="CENTER" wrappingWidth="319.0">
+            <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Observed directories" textAlignment="CENTER" wrappingWidth="319.0">
                 <font>
-                    <Font name="Javanese Text" size="25.0" />
+                    <Font name="Times New Roman Bold" size="25.0" />
                 </font>
             </Text>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="File sizes" textAlignment="CENTER" wrappingWidth="481.0" GridPane.columnIndex="1">
+            <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="File sizes" textAlignment="CENTER" wrappingWidth="481.0" GridPane.columnIndex="1">
                 <font>
-                    <Font name="Javanese Text" size="25.0" />
+                    <Font name="Times New Roman Bold" size="25.0" />
                 </font>
             </Text>
         </children>
