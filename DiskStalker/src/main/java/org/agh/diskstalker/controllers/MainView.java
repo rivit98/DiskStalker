@@ -46,11 +46,11 @@ public class MainView {
     @FXML
     private Button deleteFromDiskButton;
     @FXML
-    private FileSizeView fileSizeViewController;
+    private AbstractTabController fileSizeViewController;
     @FXML
-    private FileTypeView fileTypeViewController;
+    private AbstractTabController fileTypeViewController;
     @FXML
-    private FileModificationDateView fileModificationDateViewController;
+    private AbstractTabController fileModificationDateViewController;
 
     private final DatabaseCommandExecutor commandExecutor = new DatabaseCommandExecutor();
     private final FolderList folderList = new FolderList();
@@ -94,9 +94,9 @@ public class MainView {
     }
 
     private void initializeTabs() {
-        fileSizeViewController.prepareTableViewSizeNames(folderList);
-        fileTypeViewController.prepareTableViewTypeNames(folderList);
-        fileModificationDateViewController.prepareTableViewModificationDateNames(folderList);
+        fileSizeViewController.prepareTabController(folderList);
+        fileTypeViewController.prepareTabController(folderList);
+        fileModificationDateViewController.prepareTabController(folderList);
     }
 
     private void prepareColumns() {

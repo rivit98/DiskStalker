@@ -26,12 +26,12 @@
                 <RowConstraints maxHeight="117.5" minHeight="10.0" prefHeight="94.5" vgrow="SOMETIMES" />
             </rowConstraints>
             <children>
-                <TableView fx:id="tableViewModificationDateNames" prefHeight="357.0" prefWidth="300.0" GridPane.rowIndex="1" GridPane.rowSpan="8">
+                <TableView fx:id="foldersTableView" prefHeight="357.0" prefWidth="300.0" GridPane.rowIndex="1" GridPane.rowSpan="8">
                     <GridPane.margin>
                         <Insets bottom="30.0" left="20.0" right="20.0" />
                     </GridPane.margin>
                 </TableView>
-                <TableView fx:id="tableViewModificationDate" prefHeight="357.0" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.rowSpan="8">
+                <TableView fx:id="dataTableView" prefHeight="357.0" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.rowSpan="8">
                     <GridPane.margin><Insets bottom="30.0" left="20.0" right="20.0" />
                     </GridPane.margin>
                 </TableView>

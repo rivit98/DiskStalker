@@ -1,18 +1,12 @@
 package org.agh.diskstalker.controllers;
 
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.ImageView;
 import net.rgielen.fxweaver.core.FxmlView;
-import org.agh.diskstalker.graphics.GraphicsFactory;
-import org.agh.diskstalker.model.FolderList;
-import org.agh.diskstalker.model.ObservedFolder;
 import org.agh.diskstalker.model.tree.TreeFileNode;
 import org.springframework.stereotype.Component;
 
@@ -21,47 +15,24 @@ import java.util.Map;
 
 @Component
 @FxmlView("/views/FileModificationDateView.fxml")
-public class FileModificationDateView {
+public class FileModificationDateView extends AbstractTabController {
     @FXML
-    private TableView<ObservedFolder> tableViewModificationDateNames;
-    @FXML
-    private TableView<Map.Entry<Path, TreeFileNode>> tableViewModificationDate;
+    private TableView<Map.Entry<Path, TreeFileNode>> dataTableView;
 
-    @FXML
-    public void initialize() {
-        prepareTableViewModificationDate();
-        setSelectionModelListener();
-    }
-
-    private void setSelectionModelListener() {
-        tableViewModificationDateNames.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+    protected void setSelectionModelListener() {
+        foldersTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if(newValue != null) {
-                var map = tableViewModificationDateNames.getSelectionModel().getSelectedItem().getTreeBuilder().getPathToTreeMap();
+                var map = foldersTableView.getSelectionModel().getSelectedItem().getTreeBuilder().getPathToTreeMap();
                 ObservableList<Map.Entry<Path, TreeFileNode>> items = FXCollections.observableArrayList(map.entrySet());
-                tableViewModificationDate.setItems(items);
-                tableViewModificationDate.getItems().removeIf(val -> val.getValue().getValue().isDirectory());
-
+                dataTableView.setItems(items);
+                dataTableView.getItems().removeIf(val -> val.getValue().getValue().isDirectory());
             } else {
-                tableViewModificationDate.setItems(null);
+                dataTableView.setItems(null);
             }
         });
     }
 
-    protected void prepareTableViewModificationDateNames(FolderList folders) {
-        TableColumn<ObservedFolder, ImageView> iconColumn = new TableColumn<>("");
-        TableColumn<ObservedFolder, String> nameColumn = new TableColumn<>("Directory name");
-        iconColumn.setPrefWidth(23);
-        nameColumn.setPrefWidth(253);
-
-        tableViewModificationDateNames.getColumns().addAll(iconColumn, nameColumn);
-
-        tableViewModificationDateNames.setItems(folders.get());
-
-        iconColumn.setCellValueFactory(imageview -> new SimpleObjectProperty<>(GraphicsFactory.getGraphic(true)));
-        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-    }
-
-    private void prepareTableViewModificationDate() {
+    protected void prepareDataTableView() {
         TableColumn<Map.Entry<Path, TreeFileNode>, String> dateColumn = new TableColumn<>("Modification date");
         dateColumn.setCellValueFactory(val -> new SimpleStringProperty(val.getValue().getValue().getValue().getModificationDate()));
 
@@ -71,6 +42,6 @@ public class FileModificationDateView {
         dateColumn.setPrefWidth(170);
         nameColumn.setPrefWidth(269);
 
-        tableViewModificationDate.getColumns().addAll(dateColumn, nameColumn);
+        dataTableView.getColumns().addAll(dateColumn, nameColumn);
     }
 }
