@@ -10,7 +10,12 @@ import org.agh.diskstalker.graphics.GraphicsFactory;
 import org.agh.diskstalker.model.FolderList;
 import org.agh.diskstalker.model.ObservedFolder;
 
+import java.util.List;
+
 public abstract class AbstractTabController {
+    private final String EMPTY_STRING = "";
+    private final String DIRECOTRY_COLUMN = "Directory name";
+
     @FXML
     protected TableView<ObservedFolder> foldersTableView;
 
@@ -23,12 +28,12 @@ public abstract class AbstractTabController {
     protected abstract void setSelectionModelListener();
 
     protected void prepareTabController(FolderList folders) {
-        TableColumn<ObservedFolder, ImageView> iconColumn = new TableColumn<>("");
-        TableColumn<ObservedFolder, String> nameColumn = new TableColumn<>("Directory name");
+        TableColumn<ObservedFolder, ImageView> iconColumn = new TableColumn<>(EMPTY_STRING);
+        TableColumn<ObservedFolder, String> nameColumn = new TableColumn<>(DIRECOTRY_COLUMN);
         iconColumn.setPrefWidth(23);
         nameColumn.setPrefWidth(253);
 
-        foldersTableView.getColumns().addAll(iconColumn, nameColumn);
+        foldersTableView.getColumns().addAll(List.of(iconColumn, nameColumn));
 
         foldersTableView.setItems(folders.get());
 

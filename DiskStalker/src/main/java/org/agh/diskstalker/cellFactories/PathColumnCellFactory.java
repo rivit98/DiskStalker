@@ -26,15 +26,21 @@ public class PathColumnCellFactory extends TreeTableCell<NodeData, Path> {
 
         Optional.ofNullable(item.getFileName())
                 .ifPresentOrElse(
-                        fileName -> {
-                            setText(fileName.toString());
-                            mainViewController.getFolderList()
-                                    .getObservedFolderFromTreePath(item)
-                                    .ifPresent(folder -> {
-                                        setGraphic(GraphicsFactory.getGraphic(item.toFile().isDirectory(), folder.isSizeLimitExceeded()));
-                                    });
-                        },
-                        () -> setText(item.toString())
+                        fileName -> fileNamePresentHandler(fileName, item),
+                        () -> fileNameEmptyHandler(item)
                 );
+    }
+
+    private void fileNamePresentHandler(Path fileName, Path item) {
+        setText(fileName.toString());
+        mainViewController.getFolderList()
+                .getObservedFolderFromTreePath(item)
+                .ifPresent(folder -> {
+                    setGraphic(GraphicsFactory.getGraphic(item.toFile().isDirectory(), folder.isSizeLimitExceeded()));
+                });
+    }
+
+    private void fileNameEmptyHandler(Path item) {
+        setText(item.toString());
     }
 }

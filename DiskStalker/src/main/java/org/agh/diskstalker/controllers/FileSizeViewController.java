@@ -4,14 +4,18 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.agh.diskstalker.model.tree.TreeFileNode;
 import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 @FxmlView("/views/FileSizeView.fxml")

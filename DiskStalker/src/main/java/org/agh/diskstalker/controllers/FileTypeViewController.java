@@ -1,7 +1,8 @@
 package org.agh.diskstalker.controllers;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.agh.diskstalker.model.statisctics.Type;
 import org.springframework.stereotype.Component;
