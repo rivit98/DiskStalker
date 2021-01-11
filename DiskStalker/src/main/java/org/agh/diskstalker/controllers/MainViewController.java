@@ -82,7 +82,6 @@ public class MainViewController {
 
     private void createRoot() {
         locationTreeView.setRoot(new TreeItem<>());
-        locationTreeView.setShowRoot(false);
         locationTreeView.getRoot().setExpanded(true);
     }
 

@@ -52,7 +52,7 @@
                                   <Insets left="30.0" right="30.0" />
                               </GridPane.margin>
                           </TextField>
-                                <TreeTableView fx:id="locationTreeView" GridPane.rowIndex="1" GridPane.rowSpan="8">
+                                <TreeTableView fx:id="locationTreeView" showRoot="false" GridPane.rowIndex="1" GridPane.rowSpan="8">
                                     <GridPane.margin>
                                         <Insets bottom="30.0" left="20.0" right="20.0" />
                                     </GridPane.margin>
