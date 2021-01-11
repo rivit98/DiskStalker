@@ -26,7 +26,7 @@ public class FileTypeViewController extends AbstractTabController {
     }
 
     protected void prepareDataTableView() {
-        TableColumn<Type, Integer> quantityColumn = new TableColumn<>("Numer of files");
+        TableColumn<Type, Integer> quantityColumn = new TableColumn<>("Number of files");
         TableColumn<Type, String> typeColumn = new TableColumn<>("File type");
         quantityColumn.setPrefWidth(150);
         typeColumn.setPrefWidth(289);

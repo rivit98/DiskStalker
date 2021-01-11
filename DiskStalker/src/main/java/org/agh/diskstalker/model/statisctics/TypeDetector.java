@@ -23,12 +23,13 @@ public class TypeDetector {
     }
 
     private void addFileType(String fileType, ObservableList<Type> typeStatistics) {
-        var foundedType = typeStatistics.stream()
+        var foundType = typeStatistics.stream()
                 .filter(type -> type.getType().equals(fileType))
                 .findFirst();
 
-        foundedType.ifPresentOrElse(type -> foundedType.get().increment(), () -> {
-            typeStatistics.add(new Type(fileType));
-        });
+        foundType.ifPresentOrElse(
+                Type::increment,
+                () -> typeStatistics.add(new Type(fileType))
+        );
     }
 }

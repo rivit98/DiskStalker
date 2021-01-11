@@ -21,25 +21,29 @@ public abstract class AbstractTabController {
 
     @FXML
     public void initialize() {
+        prepareColumns();
         prepareDataTableView();
         setSelectionModelListener();
     }
 
-    protected abstract void setSelectionModelListener();
+    private void prepareColumns(){
+        var iconColumn = new TableColumn<ObservedFolder, ImageView>(EMPTY_STRING);
+        var nameColumn = new TableColumn<ObservedFolder, String>(DIRECOTRY_COLUMN);
 
-    protected void prepareTabController(FolderList folders) {
-        TableColumn<ObservedFolder, ImageView> iconColumn = new TableColumn<>(EMPTY_STRING);
-        TableColumn<ObservedFolder, String> nameColumn = new TableColumn<>(DIRECOTRY_COLUMN);
         iconColumn.setPrefWidth(23);
         nameColumn.setPrefWidth(253);
 
-        foldersTableView.getColumns().addAll(List.of(iconColumn, nameColumn));
-
-        foldersTableView.setItems(folders.get());
-
         iconColumn.setCellValueFactory(imageview -> new SimpleObjectProperty<>(GraphicsFactory.getGraphic(true)));
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+
+        foldersTableView.getColumns().addAll(List.of(iconColumn, nameColumn));
     }
+
+    protected void injectModel(FolderList folders) {
+        foldersTableView.setItems(folders.get());
+    }
+
+    protected abstract void setSelectionModelListener();
 
     protected abstract void prepareDataTableView();
 }

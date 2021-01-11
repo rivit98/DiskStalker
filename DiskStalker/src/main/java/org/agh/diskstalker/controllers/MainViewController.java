@@ -86,9 +86,9 @@ public class MainViewController {
     }
 
     private void initializeTabs() {
-        fileSizeViewController.prepareTabController(folderList);
-        fileTypeViewController.prepareTabController(folderList);
-        fileModificationDateViewController.prepareTabController(folderList);
+        fileSizeViewController.injectModel(folderList);
+        fileTypeViewController.injectModel(folderList);
+        fileModificationDateViewController.injectModel(folderList);
     }
 
     private void prepareColumns() {
