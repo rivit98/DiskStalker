@@ -8,6 +8,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class NodeData {
     private final Path path;
@@ -60,7 +62,8 @@ public class NodeData {
             }
             modificationDateProperty = new SimpleStringProperty(date);
         } catch(IOException e) {
-            System.out.println("Cannot load last modification date of file " + path);
+            var logger = Logger.getGlobal();
+            logger.log(Level.WARNING, "Cannot load last modification date of file:", path);
             modificationDateProperty = new SimpleStringProperty("NO DATA");
         }
     }
