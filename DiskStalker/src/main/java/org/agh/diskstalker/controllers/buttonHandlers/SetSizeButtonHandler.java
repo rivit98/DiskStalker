@@ -11,12 +11,12 @@ import org.apache.commons.io.FileUtils;
 import java.util.Optional;
 
 public class SetSizeButtonHandler implements EventHandler<ActionEvent> {
-
-    private final DatabaseCommandExecutor commandExecutor = new DatabaseCommandExecutor();
+    private final DatabaseCommandExecutor commandExecutor;
     private final MainViewController mainViewController;
 
-    public SetSizeButtonHandler(MainViewController mainViewController) {
+    public SetSizeButtonHandler(MainViewController mainViewController, DatabaseCommandExecutor commandExecutor) {
         this.mainViewController = mainViewController;
+        this.commandExecutor = commandExecutor;
     }
 
     @Override

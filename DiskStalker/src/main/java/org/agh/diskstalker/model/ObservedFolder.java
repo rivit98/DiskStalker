@@ -1,6 +1,7 @@
 package org.agh.diskstalker.model;
 
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
@@ -29,11 +30,13 @@ public class ObservedFolder {
     private final IFilesystemWatcher filesystemWatcher;
     private final IEventProcessor eventProcessor;
     private final TreeBuilder treeBuilder;
-    private long maximumSize;
     private final SimpleBooleanProperty sizeExceededProperty = new SimpleBooleanProperty();
     private final PublishSubject<ObservedFolderEvent> eventStream = PublishSubject.create();
     private final SimpleStringProperty name;
     private final FilesTypeStatistics filesTypeStatistics;
+    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private final FileTreeScanner scanner;
+    private long maximumSize;
 
     public ObservedFolder(Path dirToWatch, long maxSize) {
         this.dirToWatch = dirToWatch;
@@ -44,6 +47,7 @@ public class ObservedFolder {
         setMaximumSize(maxSize);
         this.sizeExceededProperty.set(false);
         this.name = new SimpleStringProperty(dirToWatch.getFileName().toString());
+        this.scanner = new FileTreeScanner(dirToWatch);
 
         scanDirectory();
     }
@@ -58,11 +62,11 @@ public class ObservedFolder {
     }
 
     private void scanDirectory() {
-        treeBuilder.getRoot().subscribe(node -> {
+        var rootDisposable = treeBuilder.getRoot().subscribe(node -> {
             eventStream.onNext(new ObservedFolderRootAvailableEvent(this, node));
         });
 
-        new FileTreeScanner(dirToWatch)
+        var scanDisposable = scanner
                 .scan()
                 .subscribeOn(Schedulers.io())
                 .observeOn(JavaFxScheduler.platform())
@@ -71,6 +75,8 @@ public class ObservedFolder {
                         this::errorHandler,
                         this::startMonitoring
                 );
+
+        compositeDisposable.addAll(rootDisposable, scanDisposable);
     }
 
     private void processEvent(FilesystemEvent event) {
@@ -83,7 +89,7 @@ public class ObservedFolder {
     }
 
     private void startMonitoring() {
-        filesystemWatcher
+        var watchDisposable = filesystemWatcher
                 .start()
                 .subscribeOn(Schedulers.io())
                 .observeOn(JavaFxScheduler.platform())
@@ -91,9 +97,13 @@ public class ObservedFolder {
                         this::processEvent,
                         this::errorHandler
                 );
+
+        compositeDisposable.add(watchDisposable);
     }
 
     public void destroy() {
+        compositeDisposable.dispose();
+        scanner.stop();
         filesystemWatcher.stop();
         eventStream.onComplete();
     }
@@ -151,7 +161,7 @@ public class ObservedFolder {
     }
 
     public void createTypeStatistics() {
-        if(!filesTypeStatistics.isStatisticsSet()) {
+        if (!filesTypeStatistics.isStatisticsSet()) {
             filesTypeStatistics.setTypeStatistics();
         }
     }

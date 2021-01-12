@@ -29,6 +29,7 @@ public class DirWatcher implements IFilesystemWatcher {
     @Override
     public void stop() {
         try {
+            subject.onComplete();
             monitor.stop();
         } catch (Exception ignored) {
         }

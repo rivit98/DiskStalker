@@ -106,18 +106,17 @@ public class MainViewController {
             return pathOptional.map(SimpleObjectProperty::new).orElseGet(SimpleObjectProperty::new);
         });
 
-        sizeColumn.setCellValueFactory(node -> {
-            var sizePropertyOptional = Optional.ofNullable(node.getValue());
-            return sizePropertyOptional
-                    .map(nodeData -> nodeData.getValue().getSizeProperty())
-                    .orElse(null);
-        });
+        sizeColumn.setCellValueFactory(
+                node -> Optional.ofNullable(node.getValue())
+                        .map(nodeData -> nodeData.getValue().getSizeProperty())
+                        .orElse(null)
+        );
     }
 
     private void initializeButtons() {
-        addButton.setOnAction(new AddButtonHandler(this));
+        addButton.setOnAction(new AddButtonHandler(this, commandExecutor));
         stopObserveButton.setOnAction(new StopObserveButtonHandler(this));
-        setSizeButton.setOnAction(new SetSizeButtonHandler(this));
+        setSizeButton.setOnAction(new SetSizeButtonHandler(this, commandExecutor));
         deleteFromDiskButton.setOnAction(new DeleteFromDiskButtonHandler(this));
 
         initializeRulesForDisablingButtons();

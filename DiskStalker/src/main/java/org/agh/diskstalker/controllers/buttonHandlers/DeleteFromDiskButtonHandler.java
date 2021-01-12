@@ -13,8 +13,6 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 public class DeleteFromDiskButtonHandler implements EventHandler<ActionEvent> {
-
-    private final DatabaseCommandExecutor commandExecutor = new DatabaseCommandExecutor();
     private final MainViewController mainViewController;
 
     public DeleteFromDiskButtonHandler(MainViewController mainViewController) {
