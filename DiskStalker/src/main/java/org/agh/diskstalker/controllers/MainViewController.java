@@ -65,10 +65,10 @@ public class MainViewController {
         initializeButtons();
         initializeSizeField();
         loadSavedFolders();
-        setStatisticsLoading();
+        initializeStatisticsLoading();
     }
 
-    private void setStatisticsLoading() {
+    private void initializeStatisticsLoading() {
         tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
             if (newTab.getId().equals("fileTypeView")) {
                 folderList.get().forEach(folder -> new Thread(folder::createTypeStatistics).start());
@@ -120,10 +120,10 @@ public class MainViewController {
         setSizeButton.setOnAction(new SetSizeButtonHandler(this));
         deleteFromDiskButton.setOnAction(new DeleteFromDiskButtonHandler(this));
 
-        setRulesForDisablingButtons();
+        initializeRulesForDisablingButtons();
     }
 
-    private void setRulesForDisablingButtons() {
+    private void initializeRulesForDisablingButtons() {
         var selectionModel = treeTableView.getSelectionModel();
 
         deleteFromDiskButton.disableProperty().bind(Bindings.createBooleanBinding(

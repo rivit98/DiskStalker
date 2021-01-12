@@ -22,7 +22,7 @@ public abstract class AbstractTabController {
     public void initialize() {
         prepareColumns();
         prepareDataTableView();
-        setSelectionModelListener();
+        configureSelectionModelListener();
     }
 
     private void prepareColumns(){
@@ -34,7 +34,7 @@ public abstract class AbstractTabController {
         foldersTableView.setItems(folders.get());
     }
 
-    protected abstract void setSelectionModelListener();
+    protected abstract void configureSelectionModelListener();
 
     protected abstract void prepareDataTableView();
 }
