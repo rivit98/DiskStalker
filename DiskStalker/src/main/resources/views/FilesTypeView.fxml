@@ -11,35 +11,35 @@
 <Tab text="Files type" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1" fx:controller="org.agh.diskstalker.controllers.FilesTypeViewController">
     <GridPane>
         <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="478.5" minWidth="227.0" prefWidth="243.0"/>
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="572.5" minWidth="321.0" prefWidth="557.0"/>
+            <ColumnConstraints prefWidth="243.0"/>
+            <ColumnConstraints prefWidth="557.0"/>
         </columnConstraints>
         <rowConstraints>
-            <RowConstraints maxHeight="118.0" minHeight="10.0" prefHeight="53.0" vgrow="SOMETIMES"/>
-            <RowConstraints maxHeight="298.0" minHeight="10.0" prefHeight="34.0" vgrow="SOMETIMES"/>
-            <RowConstraints maxHeight="233.0" minHeight="10.0" prefHeight="35.5" vgrow="SOMETIMES"/>
-            <RowConstraints maxHeight="164.0" minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES"/>
-            <RowConstraints maxHeight="144.0" minHeight="10.0" prefHeight="38.0" vgrow="SOMETIMES"/>
-            <RowConstraints maxHeight="117.0" minHeight="10.0" prefHeight="27.0" vgrow="SOMETIMES"/>
-            <RowConstraints maxHeight="139.0" minHeight="10.0" prefHeight="31.0" vgrow="SOMETIMES"/>
-            <RowConstraints maxHeight="165.5" minHeight="10.0" prefHeight="34.0" vgrow="SOMETIMES"/>
-            <RowConstraints maxHeight="117.5" minHeight="10.0" prefHeight="94.5" vgrow="SOMETIMES"/>
+            <RowConstraints prefHeight="53.0" />
+            <RowConstraints prefHeight="34.0" />
+            <RowConstraints prefHeight="35.5" />
+            <RowConstraints prefHeight="32.0" />
+            <RowConstraints prefHeight="38.0" />
+            <RowConstraints prefHeight="27.0" />
+            <RowConstraints prefHeight="31.0" />
+            <RowConstraints prefHeight="34.0" />
+            <RowConstraints prefHeight="94.5" />
         </rowConstraints>
-        <TableView fx:id="foldersTableView" prefHeight="357.0" prefWidth="188.0" GridPane.rowIndex="1" GridPane.rowSpan="8">
+        <TableView fx:id="foldersTableView" prefWidth="188.0" GridPane.rowIndex="1" GridPane.rowSpan="8">
             <GridPane.margin>
                 <Insets bottom="30.0" left="20.0" right="20.0"/>
             </GridPane.margin>
             <columns>
-                <TableColumn fx:id="nameColumn" editable="false" maxWidth="201.0" minWidth="201.0" prefWidth="201.0" resizable="false" text="Directory name"/>
+                <TableColumn fx:id="nameColumn" editable="false" prefWidth="201.0" resizable="false" text="Directory name"/>
             </columns>
         </TableView>
-        <TableView fx:id="dataTableView" prefHeight="357.0" prefWidth="532.5" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.rowSpan="8">
+        <TableView fx:id="dataTableView" prefWidth="532.5" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.rowSpan="8">
             <GridPane.margin>
                 <Insets bottom="30.0" left="20.0" right="20.0"/>
             </GridPane.margin>
             <columns>
-                <TableColumn fx:id="quantityColumn" editable="false" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" resizable="false" sortType="DESCENDING" text="Number of files"/>
-                <TableColumn fx:id="typeColumn" editable="false" maxWidth="365.0" minWidth="365.0" prefWidth="365.0" resizable="false" text="File type"/>
+                <TableColumn fx:id="quantityColumn" editable="false" prefWidth="150.0" resizable="false" sortType="DESCENDING" text="Number of files"/>
+                <TableColumn fx:id="typeColumn" editable="false"  prefWidth="365.0" resizable="false" text="File type"/>
             </columns>
         </TableView>
         <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Observed directories" textAlignment="CENTER" wrappingWidth="243.0">
