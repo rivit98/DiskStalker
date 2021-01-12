@@ -6,6 +6,8 @@ import org.apache.tika.Tika;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class TypeDetector {
     private final Tika fileTypeDetector = new Tika();
@@ -17,7 +19,8 @@ public class TypeDetector {
             return typeName;
 
         } catch (IOException e){
-            System.out.println("Cannot detect file" + file);
+            var logger = Logger.getGlobal();
+            logger.log(Level.WARNING, "Cannot detect file:", file);
         }
         return null;
     }

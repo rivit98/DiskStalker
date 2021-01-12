@@ -22,7 +22,7 @@ public final class ConnectionProvider {
             Class.forName(JDBC_DRIVER);
             connection = Optional.of(DriverManager.getConnection(jdbcAddress));
         } catch (Exception e) {
-            logger.info("Error during initialization: " + e.getMessage());
+            logger.info("Error during database initialization: " + e.getMessage());
         }
     }
 

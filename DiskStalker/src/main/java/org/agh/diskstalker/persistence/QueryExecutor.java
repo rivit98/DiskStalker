@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 
 public class QueryExecutor {
 
-    private static final Logger LOGGER = Logger.getGlobal();
+    private static final Logger logger = Logger.getGlobal();
 
     static {
         try {
@@ -20,7 +20,7 @@ public class QueryExecutor {
                     ");");
 
         } catch (SQLException e) {
-            LOGGER.info("Error during create tables: " + e.getMessage());
+            logger.info("Error during creating tables: " + e.getMessage());
             throw new RuntimeException("Cannot create tables");
         }
     }

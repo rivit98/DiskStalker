@@ -7,8 +7,11 @@ import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class ObservedFolderDao implements IObservedFolderDao {
+    private static final Logger logger = Logger.getGlobal();
+
     @Override
     public void save(ObservedFolder observedFolder) {
         var path = observedFolder.getPath().toString();
@@ -18,7 +21,7 @@ public class ObservedFolderDao implements IObservedFolderDao {
         try {
             QueryExecutor.createAndObtainId(insertIntoDB, args);
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.info("Error during saving to database: " + e.getMessage());
         }
     }
 
@@ -32,7 +35,7 @@ public class ObservedFolderDao implements IObservedFolderDao {
         try {
             QueryExecutor.executeUpdate(updateDB, args);
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.info("Error during updating in database: " + e.getMessage());
         }
     }
 
@@ -45,7 +48,7 @@ public class ObservedFolderDao implements IObservedFolderDao {
         try {
             QueryExecutor.delete(deleteObservedFolder, args);
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.info("Error during deleting from database: " + e.getMessage());
         }
     }
 
@@ -69,7 +72,7 @@ public class ObservedFolderDao implements IObservedFolderDao {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.info("Error during executing database query: " + e.getMessage());
         }
         return resultList;
     }

@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Component
@@ -22,6 +21,10 @@ import java.util.Map;
 public class FileSizeViewController extends AbstractTabController {
     @FXML
     private TableView<Map.Entry<Path,TreeFileNode>> dataTableView;
+    @FXML
+    private TableColumn<Map.Entry<Path, TreeFileNode>, String> sizeColumn;
+    @FXML
+    private TableColumn<Map.Entry<Path, TreeFileNode>, String> fileNameColumn;
 
     //FIXME:maybe there is fastest way to compare?
     private class SizeComparator implements Comparator<String> {
@@ -69,16 +72,8 @@ public class FileSizeViewController extends AbstractTabController {
     }
 
     protected void prepareDataTableView() {
-        TableColumn<Map.Entry<Path, TreeFileNode>, String> sizeColumn = new TableColumn<>("Size");
         sizeColumn.setCellValueFactory(val -> new SimpleStringProperty(FileUtils.byteCountToDisplaySize(val.getValue().getValue().getValue().getSize())));
         sizeColumn.setComparator(new SizeComparator());
-
-        TableColumn<Map.Entry<Path, TreeFileNode>, String> nameColumn = new TableColumn<>("Name");
-        nameColumn.setCellValueFactory(val -> new SimpleStringProperty(val.getValue().getValue().getValue().getName()));
-
-        sizeColumn.setPrefWidth(120);
-        nameColumn.setPrefWidth(319);
-
-        dataTableView.getColumns().addAll(List.of(sizeColumn, nameColumn));
+        fileNameColumn.setCellValueFactory(val -> new SimpleStringProperty(val.getValue().getValue().getValue().getName()));
     }
 }
