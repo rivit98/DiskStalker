@@ -39,7 +39,7 @@ public abstract class AbstractTabController {
         foldersTableView.getColumns().addAll(List.of(iconColumn, nameColumn));
     }
 
-    protected void injectModel(FolderList folders) {
+    protected void setModel(FolderList folders) {
         foldersTableView.setItems(folders.get());
     }
 

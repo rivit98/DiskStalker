@@ -60,9 +60,12 @@ public class TreeFileNode extends TreeItem<NodeData> {
                 });
     }
 
-    public void deleteMe() {
+    public boolean deleteMe() {
         updateParentSize(this, -getValue().getSize());
-        this.getParent().getChildren().remove(this);
+        return Optional.ofNullable(this.getParent())
+                .map(TreeItem::getChildren)
+                .map(childrenList -> childrenList.remove(this))
+                .orElse(false);
     }
 
     public void updateMe() {
