@@ -30,8 +30,7 @@
                 <Insets bottom="30.0" left="20.0" right="20.0"/>
             </GridPane.margin>
             <columns>
-                <TableColumn fx:id="iconColumn" editable="false" maxWidth="23.0" minWidth="23.0" prefWidth="23.0" resizable="false" sortable="false"/>
-                <TableColumn fx:id="nameColumn" editable="false" maxWidth="178.0" minWidth="178.0" prefWidth="178.0" resizable="false" text="Directory name"/>
+                <TableColumn fx:id="nameColumn" editable="false" maxWidth="201.0" minWidth="201.0" prefWidth="201.0" resizable="false" text="Directory name"/>
             </columns>
         </TableView>
         <TableView fx:id="dataTableView" prefHeight="357.0" prefWidth="532.5" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.rowSpan="8">
