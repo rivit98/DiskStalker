@@ -8,8 +8,8 @@ import org.agh.diskstalker.model.statisctics.Type;
 import org.springframework.stereotype.Component;
 
 @Component
-@FxmlView("/views/FileTypeView.fxml")
-public class FileTypeViewController extends AbstractTabController {
+@FxmlView("/views/FilesTypeView.fxml")
+public class FilesTypeViewController extends AbstractTabController {
     @FXML
     private TableView<Type> dataTableView;
     @FXML
@@ -22,6 +22,7 @@ public class FileTypeViewController extends AbstractTabController {
         foldersTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if(newValue != null) {
                 dataTableView.setItems(newValue.getFilesTypeStatistics().getTypeStatistics());
+                dataTableView.getSortOrder().addAll(quantityColumn);
             } else {
                 dataTableView.getItems().clear();
             }

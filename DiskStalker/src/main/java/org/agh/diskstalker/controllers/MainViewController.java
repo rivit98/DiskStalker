@@ -48,11 +48,9 @@ public class MainViewController {
     @FXML
     private Button deleteFromDiskButton;
     @FXML
-    private AbstractTabController fileSizeViewController;
+    private AbstractTabController filesTypeViewController;
     @FXML
-    private AbstractTabController fileTypeViewController;
-    @FXML
-    private AbstractTabController fileModificationDateViewController;
+    private AbstractTabController fileInfoViewController;
 
     private final DatabaseCommandExecutor commandExecutor = new DatabaseCommandExecutor();
     private final FolderList folderList = new FolderList();
@@ -70,9 +68,9 @@ public class MainViewController {
 
     private void initializeStatisticsLoading() {
         tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
-            if (newTab.getId().equals("fileTypeView")) {
+            if (newTab.getId().equals("filesTypeView")) {
                 folderList.get().forEach(folder -> new Thread(folder::createTypeStatistics).start());
-            } else if (newTab.getId().equals("fileModificationDateView")) {
+            } else if (newTab.getId().equals("fileInfoView")) {
                 folderList.get().forEach(folder -> new Thread(folder::createDateModificationStatistics).start());
             }
         });
@@ -89,9 +87,8 @@ public class MainViewController {
     }
 
     private void initializeTabs() {
-        fileSizeViewController.setModel(folderList);
-        fileTypeViewController.setModel(folderList);
-        fileModificationDateViewController.setModel(folderList);
+        filesTypeViewController.setModel(folderList);
+        fileInfoViewController.setModel(folderList);
     }
 
     private void prepareColumns() {

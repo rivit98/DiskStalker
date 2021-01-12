@@ -102,9 +102,8 @@
                         </GridPane>
                     </content>
                 </Tab>
-                <fx:include fx:id="fileTypeView" source="FileTypeView.fxml" />
-                <fx:include fx:id="fileSizeView" source="FileSizeView.fxml" />
-                <fx:include fx:id="fileModificationDateView" source="FileModificationDateView.fxml" />
+                <fx:include fx:id="filesTypeView" source="FilesTypeView.fxml" />
+                <fx:include fx:id="fileInfoView" source="FileInfoView.fxml" />
             </tabs>
         </TabPane>
     </children>
