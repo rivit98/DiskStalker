@@ -11,7 +11,6 @@ import org.agh.diskstalker.model.tree.TreeFileNode;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Map;
 
 @Component
@@ -19,6 +18,10 @@ import java.util.Map;
 public class FileModificationDateViewController extends AbstractTabController {
     @FXML
     private TableView<Map.Entry<Path, TreeFileNode>> dataTableView;
+    @FXML
+    private TableColumn<Map.Entry<Path, TreeFileNode>, String> dateColumn;
+    @FXML
+    private TableColumn<Map.Entry<Path, TreeFileNode>, String> fileNameColumn;
 
     protected void setSelectionModelListener() {
         foldersTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -34,15 +37,7 @@ public class FileModificationDateViewController extends AbstractTabController {
     }
 
     protected void prepareDataTableView() {
-        TableColumn<Map.Entry<Path, TreeFileNode>, String> dateColumn = new TableColumn<>("Modification date");
         dateColumn.setCellValueFactory(val -> new SimpleStringProperty(val.getValue().getValue().getValue().getModificationDate()));
-
-        TableColumn<Map.Entry<Path, TreeFileNode>, String> nameColumn = new TableColumn<>("Name");
-        nameColumn.setCellValueFactory(val -> new SimpleStringProperty(val.getValue().getValue().getValue().getName()));
-
-        dateColumn.setPrefWidth(170);
-        nameColumn.setPrefWidth(269);
-
-        dataTableView.getColumns().addAll(List.of(dateColumn, nameColumn));
+        fileNameColumn.setCellValueFactory(val -> new SimpleStringProperty(val.getValue().getValue().getValue().getName()));
     }
 }

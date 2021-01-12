@@ -24,7 +24,6 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -34,6 +33,10 @@ public class MainViewController {
     private TabPane tabPane;
     @FXML
     private TreeTableView<NodeData> locationTreeView;
+    @FXML
+    private TreeTableColumn<NodeData, Path> pathColumn;
+    @FXML
+    private TreeTableColumn<NodeData, Number> sizeColumn;
     @FXML
     private Button addButton;
     @FXML
@@ -92,12 +95,6 @@ public class MainViewController {
     }
 
     private void prepareColumns() {
-        var pathColumn = new TreeTableColumn<NodeData, Path>("Name");
-        var sizeColumn = new TreeTableColumn<NodeData, Number>("Size");
-
-        pathColumn.setPrefWidth(370);
-        sizeColumn.setPrefWidth(192);
-
         pathColumn.setCellFactory(ttc -> new PathColumnCellFactory(this));
         sizeColumn.setCellFactory(ttc -> new SizeColumnCellFactory());
 
@@ -115,8 +112,6 @@ public class MainViewController {
                     .map(nodeData -> nodeData.getValue().getSizeProperty())
                     .orElse(null);
         });
-
-        locationTreeView.getColumns().addAll(List.of(pathColumn, sizeColumn));
     }
 
     private void initializeButtons() {
