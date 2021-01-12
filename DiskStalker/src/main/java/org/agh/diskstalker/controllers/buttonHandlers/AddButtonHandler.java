@@ -15,11 +15,12 @@ import java.util.Optional;
 
 public class AddButtonHandler implements EventHandler<ActionEvent> {
 
-    private final DatabaseCommandExecutor commandExecutor = new DatabaseCommandExecutor();
+    private final DatabaseCommandExecutor commandExecutor;
     private final MainViewController mainViewController;
 
-    public AddButtonHandler(MainViewController mainViewController) {
+    public AddButtonHandler(MainViewController mainViewController, DatabaseCommandExecutor commandExecutor) {
         this.mainViewController = mainViewController;
+        this.commandExecutor = commandExecutor;
     }
 
     @Override

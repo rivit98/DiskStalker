@@ -114,9 +114,9 @@ public class MainViewController {
     }
 
     private void initializeButtons() {
-        addButton.setOnAction(new AddButtonHandler(this));
+        addButton.setOnAction(new AddButtonHandler(this, commandExecutor));
         stopObserveButton.setOnAction(new StopObserveButtonHandler(this));
-        setSizeButton.setOnAction(new SetSizeButtonHandler(this));
+        setSizeButton.setOnAction(new SetSizeButtonHandler(this, commandExecutor));
         deleteFromDiskButton.setOnAction(new DeleteFromDiskButtonHandler(this));
 
         setRulesForDisablingButtons();
