@@ -30,12 +30,13 @@ public class ObservedFolder {
     private final IFilesystemWatcher filesystemWatcher;
     private final IEventProcessor eventProcessor;
     private final TreeBuilder treeBuilder;
-    private long maximumSize;
     private final SimpleBooleanProperty sizeExceededProperty = new SimpleBooleanProperty();
     private final PublishSubject<ObservedFolderEvent> eventStream = PublishSubject.create();
     private final SimpleStringProperty name;
     private final FilesTypeStatistics filesTypeStatistics;
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private final FileTreeScanner scanner;
+    private long maximumSize;
 
     public ObservedFolder(Path dirToWatch, long maxSize) {
         this.dirToWatch = dirToWatch;
@@ -46,6 +47,7 @@ public class ObservedFolder {
         setMaximumSize(maxSize);
         this.sizeExceededProperty.set(false);
         this.name = new SimpleStringProperty(dirToWatch.getFileName().toString());
+        this.scanner = new FileTreeScanner(dirToWatch);
 
         scanDirectory();
     }
@@ -64,7 +66,7 @@ public class ObservedFolder {
             eventStream.onNext(new ObservedFolderRootAvailableEvent(this, node));
         });
 
-        var scanDisposable = new FileTreeScanner(dirToWatch)
+        var scanDisposable = scanner
                 .scan()
                 .subscribeOn(Schedulers.io())
                 .observeOn(JavaFxScheduler.platform())
@@ -101,6 +103,7 @@ public class ObservedFolder {
 
     public void destroy() {
         compositeDisposable.dispose();
+        scanner.stop();
         filesystemWatcher.stop();
         eventStream.onComplete();
     }
