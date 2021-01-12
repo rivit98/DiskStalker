@@ -24,7 +24,6 @@ public class FileTreeScanner implements IFilesystemScanner {
     }
 
     public void stop(){
-        System.out.println("stop");
         fileVisitorEmitter.stop();
     }
 }

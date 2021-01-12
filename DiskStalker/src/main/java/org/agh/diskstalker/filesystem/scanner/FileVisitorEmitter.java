@@ -21,7 +21,6 @@ public class FileVisitorEmitter extends SimpleFileVisitor<Path> {
     }
 
     public FileVisitResult emitPath(Path path) {
-        System.out.println(path);
         if (observer.isDisposed() || stopped) {
             return TERMINATE;
         }
