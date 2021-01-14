@@ -1,6 +1,6 @@
 package org.agh.diskstalker.events.observedFolderEvents;
 
-import org.agh.diskstalker.controllers.Alerts;
+import org.agh.diskstalker.controllers.alerts.Alerts;
 import org.agh.diskstalker.controllers.MainViewController;
 import org.agh.diskstalker.model.ObservedFolder;
 

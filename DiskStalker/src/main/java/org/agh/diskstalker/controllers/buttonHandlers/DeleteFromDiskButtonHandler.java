@@ -3,9 +3,8 @@ package org.agh.diskstalker.controllers.buttonHandlers;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ButtonType;
-import org.agh.diskstalker.controllers.Alerts;
+import org.agh.diskstalker.controllers.alerts.Alerts;
 import org.agh.diskstalker.controllers.MainViewController;
-import org.agh.diskstalker.persistence.DatabaseCommandExecutor;
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;

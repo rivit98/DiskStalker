@@ -3,11 +3,13 @@ package org.agh.diskstalker.persistence;
 import org.agh.diskstalker.persistence.command.CloseDbConnectionCommand;
 import org.agh.diskstalker.persistence.command.CommandResult;
 import org.agh.diskstalker.persistence.command.IObservedFolderCommand;
+import org.springframework.stereotype.Service;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+@Service
 public class DatabaseCommandExecutor {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 

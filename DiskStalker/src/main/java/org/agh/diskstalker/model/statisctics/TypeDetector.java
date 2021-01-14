@@ -10,7 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class TypeDetector {
-    private final Tika fileTypeDetector = new Tika();
+    private final Tika fileTypeDetector = new Tika(); //TODO: Service with thread pool
 
     public String detectType(Path file, ObservableList<Type> typeStatistics) {
         try{

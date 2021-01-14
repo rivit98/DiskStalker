@@ -1,4 +1,4 @@
-package org.agh.diskstalker.controllers;
+package org.agh.diskstalker.controllers.listeners;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;

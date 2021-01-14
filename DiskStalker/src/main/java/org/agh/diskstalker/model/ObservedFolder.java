@@ -30,12 +30,12 @@ public class ObservedFolder {
     private final IFilesystemWatcher filesystemWatcher;
     private final IEventProcessor eventProcessor;
     private final TreeBuilder treeBuilder;
-    private final SimpleBooleanProperty sizeExceededProperty = new SimpleBooleanProperty();
-    private final PublishSubject<ObservedFolderEvent> eventStream = PublishSubject.create();
     private final SimpleStringProperty name;
     private final FilesTypeStatistics filesTypeStatistics;
-    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
     private final FileTreeScanner scanner;
+    private final PublishSubject<ObservedFolderEvent> eventStream = PublishSubject.create();
+    private final SimpleBooleanProperty sizeExceededProperty = new SimpleBooleanProperty();
+    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
     private long maximumSize;
 
     public ObservedFolder(Path dirToWatch, long maxSize) {

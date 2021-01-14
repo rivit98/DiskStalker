@@ -30,7 +30,7 @@ public class FileVisitorEmitter extends SimpleFileVisitor<Path> {
     }
 
     @Override
-    public FileVisitResult visitFile(Path file, BasicFileAttributes attr) {
+    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
         return emitPath(file);
     }
 

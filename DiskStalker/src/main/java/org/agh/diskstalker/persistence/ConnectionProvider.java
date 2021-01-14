@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import java.util.Optional;
 import java.util.logging.Logger;
 
-//TODO: singleton logger? injecting
+//TODO: singleton logger? injecting, service spring
 public final class ConnectionProvider {
     private static final String JDBC_DRIVER = "org.sqlite.JDBC";
     private static final Logger logger = Logger.getGlobal();

@@ -12,6 +12,7 @@ import org.agh.diskstalker.controllers.buttonHandlers.AddButtonHandler;
 import org.agh.diskstalker.controllers.buttonHandlers.DeleteFromDiskButtonHandler;
 import org.agh.diskstalker.controllers.buttonHandlers.SetSizeButtonHandler;
 import org.agh.diskstalker.controllers.buttonHandlers.StopObserveButtonHandler;
+import org.agh.diskstalker.controllers.listeners.MaxSizeButtonListener;
 import org.agh.diskstalker.formatters.StringToIntFormatter;
 import org.agh.diskstalker.model.FolderList;
 import org.agh.diskstalker.model.NodeData;
@@ -21,6 +22,7 @@ import org.agh.diskstalker.persistence.DatabaseCommandExecutor;
 import org.agh.diskstalker.persistence.command.ConnectToDbCommand;
 import org.agh.diskstalker.persistence.command.DeleteObservedFolderCommand;
 import org.agh.diskstalker.persistence.command.GetAllObservedFolderCommand;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
@@ -52,13 +54,20 @@ public class MainViewController {
     @FXML
     private AbstractTabController fileInfoViewController;
 
-    private final DatabaseCommandExecutor commandExecutor = new DatabaseCommandExecutor();
+    private final DatabaseCommandExecutor commandExecutor;
+
     private final FolderList folderList = new FolderList();
+
+    @Autowired
+    public MainViewController(DatabaseCommandExecutor commandExecutor) {
+        this.commandExecutor = commandExecutor;
+        this.commandExecutor.executeCommand(new ConnectToDbCommand());
+    }
 
     @FXML
     public void initialize() {
-        commandExecutor.executeCommand(new ConnectToDbCommand());
-        initializeTableTreeView();
+        createRoot();
+        prepareColumns();
         initializeTabs();
         initializeButtons();
         initializeSizeField();
@@ -76,32 +85,22 @@ public class MainViewController {
         });
     }
 
-    private void initializeTableTreeView() {
-        createRoot();
-        prepareColumns();
-    }
-
     private void createRoot() {
         treeTableView.setRoot(new TreeItem<>());
         treeTableView.getRoot().setExpanded(true);
-    }
-
-    private void initializeTabs() {
-        filesTypeViewController.setModel(folderList);
-        fileInfoViewController.setModel(folderList);
     }
 
     private void prepareColumns() {
         pathColumn.setCellFactory(ttc -> new PathColumnCellFactory(this));
         sizeColumn.setCellFactory(ttc -> new SizeColumnCellFactory());
 
-        pathColumn.setCellValueFactory(node -> {
-            var pathOptional = Optional.ofNullable(node.getValue())
+        pathColumn.setCellValueFactory(
+                node -> Optional.ofNullable(node.getValue())
                     .flatMap(v -> Optional.ofNullable(v.getValue()))
-                    .map(NodeData::getPath);
-
-            return pathOptional.map(SimpleObjectProperty::new).orElseGet(SimpleObjectProperty::new);
-        });
+                    .map(NodeData::getPath)
+                    .map(SimpleObjectProperty::new)
+                    .orElseGet(SimpleObjectProperty::new)
+        );
 
         sizeColumn.setCellValueFactory(
                 node -> Optional.ofNullable(node.getValue())
@@ -110,16 +109,21 @@ public class MainViewController {
         );
     }
 
+    private void initializeTabs() {
+        filesTypeViewController.setModel(folderList);
+        fileInfoViewController.setModel(folderList);
+    }
+
     private void initializeButtons() {
         addButton.setOnAction(new AddButtonHandler(this, commandExecutor));
         stopObserveButton.setOnAction(new StopObserveButtonHandler(this));
         setSizeButton.setOnAction(new SetSizeButtonHandler(this, commandExecutor));
         deleteFromDiskButton.setOnAction(new DeleteFromDiskButtonHandler(this));
 
-        initializeRulesForDisablingButtons();
+        createButtonBindings();
     }
 
-    private void initializeRulesForDisablingButtons() {
+    private void createButtonBindings() {
         var selectionModel = treeTableView.getSelectionModel();
 
         deleteFromDiskButton.disableProperty().bind(Bindings.createBooleanBinding(
@@ -205,8 +209,7 @@ public class MainViewController {
     }
 
     public void onExit() {
-        //TODO: debug, why app closes so long, probably DB connection needs to be closed
-        commandExecutor.stop();
         folderList.get().forEach(ObservedFolder::destroy);
+        commandExecutor.stop();
     }
 }
