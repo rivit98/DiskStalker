@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
-<?import javafx.scene.control.TableColumn?>
-
-<Tab text="File info" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1" fx:controller="org.agh.diskstalker.controllers.FileInfoViewController">
+<Tab text="File info" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1" fx:controller="org.agh.diskstalker.controllers.FileInfoController">
     <GridPane>
         <columnConstraints>
             <ColumnConstraints prefWidth="243.0"/>
@@ -25,14 +22,11 @@
             <RowConstraints prefHeight="34.0" />
             <RowConstraints prefHeight="94.5" />
         </rowConstraints>
-        <TableView fx:id="foldersTableView" prefWidth="188.0" GridPane.rowIndex="1" GridPane.rowSpan="8">
+        <ListView fx:id="foldersTableView" prefWidth="188.0" GridPane.rowIndex="1" GridPane.rowSpan="8">
             <GridPane.margin>
                 <Insets bottom="30.0" left="20.0" right="20.0"/>
             </GridPane.margin>
-            <columns>
-                <TableColumn fx:id="nameColumn" editable="false" prefWidth="201.0" resizable="false" text="Directory name"/>
-            </columns>
-        </TableView>
+        </ListView>
         <TableView fx:id="dataTableView" prefWidth="532.5" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.rowSpan="8">
             <GridPane.margin>
                 <Insets bottom="30.0" left="20.0" right="20.0"/>

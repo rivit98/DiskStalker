@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 public class ObservedFolderDao implements IObservedFolderDao {
-    private static final Logger logger = Logger.getGlobal();
+    private static final Logger logger = Logger.getGlobal(); //TODO: inject
 
     @Override
     public void save(ObservedFolder observedFolder) {

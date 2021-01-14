@@ -20,7 +20,7 @@ public class EventProcessor implements IEventProcessor {
     @Override
     public void processEvent(FilesystemEvent filesystemEvent) {
         var resolvedPath = filesystemEvent.getTargetDir();
-        var eventType = filesystemEvent.getEventType();
+        var eventType = filesystemEvent.getType();
 
         switch (eventType) {
             case FILE_CREATED -> handleCreateEventFile(resolvedPath);

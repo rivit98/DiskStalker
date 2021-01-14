@@ -5,7 +5,7 @@ import javafx.scene.image.ImageView;
 
 import java.util.Objects;
 
-public final class GraphicsFactory { //TODO: inject as singleton? :D
+public final class GraphicsFactory { //TODO: inject as service?
     private static final Image FOLDER_IMAGE =
             new Image(
                     Objects.requireNonNull(

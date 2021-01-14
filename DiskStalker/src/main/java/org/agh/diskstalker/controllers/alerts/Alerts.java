@@ -8,6 +8,7 @@ import org.apache.commons.io.FileUtils;
 
 import java.nio.file.Path;
 
+//TODO: inject as spring service
 public class Alerts {
     private Alerts() {
     }

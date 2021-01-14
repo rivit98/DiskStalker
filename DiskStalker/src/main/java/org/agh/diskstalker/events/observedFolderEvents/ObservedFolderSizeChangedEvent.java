@@ -1,7 +1,7 @@
 package org.agh.diskstalker.events.observedFolderEvents;
 
+import org.agh.diskstalker.controllers.MainController;
 import org.agh.diskstalker.controllers.alerts.Alerts;
-import org.agh.diskstalker.controllers.MainViewController;
 import org.agh.diskstalker.model.ObservedFolder;
 
 public class ObservedFolderSizeChangedEvent extends AbstractObservedFolderEvent {
@@ -10,17 +10,17 @@ public class ObservedFolderSizeChangedEvent extends AbstractObservedFolderEvent 
     }
 
     @Override
-    public void dispatch(MainViewController mainViewController) {
+    public void dispatch(MainController mainController) {
         if (folder.isSizeLimitExceeded()) {
             if(!folder.getSizeExceededProperty().getValue()) {
                 Alerts.sizeExceededAlert(folder.getPath().toString(), folder.getMaximumSize());
                 folder.setSizeExceeded(true);
-                mainViewController.getTreeTableView().refresh(); //TODO: change this
+                mainController.refreshViews();
             }
         }
         else {
             folder.setSizeExceeded(false);
-            mainViewController.getTreeTableView().refresh(); //TODO: change this
+            mainController.refreshViews();
         }
     }
 }

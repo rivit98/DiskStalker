@@ -1,21 +1,13 @@
 package org.agh.diskstalker.events.filesystemEvents;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 import java.nio.file.Path;
 
+@AllArgsConstructor
+@Getter
 public class FilesystemEvent {
     private final Path targetDir;
     private final FilesystemEventType type;
-
-    public FilesystemEvent(Path targetDir, FilesystemEventType filesystemEventType) {
-        this.targetDir = targetDir;
-        this.type = filesystemEventType;
-    }
-
-    public Path getTargetDir() {
-        return targetDir;
-    }
-
-    public FilesystemEventType getEventType() {
-        return type;
-    }
 }

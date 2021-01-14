@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 
 public class QueryExecutor {
 
-    private static final Logger logger = Logger.getGlobal();
+    private static final Logger logger = Logger.getGlobal(); //TODO: inject
 
     static {
         try {

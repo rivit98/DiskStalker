@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 //TODO: singleton logger? injecting, service spring
 public final class ConnectionProvider {
     private static final String JDBC_DRIVER = "org.sqlite.JDBC";
-    private static final Logger logger = Logger.getGlobal();
+    private static final Logger logger = Logger.getGlobal(); //TODO: inject
 
     private static Optional<Connection> connection = Optional.empty();
 

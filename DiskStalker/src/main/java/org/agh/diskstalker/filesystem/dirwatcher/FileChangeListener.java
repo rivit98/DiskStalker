@@ -1,16 +1,14 @@
 package org.agh.diskstalker.filesystem.dirwatcher;
 
+import lombok.AllArgsConstructor;
 import org.agh.diskstalker.events.filesystemEvents.FilesystemEventType;
 import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
 
 import java.io.File;
 
+@AllArgsConstructor
 public class FileChangeListener extends FileAlterationListenerAdaptor {
     private final IFilesystemWatcher filesystemWatcher;
-
-    public FileChangeListener(IFilesystemWatcher filesystemWatcher) {
-        this.filesystemWatcher = filesystemWatcher;
-    }
 
     @Override
     public void onFileCreate(File file) {

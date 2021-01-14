@@ -5,13 +5,11 @@ import javafx.event.EventHandler;
 import javafx.scene.control.TreeItem;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+import org.agh.diskstalker.controllers.MainController;
 import org.agh.diskstalker.controllers.alerts.Alerts;
-import org.agh.diskstalker.controllers.MainViewController;
 import org.agh.diskstalker.model.ObservedFolder;
 import org.agh.diskstalker.persistence.DatabaseCommandExecutor;
 import org.agh.diskstalker.persistence.command.SaveObservedFolderCommand;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -19,11 +17,11 @@ import java.util.Collection;
 import java.util.Optional;
 
 public class AddButtonHandler implements EventHandler<ActionEvent> {
-    private final MainViewController mainViewController;
+    private final MainController mainController;
     private final DatabaseCommandExecutor commandExecutor;
 
-    public AddButtonHandler(MainViewController mainViewController, DatabaseCommandExecutor commandExecutor) {
-        this.mainViewController = mainViewController;
+    public AddButtonHandler(MainController mainController, DatabaseCommandExecutor commandExecutor) {
+        this.mainController = mainController;
         this.commandExecutor = commandExecutor;
     }
 
@@ -43,14 +41,14 @@ public class AddButtonHandler implements EventHandler<ActionEvent> {
             Alerts.tryingToAddSameFolderToObservedAlert();
         } else {
             var folder = new ObservedFolder(path);
-            mainViewController.observeFolderEvents(folder);
+            mainController.observeFolderEvents(folder);
 
             commandExecutor.executeCommand(new SaveObservedFolderCommand(folder));
         }
     }
 
     private boolean checkIfFolderAlreadyExists(Path path){
-        return Optional.ofNullable(mainViewController.getTreeTableView().getRoot())
+        return Optional.ofNullable(mainController.getTreeTableView().getRoot())
                 .map(TreeItem::getChildren)
                 .map(Collection::stream)
                 .map(stream -> stream.anyMatch(children -> children.getValue().getPath().equals(path)))

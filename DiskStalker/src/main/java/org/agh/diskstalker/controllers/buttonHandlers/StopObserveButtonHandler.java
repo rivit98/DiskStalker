@@ -2,24 +2,24 @@ package org.agh.diskstalker.controllers.buttonHandlers;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import org.agh.diskstalker.controllers.MainViewController;
+import org.agh.diskstalker.controllers.MainController;
 
 import java.util.Optional;
 
 public class StopObserveButtonHandler implements EventHandler<ActionEvent> {
-    private final MainViewController mainViewController;
+    private final MainController mainController;
 
-    public StopObserveButtonHandler(MainViewController mainViewController) {
-        this.mainViewController = mainViewController;
+    public StopObserveButtonHandler(MainController mainController) {
+        this.mainController = mainController;
     }
 
     @Override
     public void handle(ActionEvent event) {
         Optional.ofNullable(
-                mainViewController.getTreeTableView().getSelectionModel().getSelectedItem()
+                mainController.getTreeTableView().getSelectionModel().getSelectedItem()
         ).ifPresent(item -> {
-            if(mainViewController.removeTreeItem(item)){
-                mainViewController.getMaxSizeField().clear();
+            if(mainController.removeTreeItem(item)){
+                mainController.getMaxSizeField().clear();
             }
         });
     }

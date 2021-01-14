@@ -5,6 +5,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import lombok.Getter;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.agh.diskstalker.cellFactories.PathColumnCellFactory;
 import org.agh.diskstalker.cellFactories.SizeColumnCellFactory;
@@ -22,7 +23,6 @@ import org.agh.diskstalker.persistence.DatabaseCommandExecutor;
 import org.agh.diskstalker.persistence.command.ConnectToDbCommand;
 import org.agh.diskstalker.persistence.command.DeleteObservedFolderCommand;
 import org.agh.diskstalker.persistence.command.GetAllObservedFolderCommand;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
@@ -30,7 +30,7 @@ import java.util.Optional;
 
 @Component
 @FxmlView("/views/MainView.fxml")
-public class MainViewController {
+public class MainController {
     @FXML
     private TabPane tabPane;
     @FXML
@@ -54,18 +54,14 @@ public class MainViewController {
     @FXML
     private AbstractTabController fileInfoViewController;
 
-    private final DatabaseCommandExecutor commandExecutor;
+    private final DatabaseCommandExecutor commandExecutor = new DatabaseCommandExecutor();
 
+    @Getter
     private final FolderList folderList = new FolderList();
-
-    @Autowired
-    public MainViewController(DatabaseCommandExecutor commandExecutor) {
-        this.commandExecutor = commandExecutor;
-        this.commandExecutor.executeCommand(new ConnectToDbCommand());
-    }
 
     @FXML
     public void initialize() {
+        this.commandExecutor.executeCommand(new ConnectToDbCommand());
         createRoot();
         prepareColumns();
         initializeTabs();
@@ -200,12 +196,14 @@ public class MainViewController {
         return treeTableView;
     }
 
-    public FolderList getFolderList() {
-        return folderList;
-    }
-
     public TextField getMaxSizeField() {
         return maxSizeField;
+    }
+
+    public void refreshViews(){
+        treeTableView.refresh();
+        fileInfoViewController.refresh();
+        filesTypeViewController.refresh();
     }
 
     public void onExit() {

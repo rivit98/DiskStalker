@@ -1,12 +1,11 @@
 package org.agh.diskstalker.model;
 
-import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
+import lombok.Getter;
 import org.agh.diskstalker.events.eventProcessor.EventProcessor;
 import org.agh.diskstalker.events.eventProcessor.IEventProcessor;
 import org.agh.diskstalker.events.filesystemEvents.FilesystemEvent;
@@ -26,34 +25,42 @@ import java.util.Optional;
 
 
 public class ObservedFolder {
-    private final Path dirToWatch;
+    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
     private final IFilesystemWatcher filesystemWatcher;
     private final IEventProcessor eventProcessor;
-    private final TreeBuilder treeBuilder;
-    private final SimpleStringProperty name;
-    private final FilesTypeStatistics filesTypeStatistics;
     private final FileTreeScanner scanner;
+
+    @Getter
+    private final Path path;
+    @Getter
+    private final FilesTypeStatistics filesTypeStatistics;
+    @Getter
     private final PublishSubject<ObservedFolderEvent> eventStream = PublishSubject.create();
-    private final SimpleBooleanProperty sizeExceededProperty = new SimpleBooleanProperty();
-    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
+    @Getter
+    private final SimpleBooleanProperty sizeExceededProperty = new SimpleBooleanProperty(false);
+    @Getter
+    private final TreeBuilder treeBuilder;
+    @Getter
+    private final String name;
+    @Getter
     private long maximumSize;
 
-    public ObservedFolder(Path dirToWatch, long maxSize) {
-        this.dirToWatch = dirToWatch;
-        this.filesystemWatcher = new DirWatcher(dirToWatch);
+
+    public ObservedFolder(Path path, long maxSize) {
+        this.path = path;
+        this.filesystemWatcher = new DirWatcher(path);
         this.treeBuilder = new TreeBuilder();
         this.filesTypeStatistics = new FilesTypeStatistics(treeBuilder.getPathToTreeMap());
         this.eventProcessor = new EventProcessor(treeBuilder, filesTypeStatistics);
         setMaximumSize(maxSize);
-        this.sizeExceededProperty.set(false);
-        this.name = new SimpleStringProperty(dirToWatch.getFileName().toString());
-        this.scanner = new FileTreeScanner(dirToWatch);
+        this.name = path.getFileName().toString();
+        this.scanner = new FileTreeScanner(path);
 
         scanDirectory();
     }
 
-    public ObservedFolder(Path dirToWatch) {
-        this(dirToWatch, 0);
+    public ObservedFolder(Path path) {
+        this(path, 0);
     }
 
     private void errorHandler(Throwable t) {
@@ -62,7 +69,7 @@ public class ObservedFolder {
     }
 
     private void scanDirectory() {
-        var rootDisposable = treeBuilder.getRoot().subscribe(node -> {
+        var rootDisposable = treeBuilder.getRootSubject().subscribe(node -> {
             eventStream.onNext(new ObservedFolderRootAvailableEvent(this, node));
         });
 
@@ -112,21 +119,13 @@ public class ObservedFolder {
         return treeBuilder.containsNode(path);
     }
 
-    public Path getPath() {
-        return dirToWatch;
-    }
-
     public void setMaximumSize(long value) {
         maximumSize = value;
         sendSizeChangedEvent(); // force check size check
     }
 
-    public Long getMaximumSize() {
-        return maximumSize;
-    }
-
     public Long getSize() {
-        return Optional.ofNullable(treeBuilder.getRoot().getValue())
+        return Optional.ofNullable(treeBuilder.getRootSubject().getValue())
                 .map(rootNode -> rootNode.getValue().getSize())
                 .orElse(0L);
     }
@@ -134,14 +133,6 @@ public class ObservedFolder {
     public boolean isSizeLimitExceeded() {
         var maxSize = this.getMaximumSize();
         return maxSize > 0 && getSize() > maxSize;
-    }
-
-    public Observable<ObservedFolderEvent> getEventStream() {
-        return eventStream;
-    }
-
-    public SimpleBooleanProperty getSizeExceededProperty() {
-        return sizeExceededProperty;
     }
 
     public void setSizeExceeded(boolean sizeExceededFlag) {
@@ -153,11 +144,7 @@ public class ObservedFolder {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ObservedFolder that = (ObservedFolder) o;
-        return Objects.equals(dirToWatch, that.dirToWatch);
-    }
-
-    public String getName() {
-        return name.get();
+        return Objects.equals(path, that.path);
     }
 
     public void createTypeStatistics() {
@@ -168,13 +155,5 @@ public class ObservedFolder {
 
     public void createDateModificationStatistics() {
         treeBuilder.getPathToTreeMap().forEach((key, val) -> val.getValue().setModificationDate());
-    }
-
-    public FilesTypeStatistics getFilesTypeStatistics() {
-        return filesTypeStatistics;
-    }
-
-    public TreeBuilder getTreeBuilder() {
-        return treeBuilder;
     }
 }

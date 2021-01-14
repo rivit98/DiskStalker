@@ -2,6 +2,7 @@ package org.agh.diskstalker.model.tree;
 
 import io.reactivex.rxjava3.subjects.SingleSubject;
 import javafx.scene.control.TreeItem;
+import lombok.Getter;
 import org.agh.diskstalker.model.NodeData;
 
 import java.nio.file.Path;
@@ -9,7 +10,9 @@ import java.util.HashMap;
 
 
 public class TreeBuilder {
+    @Getter
     private final HashMap<Path, TreeFileNode> pathToTreeMap = new HashMap<>();
+    @Getter
     private final SingleSubject<TreeFileNode> rootSubject = SingleSubject.create();
     private TreeFileNode root;
 
@@ -33,16 +36,8 @@ public class TreeBuilder {
         pathToTreeMap.put(nodeData.getPath(), newNode);
     }
 
-    public SingleSubject<TreeFileNode> getRoot() {
-        return rootSubject;
-    }
-
     public boolean containsNode(Path path) {
         return pathToTreeMap.containsKey(path);
-    }
-
-    public HashMap<Path, TreeFileNode> getPathToTreeMap() {
-        return pathToTreeMap;
     }
 
     public void removeMappedDirsRecursively(TreeItem<NodeData> node) {

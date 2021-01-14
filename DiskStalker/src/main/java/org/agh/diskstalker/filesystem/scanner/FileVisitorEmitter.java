@@ -15,7 +15,6 @@ public class FileVisitorEmitter extends SimpleFileVisitor<Path> {
     private final ObservableEmitter<NodeData> observer;
     private boolean stopped = false;
 
-
     public FileVisitorEmitter(ObservableEmitter<NodeData> observer) {
         this.observer = observer;
     }

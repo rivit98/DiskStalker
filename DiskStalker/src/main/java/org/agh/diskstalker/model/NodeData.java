@@ -2,6 +2,8 @@ package org.agh.diskstalker.model;
 
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,12 +13,14 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@Getter
 public class NodeData {
     private final Path path;
     private final boolean isDirectory;
     private final SimpleLongProperty sizeProperty;
     private final SimpleStringProperty nameProperty;
     private SimpleStringProperty modificationDateProperty;
+    @Setter
     private String type;
 
     public NodeData(Path path) {
@@ -27,20 +31,8 @@ public class NodeData {
         this.nameProperty = new SimpleStringProperty(path.getFileName().toString());
     }
 
-    public Path getPath() {
-        return path;
-    }
-
-    public boolean isDirectory() {
-        return isDirectory;
-    }
-
     public boolean isFile() {
         return !isDirectory;
-    }
-
-    public SimpleLongProperty getSizeProperty() {
-        return sizeProperty;
     }
 
     public String getName() {
@@ -66,14 +58,6 @@ public class NodeData {
             logger.log(Level.WARNING, "Cannot load last modification date of file:", path);
             modificationDateProperty = new SimpleStringProperty("NO DATA");
         }
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getType() {
-        return type;
     }
 
     public long getSize() {
