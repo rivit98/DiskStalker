@@ -20,11 +20,6 @@ public class FolderList {
                 .findFirst();
     }
 
-//    public Optional<ObservedFolder> getObservedFolderFromSelection() {
-//        return Optional.ofNullable(locationTreeView.getSelectionModel().getSelectedItem())
-//                .flatMap(item -> getObservedFolderFromTreePath(item.getValue().getPath()));
-//    }
-
     public Optional<ObservedFolder> getObservedFolderFromTreeItem(TreeItem<NodeData> treeItem) {
         return Optional.ofNullable(treeItem)
                 .flatMap(item -> getObservedFolderFromTreePath(item.getValue().getPath()));

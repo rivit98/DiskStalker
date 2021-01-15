@@ -10,7 +10,7 @@ public class CloseDbConnectionCommand extends AbstractObservedFolderCommand{
         try {
             ConnectionProvider.close();
         } catch (SQLException exception) {
-            exception.printStackTrace();
+            exception.printStackTrace(); //TODO: logger
         }
         return CommandResult.empty();
     }

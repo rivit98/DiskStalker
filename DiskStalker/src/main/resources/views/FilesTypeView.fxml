@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.control.TableColumn?>
+
+<?import javafx.scene.control.ListView?>
+<Tab text="Files type" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1" fx:controller="org.agh.diskstalker.controllers.FilesTypeController">
+    <GridPane>
+        <columnConstraints>
+            <ColumnConstraints prefWidth="243.0"/>
+            <ColumnConstraints prefWidth="557.0"/>
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints prefHeight="53.0" />
+            <RowConstraints prefHeight="34.0" />
+            <RowConstraints prefHeight="35.5" />
+            <RowConstraints prefHeight="32.0" />
+            <RowConstraints prefHeight="38.0" />
+            <RowConstraints prefHeight="27.0" />
+            <RowConstraints prefHeight="31.0" />
+            <RowConstraints prefHeight="34.0" />
+            <RowConstraints prefHeight="94.5" />
+        </rowConstraints>
+        <ListView fx:id="foldersTableView" prefWidth="188.0" GridPane.rowIndex="1" GridPane.rowSpan="8">
+            <GridPane.margin>
+                <Insets bottom="30.0" left="20.0" right="20.0"/>
+            </GridPane.margin>
+        </ListView>
+        <TableView fx:id="dataTableView" prefWidth="532.5" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.rowSpan="8">
+            <GridPane.margin>
+                <Insets bottom="30.0" left="20.0" right="20.0"/>
+            </GridPane.margin>
+            <columns>
+                <TableColumn fx:id="quantityColumn" editable="false" prefWidth="150.0" resizable="false" sortType="DESCENDING" text="Number of files"/>
+                <TableColumn fx:id="typeColumn" editable="false"  prefWidth="365.0" resizable="false" text="File type"/>
+            </columns>
+        </TableView>
+        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Observed directories" textAlignment="CENTER" wrappingWidth="243.0">
+            <font>
+                <Font name="Times New Roman Bold" size="25.0"/>
+            </font>
+        </Text>
+        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Files number by type" textAlignment="CENTER" wrappingWidth="557.0" GridPane.columnIndex="1">
+            <font>
+                <Font name="Times New Roman Bold" size="25.0"/>
+            </font>
+        </Text>
+    </GridPane>
+</Tab>

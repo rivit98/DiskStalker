@@ -9,39 +9,41 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
-import static java.nio.file.FileVisitResult.CONTINUE;
-import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
+import static java.nio.file.FileVisitResult.*;
 
 public class FileVisitorEmitter extends SimpleFileVisitor<Path> {
     private final ObservableEmitter<NodeData> observer;
-
+    private boolean stopped = false;
 
     public FileVisitorEmitter(ObservableEmitter<NodeData> observer) {
         this.observer = observer;
     }
 
-    public void emitPath(Path path) {
-        if (observer.isDisposed()) {
-            return;
+    public FileVisitResult emitPath(Path path) {
+        if (observer.isDisposed() || stopped) {
+            return TERMINATE;
         }
 
         observer.onNext(new NodeData(path));
+        return CONTINUE;
     }
 
     @Override
-    public FileVisitResult visitFile(Path file, BasicFileAttributes attr) {
-        emitPath(file);
-        return CONTINUE;
+    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+        return emitPath(file);
     }
 
     @Override
     public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
-        emitPath(dir);
-        return CONTINUE;
+        return emitPath(dir);
     }
 
     @Override
     public FileVisitResult visitFileFailed(Path file, IOException exc) {
         return SKIP_SUBTREE;
+    }
+
+    public void stop() {
+        stopped = true;
     }
 }

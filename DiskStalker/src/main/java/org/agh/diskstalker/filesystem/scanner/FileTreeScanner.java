@@ -8,6 +8,7 @@ import java.nio.file.Path;
 
 public class FileTreeScanner implements IFilesystemScanner {
     private final Path dirPath;
+    private FileVisitorEmitter fileVisitorEmitter;
 
     public FileTreeScanner(Path dirPath) {
         this.dirPath = dirPath;
@@ -16,8 +17,13 @@ public class FileTreeScanner implements IFilesystemScanner {
     @Override
     public Observable<NodeData> scan() {
         return Observable.create(emitter -> {
-            Files.walkFileTree(dirPath, new FileVisitorEmitter(emitter));
+            fileVisitorEmitter = new FileVisitorEmitter(emitter);
+            Files.walkFileTree(dirPath, fileVisitorEmitter);
             emitter.onComplete();
         });
+    }
+
+    public void stop(){
+        fileVisitorEmitter.stop();
     }
 }

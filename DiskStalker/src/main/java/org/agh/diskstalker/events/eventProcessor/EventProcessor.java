@@ -1,7 +1,7 @@
-package org.agh.diskstalker.eventProcessor;
+package org.agh.diskstalker.events.eventProcessor;
 
+import org.agh.diskstalker.events.filesystemEvents.FilesystemEvent;
 import org.agh.diskstalker.model.NodeData;
-import org.agh.diskstalker.model.events.filesystemEvents.FilesystemEvent;
 import org.agh.diskstalker.model.statisctics.FilesTypeStatistics;
 import org.agh.diskstalker.model.tree.TreeBuilder;
 import org.agh.diskstalker.model.tree.TreeFileNode;
@@ -20,7 +20,7 @@ public class EventProcessor implements IEventProcessor {
     @Override
     public void processEvent(FilesystemEvent filesystemEvent) {
         var resolvedPath = filesystemEvent.getTargetDir();
-        var eventType = filesystemEvent.getEventType();
+        var eventType = filesystemEvent.getType();
 
         switch (eventType) {
             case FILE_CREATED -> handleCreateEventFile(resolvedPath);

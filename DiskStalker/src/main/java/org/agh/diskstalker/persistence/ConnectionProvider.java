@@ -6,10 +6,10 @@ import java.sql.SQLException;
 import java.util.Optional;
 import java.util.logging.Logger;
 
-//TODO: singleton logger? injecting
+//TODO: singleton logger? injecting, service spring
 public final class ConnectionProvider {
     private static final String JDBC_DRIVER = "org.sqlite.JDBC";
-    private static final Logger logger = Logger.getGlobal();
+    private static final Logger logger = Logger.getGlobal(); //TODO: inject
 
     private static Optional<Connection> connection = Optional.empty();
 
@@ -22,7 +22,7 @@ public final class ConnectionProvider {
             Class.forName(JDBC_DRIVER);
             connection = Optional.of(DriverManager.getConnection(jdbcAddress));
         } catch (Exception e) {
-            logger.info("Error during initialization: " + e.getMessage());
+            logger.info("Error during database initialization: " + e.getMessage());
         }
     }
 

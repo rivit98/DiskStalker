@@ -12,19 +12,19 @@ public class DiskStalkerSpringBootstrap extends Application {
     private ConfigurableApplicationContext context;
 
     @Override
-    public void init() throws Exception {
+    public void init() {
         this.context = new SpringApplicationBuilder()
                 .sources(DiskStalkerMain.class)
                 .run(getParameters().getRaw().toArray(new String[0]));
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         context.publishEvent(new StageReadyEvent(primaryStage));
     }
 
     @Override
-    public void stop() throws Exception {
+    public void stop() {
         context.close();
         Platform.exit();
     }

@@ -2,8 +2,8 @@ package org.agh.diskstalker.filesystem.dirwatcher;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
-import org.agh.diskstalker.model.events.filesystemEvents.FilesystemEvent;
-import org.agh.diskstalker.model.events.filesystemEvents.FilesystemEventType;
+import org.agh.diskstalker.events.filesystemEvents.FilesystemEvent;
+import org.agh.diskstalker.events.filesystemEvents.FilesystemEventType;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
 
@@ -29,6 +29,7 @@ public class DirWatcher implements IFilesystemWatcher {
     @Override
     public void stop() {
         try {
+            subject.onComplete();
             monitor.stop();
         } catch (Exception ignored) {
         }

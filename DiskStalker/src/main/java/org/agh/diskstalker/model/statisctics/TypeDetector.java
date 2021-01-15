@@ -6,9 +6,11 @@ import org.apache.tika.Tika;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class TypeDetector {
-    private final Tika fileTypeDetector = new Tika();
+    private final Tika fileTypeDetector = new Tika(); //TODO: Service with thread pool
 
     public String detectType(Path file, ObservableList<Type> typeStatistics) {
         try{
@@ -17,18 +19,20 @@ public class TypeDetector {
             return typeName;
 
         } catch (IOException e){
-            System.out.println("Cannot detect file" + file);
+            var logger = Logger.getGlobal();
+            logger.log(Level.WARNING, "Cannot detect file:", file);
         }
         return null;
     }
 
     private void addFileType(String fileType, ObservableList<Type> typeStatistics) {
-        var foundedType = typeStatistics.stream()
+        var foundType = typeStatistics.stream()
                 .filter(type -> type.getType().equals(fileType))
                 .findFirst();
 
-        foundedType.ifPresentOrElse(type -> foundedType.get().increment(), () -> {
-            typeStatistics.add(new Type(fileType));
-        });
+        foundType.ifPresentOrElse(
+                Type::increment,
+                () -> typeStatistics.add(new Type(fileType))
+        );
     }
 }

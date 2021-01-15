@@ -45,11 +45,11 @@ public class FilesTypeStatistics {
     }
 
     public void decrementTypeCounter(NodeData node) {
-        var foundedType = typeStatistics.stream()
+        var foundType = typeStatistics.stream()
                 .filter(type -> type.getType().equals(node.getType()))
                 .findFirst();
 
-        foundedType.ifPresent(type -> {
+        foundType.ifPresent(type -> {
             type.decrement();
             if(type.getQuantity() == 0) {
                 typeStatistics.remove(type);

@@ -1,13 +1,11 @@
 package org.agh.diskstalker.persistence.command;
 
+import lombok.AllArgsConstructor;
 import org.agh.diskstalker.model.ObservedFolder;
 
+@AllArgsConstructor
 public class UpdateObservedFolderCommand extends AbstractObservedFolderCommand {
     private final ObservedFolder observedFolder;
-
-    public UpdateObservedFolderCommand(ObservedFolder folder) {
-        observedFolder = folder;
-    }
 
     @Override
     public CommandResult get() {

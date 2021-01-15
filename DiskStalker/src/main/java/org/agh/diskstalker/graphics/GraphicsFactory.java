@@ -5,7 +5,7 @@ import javafx.scene.image.ImageView;
 
 import java.util.Objects;
 
-public final class GraphicsFactory { //TODO: inject as singleton? :D
+public final class GraphicsFactory { //TODO: inject as service?
     private static final Image FOLDER_IMAGE =
             new Image(
                     Objects.requireNonNull(
@@ -23,7 +23,7 @@ public final class GraphicsFactory { //TODO: inject as singleton? :D
     private static final Image FOLDER_IMAGE_RED =
             new Image(
                     Objects.requireNonNull(
-                            GraphicsFactory.class.getResource("/images/folder-red.png")
+                            GraphicsFactory.class.getResource("/images/folder-red-16.png")
                     ).toString()
             );
 
