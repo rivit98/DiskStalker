@@ -15,12 +15,12 @@ public class ObservedFolderFilesAmountChangedEvent extends AbstractObservedFolde
             if(!folder.getFilesAmountExceededProperty().getValue()) {
                 Alerts.filesAmountExceededAlert(folder.getPath().toString(), folder.getMaximumFilesAmount());
                 folder.setFilesAmountExceeded(true);
-                //mainController.refreshViews();
+                mainController.refreshViews();
             }
         }
         else {
             folder.setFilesAmountExceeded(false);
-            //mainController.refreshViews();
+            mainController.refreshViews();
         }
     }
 }

@@ -13,7 +13,7 @@ public class ObservedFolderDao implements IObservedFolderDao {
     private static final Logger logger = Logger.getGlobal(); //TODO: inject
 
     @Override
-    public void save(ObservedFolder observedFolder) {
+    public void save(ObservedFolder observedFolder) { //todo: insert maximum files amount exceeded to database
         var path = observedFolder.getPath().toString();
         var insertIntoDB = "INSERT INTO observedFolders (path, max_size, limit_exceeded) VALUES (?, ?, ?);";
         Object[] args = {path, 0, observedFolder.isSizeLimitExceeded() ? 1 : 0};
