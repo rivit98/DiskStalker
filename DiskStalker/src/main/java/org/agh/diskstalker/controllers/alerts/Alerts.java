@@ -28,9 +28,24 @@ public class Alerts {
         newAlert.showAndWait().filter(response -> response == ButtonType.OK);
     }
 
+    public static void setMaxFilesAmountAlert(String path, Long amount) {
+        var newAlert = createAlert(
+                "Max files amount for folder:\n" + path + "\nset to:\n" + amount,
+                AlertType.INFORMATION
+        );
+        newAlert.showAndWait().filter(response -> response == ButtonType.OK);
+    }
+
     public static void sizeExceededAlert(String path, Long size) {
         var newAlert = createAlert(
                 "Folder:\n" + path + "\nexceeded size:\n" + FileUtils.byteCountToDisplaySize(size)
+        );
+        Platform.runLater(newAlert::showAndWait);
+    }
+
+    public static void filesAmountExceededAlert(String path, Long amount) {
+        var newAlert = createAlert(
+                "Folder:\n" + path + "\nexceeded files amount:\n" + amount
         );
         Platform.runLater(newAlert::showAndWait);
     }
