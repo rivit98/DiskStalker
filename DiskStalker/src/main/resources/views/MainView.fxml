@@ -15,92 +15,114 @@
 
 <GridPane prefHeight="500.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.agh.diskstalker.controllers.MainController">
     <columnConstraints>
-        <ColumnConstraints prefWidth="467.0"/>
-        <ColumnConstraints prefWidth="133.0"/>
+        <ColumnConstraints prefWidth="467.0" />
+        <ColumnConstraints prefWidth="133.0" />
     </columnConstraints>
     <rowConstraints>
-        <RowConstraints/>
-        <RowConstraints prefHeight="85.0"/>
-        <RowConstraints prefHeight="32.0"/>
-        <RowConstraints prefHeight="31.5"/>
-        <RowConstraints prefHeight="31.0"/>
-        <RowConstraints prefHeight="24.5"/>
-        <RowConstraints prefHeight="26.0"/>
-        <RowConstraints prefHeight="35.5"/>
-        <RowConstraints prefHeight="137.0"/>
-        <RowConstraints/>
+        <RowConstraints />
+        <RowConstraints prefHeight="85.0" />
+        <RowConstraints prefHeight="32.0" />
+        <RowConstraints prefHeight="31.5" />
+        <RowConstraints prefHeight="31.0" />
+        <RowConstraints prefHeight="24.5" />
+        <RowConstraints prefHeight="26.0" />
+        <RowConstraints prefHeight="35.5" />
+        <RowConstraints prefHeight="137.0" />
+        <RowConstraints />
     </rowConstraints>
     <TabPane fx:id="tabPane" prefHeight="500.0" prefWidth="800.0" tabClosingPolicy="UNAVAILABLE" GridPane.columnSpan="2" GridPane.rowIndex="1" GridPane.rowSpan="8">
         <Tab fx:id="main" text="Space">
             <GridPane>
                 <columnConstraints>
-                    <ColumnConstraints prefWidth="604.0"/>
-                    <ColumnConstraints prefWidth="195.5"/>
+                    <ColumnConstraints prefWidth="606.5" />
+                    <ColumnConstraints prefWidth="114.5" />
+               <ColumnConstraints prefWidth="78.5" />
                 </columnConstraints>
                 <rowConstraints>
-                    <RowConstraints prefHeight="53.0"/>
-                    <RowConstraints prefHeight="34.0"/>
-                    <RowConstraints prefHeight="35.5"/>
-                    <RowConstraints prefHeight="32.0"/>
-                    <RowConstraints prefHeight="38.0"/>
-                    <RowConstraints prefHeight="27.0"/>
-                    <RowConstraints prefHeight="31.0"/>
-                    <RowConstraints prefHeight="34.0"/>
-                    <RowConstraints prefHeight="94.5"/>
+                    <RowConstraints prefHeight="53.0" />
+                    <RowConstraints prefHeight="35.0" />
+                    <RowConstraints prefHeight="36.5" />
+                    <RowConstraints prefHeight="33.5" />
+                    <RowConstraints prefHeight="45.0" />
+                    <RowConstraints prefHeight="15.0" />
+                    <RowConstraints prefHeight="35.0" />
+                    <RowConstraints prefHeight="7.0" />
+                    <RowConstraints prefHeight="15.0" />
+                   <RowConstraints prefHeight="35.0" />
+                   <RowConstraints prefHeight="7.0" />
+                   <RowConstraints prefHeight="15.0" />
+                   <RowConstraints prefHeight="35.0" />
+                   <RowConstraints maxHeight="146.0" minHeight="10.0" prefHeight="64.5" />
+                   <RowConstraints maxHeight="126.0" minHeight="10.0" prefHeight="12.0" />
                 </rowConstraints>
-                <TextField fx:id="maxSizeField" prefHeight="25.0" prefWidth="125.0" GridPane.columnIndex="1" GridPane.rowIndex="6">
-                    <padding>
-                        <Insets right="10.0"/>
-                    </padding>
+                <TreeTableView fx:id="treeTableView" showRoot="false" GridPane.rowIndex="1" GridPane.rowSpan="13">
                     <GridPane.margin>
-                        <Insets left="30.0" right="30.0"/>
-                    </GridPane.margin>
-                </TextField>
-                <TreeTableView fx:id="treeTableView" showRoot="false" GridPane.rowIndex="1" GridPane.rowSpan="8">
-                    <GridPane.margin>
-                        <Insets bottom="30.0" left="20.0" right="20.0"/>
+                        <Insets left="20.0" right="20.0" bottom="18.0" />
                     </GridPane.margin>
                     <columns>
-                        <TreeTableColumn fx:id="pathColumn" editable="false" prefWidth="370.0" resizable="false" sortable="false" text="Name"/>
-                        <TreeTableColumn fx:id="sizeColumn" editable="false" prefWidth="192.0" resizable="false" sortable="false" text="Size"/>
+                        <TreeTableColumn fx:id="pathColumn" editable="false" prefWidth="370.0" resizable="false" sortable="false" text="Name" />
+                        <TreeTableColumn fx:id="sizeColumn" editable="false" prefWidth="194.5" resizable="false" sortable="false" text="Size" />
                     </columns>
                 </TreeTableView>
-                <Button fx:id="addButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="125.0" text="Start observing" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                <Button fx:id="addButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="125.0" text="Start observing" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="1">
                     <GridPane.margin>
-                        <Insets left="35.0"/>
+                        <Insets left="35.0" />
                     </GridPane.margin>
                 </Button>
-                <Button fx:id="stopObserveButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="125.0" text="Stop observing" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                <Button fx:id="stopObserveButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="125.0" text="Stop observing" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="2">
                     <GridPane.margin>
-                        <Insets left="35.0"/>
+                        <Insets left="35.0" />
                     </GridPane.margin>
                 </Button>
-                <Button fx:id="deleteFromDiskButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="125.0" text="Delete from disk" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                <Button fx:id="deleteFromDiskButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="125.0" text="Delete from disk" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="3">
                     <GridPane.margin>
-                        <Insets left="35.0"/>
+                        <Insets left="35.0" />
                     </GridPane.margin>
                 </Button>
-                <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Max directory size (MB)" wrappingWidth="133.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                <Button fx:id="setSizeButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="50.0" text="Set" GridPane.columnIndex="2" GridPane.rowIndex="6">
                     <GridPane.margin>
-                        <Insets left="35.0"/>
+                        <Insets left="10.0" />
                     </GridPane.margin>
-                </Text>
-                <Button fx:id="setSizeButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="125.0" text="Set size" GridPane.columnIndex="1" GridPane.rowIndex="7">
+                </Button>
+                <Button fx:id="setNumberOfFilesButton" mnemonicParsing="false" prefWidth="50.0" text="Set" GridPane.columnIndex="2" GridPane.rowIndex="9">
                     <GridPane.margin>
-                        <Insets left="35.0"/>
+                        <Insets left="10.0" />
+                    </GridPane.margin>
+                </Button>
+                <Button fx:id="setBiggestFileSizeButton" mnemonicParsing="false" prefWidth="50.0" text="Set" GridPane.columnIndex="2" GridPane.rowIndex="12">
+                    <GridPane.margin>
+                        <Insets left="10.0" />
                     </GridPane.margin>
                 </Button>
                 <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Observed directories" textAlignment="CENTER" wrappingWidth="527.0">
                     <font>
-                        <Font name="Times New Roman Bold" size="25.0"/>
+                        <Font name="Times New Roman Bold" size="25.0" />
                     </font>
                     <GridPane.margin>
-                        <Insets/>
+                        <Insets />
                     </GridPane.margin>
                 </Text>
+            <TextField fx:id="maxSizeField" promptText="Size(MB)" prefHeight="25.0" prefWidth="125.0" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                <GridPane.margin>
+                    <Insets left="5.0" />
+                </GridPane.margin>
+            </TextField>
+            <TextField fx:id="numberOfFilesField" promptText="Number" prefHeight="25.0" prefWidth="125.0" GridPane.columnIndex="1" GridPane.rowIndex="9">
+               <GridPane.margin>
+                  <Insets left="5.0" />
+               </GridPane.margin>
+            </TextField>
+            <TextField fx:id="biggestFileField" promptText="Size(MB)" prefHeight="25.0" prefWidth="125.0" GridPane.columnIndex="1" GridPane.rowIndex="12">
+               <GridPane.margin>
+                  <Insets left="5.0" />
+               </GridPane.margin>
+            </TextField>
+            <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Total size limit" textAlignment="CENTER" wrappingWidth="193.5" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+            <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Number of files limit" textAlignment="CENTER" wrappingWidth="193.5" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+            <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Biggest file size limit" textAlignment="CENTER" wrappingWidth="194.0" GridPane.columnIndex="1" GridPane.rowIndex="11" />
             </GridPane>
         </Tab>
-        <fx:include fx:id="filesTypeView" source="FilesTypeView.fxml"/>
-        <fx:include fx:id="fileInfoView" source="FileInfoView.fxml"/>
+        <fx:include fx:id="filesTypeView" source="FilesTypeView.fxml" />
+        <fx:include fx:id="fileInfoView" source="FileInfoView.fxml" />
     </TabPane>
 </GridPane>
