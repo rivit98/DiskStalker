@@ -14,6 +14,6 @@ public class StringToIntFormatter extends TextFormatter<Integer>{
     };
 
     public StringToIntFormatter() {
-        super(new IntegerStringConverter(), 0, filter);
+        super(new IntegerStringConverter(), null, filter);
     }
 }
