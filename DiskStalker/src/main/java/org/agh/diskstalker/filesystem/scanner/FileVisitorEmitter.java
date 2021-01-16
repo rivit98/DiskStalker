@@ -19,23 +19,23 @@ public class FileVisitorEmitter extends SimpleFileVisitor<Path> {
         this.observer = observer;
     }
 
-    public FileVisitResult emitPath(Path path) {
+    public FileVisitResult emitPath(Path path, BasicFileAttributes attrs) {
         if (observer.isDisposed() || stopped) {
             return TERMINATE;
         }
 
-        observer.onNext(new NodeData(path));
+        observer.onNext(new NodeData(path, attrs));
         return CONTINUE;
     }
 
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-        return emitPath(file);
+        return emitPath(file, attrs);
     }
 
     @Override
     public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
-        return emitPath(dir);
+        return emitPath(dir, attrs);
     }
 
     @Override

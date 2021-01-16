@@ -7,6 +7,8 @@ import net.rgielen.fxweaver.core.FxmlView;
 import org.agh.diskstalker.model.statisctics.Type;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
+
 @Component
 @FxmlView("/views/FilesTypeView.fxml")
 public class FilesTypeController extends AbstractTabController {
@@ -22,7 +24,7 @@ public class FilesTypeController extends AbstractTabController {
         foldersTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if(newValue != null) {
                 dataTableView.setItems(newValue.getFilesTypeStatistics().getTypeStatistics());
-                dataTableView.getSortOrder().addAll(quantityColumn);
+                dataTableView.getSortOrder().addAll(Collections.singletonList(quantityColumn));
             } else {
                 dataTableView.getItems().clear();
             }

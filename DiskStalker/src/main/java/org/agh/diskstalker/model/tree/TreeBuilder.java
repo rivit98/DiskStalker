@@ -7,6 +7,7 @@ import org.agh.diskstalker.model.NodeData;
 
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.Optional;
 
 
 public class TreeBuilder {
@@ -34,6 +35,7 @@ public class TreeBuilder {
         var parentNode = pathToTreeMap.get(parentPath);
         parentNode.insertNode(newNode);
         pathToTreeMap.put(nodeData.getPath(), newNode);
+        nodeData.updateModificationTime();
     }
 
     public boolean containsNode(Path path) {
@@ -46,7 +48,10 @@ public class TreeBuilder {
     }
 
     public void removeMappedDirs(TreeItem<NodeData> node) {
-        pathToTreeMap.remove(node.getValue().getPath());
+        Optional.ofNullable(node)
+                .map(TreeItem::getValue)
+                .map(NodeData::getPath)
+                .ifPresent(pathToTreeMap::remove);
     }
 }
 

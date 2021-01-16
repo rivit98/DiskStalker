@@ -36,7 +36,6 @@ public class EventProcessor implements IEventProcessor {
 
     private void handleModifyEventFile(Path resolvedPath) {
         var modifiedNode = treeBuilder.getPathToTreeMap().get(resolvedPath);
-        modifiedNode.getValue().setModificationDate();
         modifiedNode.updateMe();
     }
 
@@ -65,7 +64,6 @@ public class EventProcessor implements IEventProcessor {
 
     private void handleCreateCommon(Path resolvedPath) {
         var nodeData = new NodeData(resolvedPath);
-        nodeData.setModificationDate();
         var newTreeNode = new TreeFileNode(nodeData);
         treeBuilder.insertNewNode(newTreeNode);
         filesTypeStatistics.addNewNodeType(nodeData);

@@ -1,12 +1,12 @@
-package org.agh.diskstalker.cellFactories;
+package org.agh.diskstalker.controllers.cellFactories;
 
 import javafx.css.PseudoClass;
-import javafx.scene.control.TreeTableCell;
+import javafx.scene.control.TableCell;
 import org.agh.diskstalker.model.NodeData;
 import org.apache.commons.io.FileUtils;
 
-public class SizeColumnCellFactory extends TreeTableCell<NodeData, Number> {
-    public SizeColumnCellFactory() {
+public class SizeTableColumnCellFactory extends TableCell<NodeData, Number> {
+    public SizeTableColumnCellFactory() {
         pseudoClassStateChanged(PseudoClass.getPseudoClass("centered"), true);
     }
 

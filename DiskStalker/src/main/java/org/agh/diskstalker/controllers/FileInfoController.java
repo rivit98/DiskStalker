@@ -1,72 +1,53 @@
 package org.agh.diskstalker.controllers;
 
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TreeItem;
 import net.rgielen.fxweaver.core.FxmlView;
-import org.agh.diskstalker.model.tree.TreeFileNode;
-import org.apache.commons.io.FileUtils;
+import org.agh.diskstalker.controllers.cellFactories.DateColumnCellFactory;
+import org.agh.diskstalker.controllers.cellFactories.SizeTableColumnCellFactory;
+import org.agh.diskstalker.model.NodeData;
+import org.agh.diskstalker.model.ObservedFolder;
+import org.agh.diskstalker.model.tree.TreeBuilder;
 import org.springframework.stereotype.Component;
 
-import java.nio.file.Path;
-import java.util.Comparator;
+import java.nio.file.attribute.FileTime;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 @FxmlView("/views/FileInfoView.fxml")
 public class FileInfoController extends AbstractTabController {
     @FXML
-    private TableView<Map.Entry<Path, TreeFileNode>> dataTableView;
+    private TableView<NodeData> dataTableView;
     @FXML
-    private TableColumn<Map.Entry<Path, TreeFileNode>, String> dateColumn;
+    private TableColumn<NodeData, FileTime> dateColumn;
     @FXML
-    private TableColumn<Map.Entry<Path, TreeFileNode>, String> sizeColumn;
+    private TableColumn<NodeData, Number> sizeColumn;
     @FXML
-    private TableColumn<Map.Entry<Path, TreeFileNode>, String> fileNameColumn;
-
-    //FIXME:maybe there is fastest way to compare?
-    private class SizeComparator implements Comparator<String> {
-        private final HashMap<String, Integer> comparingMap;
-
-        private SizeComparator() {
-            comparingMap = new HashMap<>();
-            comparingMap.put("bytes", 1);
-            comparingMap.put("KB", 2);
-            comparingMap.put("MB", 3);
-            comparingMap.put("GB", 4);
-
-        }
-
-        @Override
-        public int compare(String s1, String s2) {
-            var firstSize = s1.split(" ");
-            var secondSize = s2.split(" ");
-
-            var val1 = comparingMap.get(firstSize[1]);
-            var val2 = comparingMap.get(secondSize[1]);
-
-            if(val1 < val2) {
-                return 1;
-            } else if(val1 == val2) {
-                var res = Long.parseLong(firstSize[0]);
-                var res2 = Long.parseLong(secondSize[0]);
-                return Long.compare(res2, res);
-            } else return -1;
-        }
-    }
+    private TableColumn<NodeData, String> fileNameColumn;
 
     protected void configureSelectionModelListener() {
-        foldersTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+        var selectionModel = foldersTableView.getSelectionModel();
+        selectionModel.selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if(newValue != null) {
-                var map = foldersTableView.getSelectionModel().getSelectedItem().getTreeBuilder().getPathToTreeMap();
-                ObservableList<Map.Entry<Path, TreeFileNode>> items = FXCollections.observableArrayList(map.entrySet());
-                dataTableView.setItems(items);
-                dataTableView.getItems().removeIf(val -> val.getValue().getValue().isDirectory());
-                dataTableView.getSortOrder().addAll(dateColumn, sizeColumn);
+                Optional.ofNullable(foldersTableView.getSelectionModel().getSelectedItem())
+                        .map(ObservedFolder::getTreeBuilder)
+                        .map(TreeBuilder::getPathToTreeMap)
+                        .map(HashMap::values)
+                        .map(coll -> coll.stream().map(TreeItem::getValue))
+                        .map(collection -> collection.filter(NodeData::isFile).collect(Collectors.toList()))
+                        .ifPresent(treeFileNodes -> {
+                            //FIXME: removing files from disk does not update this view
+//                            var items = new FilteredList<>(FXCollections.observableArrayList(treeFileNodes), val -> val.getValue().isFile());
+                            dataTableView.setItems(FXCollections.observableList(treeFileNodes));
+                            dataTableView.getSortOrder().addAll(List.of(dateColumn, sizeColumn));
+                        });
             } else {
                 dataTableView.getItems().clear();
             }
@@ -74,9 +55,18 @@ public class FileInfoController extends AbstractTabController {
     }
 
     protected void prepareDataTableView() {
-        dateColumn.setCellValueFactory(val -> new SimpleStringProperty(val.getValue().getValue().getValue().getModificationDate()));
-        sizeColumn.setCellValueFactory(val -> new SimpleStringProperty(FileUtils.byteCountToDisplaySize(val.getValue().getValue().getValue().getSize())));
-        sizeColumn.setComparator(new SizeComparator());
-        fileNameColumn.setCellValueFactory(val -> new SimpleStringProperty(val.getValue().getValue().getValue().getName()));
+        dateColumn.setCellFactory(ttc -> new DateColumnCellFactory());
+        dateColumn.setCellValueFactory(node -> Optional.ofNullable(node.getValue())
+                .map(NodeData::getModificationDate)
+                .orElseGet(SimpleObjectProperty::new)
+        );
+
+        sizeColumn.setCellFactory(val -> new SizeTableColumnCellFactory());
+        sizeColumn.setCellValueFactory(node -> Optional.ofNullable(node.getValue())
+                        .map(NodeData::getSizeProperty)
+                        .orElse(null)
+        );
+
+        fileNameColumn.setCellValueFactory(val -> val.getValue().getFilename());
     }
 }

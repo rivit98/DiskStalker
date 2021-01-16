@@ -152,8 +152,4 @@ public class ObservedFolder {
             filesTypeStatistics.setTypeStatistics();
         }
     }
-
-    public void createDateModificationStatistics() {
-        treeBuilder.getPathToTreeMap().forEach((key, val) -> val.getValue().setModificationDate());
-    }
 }

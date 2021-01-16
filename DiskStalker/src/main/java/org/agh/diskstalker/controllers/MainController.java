@@ -7,8 +7,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import lombok.Getter;
 import net.rgielen.fxweaver.core.FxmlView;
-import org.agh.diskstalker.cellFactories.PathColumnCellFactory;
-import org.agh.diskstalker.cellFactories.SizeColumnCellFactory;
+import org.agh.diskstalker.controllers.cellFactories.PathColumnCellFactory;
+import org.agh.diskstalker.controllers.cellFactories.SizeTreeTableColumnCellFactory;
 import org.agh.diskstalker.controllers.buttonHandlers.AddButtonHandler;
 import org.agh.diskstalker.controllers.buttonHandlers.DeleteFromDiskButtonHandler;
 import org.agh.diskstalker.controllers.buttonHandlers.SetSizeButtonHandler;
@@ -33,7 +33,7 @@ import java.util.Optional;
 public class MainController {
     @FXML
     private TabPane tabPane;
-    @FXML
+    @FXML @Getter
     private TreeTableView<NodeData> treeTableView;
     @FXML
     private TreeTableColumn<NodeData, Path> pathColumn;
@@ -45,7 +45,7 @@ public class MainController {
     private Button stopObserveButton;
     @FXML
     private Button setSizeButton;
-    @FXML
+    @FXML @Getter
     private TextField maxSizeField;
     @FXML
     private Button deleteFromDiskButton;
@@ -75,8 +75,6 @@ public class MainController {
         tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
             if (newTab.getId().equals("filesTypeView")) {
                 folderList.get().forEach(folder -> new Thread(folder::createTypeStatistics).start());
-            } else if (newTab.getId().equals("fileInfoView")) {
-                folderList.get().forEach(folder -> new Thread(folder::createDateModificationStatistics).start());
             }
         });
     }
@@ -88,7 +86,7 @@ public class MainController {
 
     private void prepareColumns() {
         pathColumn.setCellFactory(ttc -> new PathColumnCellFactory(this));
-        sizeColumn.setCellFactory(ttc -> new SizeColumnCellFactory());
+        sizeColumn.setCellFactory(ttc -> new SizeTreeTableColumnCellFactory());
 
         pathColumn.setCellValueFactory(
                 node -> Optional.ofNullable(node.getValue())
@@ -100,7 +98,8 @@ public class MainController {
 
         sizeColumn.setCellValueFactory(
                 node -> Optional.ofNullable(node.getValue())
-                        .map(nodeData -> nodeData.getValue().getSizeProperty())
+                        .map(TreeItem::getValue)
+                        .map(NodeData::getSizeProperty)
                         .orElse(null)
         );
     }
@@ -190,14 +189,6 @@ public class MainController {
         }
         commandExecutor.executeCommand(new DeleteObservedFolderCommand(folder));
         return folderList.get().remove(folder);
-    }
-
-    public TreeTableView<NodeData> getTreeTableView() {
-        return treeTableView;
-    }
-
-    public TextField getMaxSizeField() {
-        return maxSizeField;
     }
 
     public void refreshViews(){

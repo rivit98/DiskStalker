@@ -36,7 +36,7 @@ public class NodeDataTest {
         var newSize = 14L;
 
         //when
-        nodeData.modifySize(newSize);
+        nodeData.setSize(newSize);
 
         //then
         Assertions.assertEquals(nodeData.getSize(), newSize);

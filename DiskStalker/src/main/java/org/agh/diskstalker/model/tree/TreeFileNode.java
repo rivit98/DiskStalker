@@ -54,7 +54,7 @@ public class TreeFileNode extends TreeItem<NodeData> {
                 .ifPresent(parent -> {
                     Optional.ofNullable(parent.getValue())
                             .ifPresent(value -> {
-                                value.modifySize(deltaSize);
+                                value.setSize(deltaSize);
                                 updateParentSize(parent, deltaSize);
                             });
                 });
@@ -71,6 +71,7 @@ public class TreeFileNode extends TreeItem<NodeData> {
     public void updateMe() {
         var nodeData = getValue();
         var oldSize = nodeData.getSize();
+        nodeData.updateModificationTime();
         updateParentSize(this, nodeData.updateFileSize() - oldSize);
     }
 

@@ -1,63 +1,56 @@
 package org.agh.diskstalker.model;
 
 import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.concurrent.TimeUnit;
 
 @Getter
 public class NodeData {
     private final Path path;
     private final boolean isDirectory;
     private final SimpleLongProperty sizeProperty;
-    private final SimpleStringProperty nameProperty;
-    private SimpleStringProperty modificationDateProperty;
+    private final SimpleStringProperty filename;
+    private final SimpleObjectProperty<FileTime> modificationDateProperty;
     @Setter
     private String type;
 
     public NodeData(Path path) {
+        this(path, null);
+    }
+
+    public NodeData(Path path, BasicFileAttributes attributes){
         this.path = path;
-        var f = path.toFile();
-        this.isDirectory = f.isDirectory();
-        this.sizeProperty = new SimpleLongProperty(isFile() ? f.length() : 0);
-        this.nameProperty = new SimpleStringProperty(path.getFileName().toString());
+        if(attributes != null){
+            this.isDirectory = attributes.isDirectory();
+            this.sizeProperty = new SimpleLongProperty(isFile() ? attributes.size() : 0);
+            this.modificationDateProperty = new SimpleObjectProperty<>(attributes.lastModifiedTime());
+        }else{
+            var f = path.toFile();
+            this.isDirectory = f.isDirectory();
+            this.sizeProperty = new SimpleLongProperty(isFile() ? f.length() : 0);
+            this.modificationDateProperty = new SimpleObjectProperty<>(FileTime.from(f.lastModified(), TimeUnit.SECONDS));
+        }
+        this.filename = new SimpleStringProperty(path.getFileName().toString());
     }
 
     public boolean isFile() {
         return !isDirectory;
     }
 
-    public String getName() {
-        return nameProperty.get();
+    public SimpleObjectProperty<FileTime> getModificationDate(){
+        return modificationDateProperty;
     }
 
-    public String getModificationDate(){
-        return modificationDateProperty.get();
-    }
-
-    public void setModificationDate() {
-        try{
-            BasicFileAttributes attributes = Files.readAttributes(path, BasicFileAttributes.class);
-            var date = attributes.lastModifiedTime().toString()
-                    .replace("T", " ")
-                    .replace("Z", " ");
-            if(date.contains(".")) {
-                date = date.split("\\.")[0];
-            }
-            modificationDateProperty = new SimpleStringProperty(date);
-        } catch(IOException e) {
-            var logger = Logger.getGlobal();
-            logger.log(Level.WARNING, "Cannot load last modification date of file:", path);
-            modificationDateProperty = new SimpleStringProperty("NO DATA");
-        }
+    public void updateModificationTime() {
+        modificationDateProperty.set(FileTime.from(path.toFile().lastModified(), TimeUnit.MILLISECONDS));
     }
 
     public long getSize() {
@@ -74,7 +67,7 @@ public class NodeData {
         return actualSize;
     }
 
-    public void modifySize(long size) {
+    public void setSize(long size) {
         var newSize = getSize() + size;
         sizeProperty.set(newSize);
     }
