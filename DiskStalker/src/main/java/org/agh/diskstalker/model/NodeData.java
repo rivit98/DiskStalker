@@ -14,6 +14,8 @@ import java.util.concurrent.TimeUnit;
 
 @Getter
 public class NodeData {
+    private static final int MILLIS_IN_SECOND = 1000;
+
     private final Path path;
     private final boolean isDirectory;
     private final SimpleLongProperty sizeProperty;
@@ -50,7 +52,9 @@ public class NodeData {
     }
 
     public void updateModificationTime() {
-        modificationDateProperty.set(FileTime.from(path.toFile().lastModified(), TimeUnit.MILLISECONDS));
+        modificationDateProperty.set(
+                FileTime.from(path.toFile().lastModified() / MILLIS_IN_SECOND, TimeUnit.SECONDS)
+        );
     }
 
     public long getSize() {

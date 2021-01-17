@@ -45,6 +45,7 @@ public class FileInfoController extends AbstractTabController {
         );
 
         sizeColumn.setCellFactory(val -> new SizeTableColumnCellFactory());
+        sizeColumn.setSortType(TableColumn.SortType.DESCENDING);
         sizeColumn.setCellValueFactory(node -> Optional.ofNullable(node.getValue())
                         .map(NodeData::getSizeProperty)
                         .orElse(null)
