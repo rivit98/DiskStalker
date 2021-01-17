@@ -76,7 +76,7 @@
                         <Insets left="10.0" />
                     </GridPane.margin>
                 </Button>
-                <Button fx:id="setNumberOfFilesButton" mnemonicParsing="false" prefWidth="50.0" text="Set" GridPane.columnIndex="2" GridPane.rowIndex="9">
+                <Button fx:id="setMaxFilesAmountButton" mnemonicParsing="false" prefWidth="50.0" text="Set" GridPane.columnIndex="2" GridPane.rowIndex="9">
                     <GridPane.margin>
                         <Insets left="10.0" />
                     </GridPane.margin>
@@ -99,7 +99,7 @@
                     <Insets left="5.0" />
                 </GridPane.margin>
             </TextField>
-            <TextField fx:id="numberOfFilesField" promptText="Number" prefHeight="25.0" prefWidth="125.0" GridPane.columnIndex="1" GridPane.rowIndex="9">
+            <TextField fx:id="maxFilesAmountField" promptText="Number" prefHeight="25.0" prefWidth="125.0" GridPane.columnIndex="1" GridPane.rowIndex="9">
                <GridPane.margin>
                   <Insets left="5.0" />
                </GridPane.margin>
