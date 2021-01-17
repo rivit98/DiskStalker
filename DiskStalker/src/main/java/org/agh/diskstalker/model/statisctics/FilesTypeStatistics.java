@@ -2,18 +2,18 @@ package org.agh.diskstalker.model.statisctics;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import org.agh.diskstalker.model.NodeData;
 import org.agh.diskstalker.model.tree.TreeFileNode;
 
 import java.nio.file.Path;
-import java.util.HashMap;
 
 public class FilesTypeStatistics {
     private final ObservableList<Type> typeStatistics;
-    private final HashMap<Path, TreeFileNode> pathToTreeMap;
+    private final ObservableMap<Path, TreeFileNode> pathToTreeMap;
     private boolean statisticsSet;
 
-    public FilesTypeStatistics(HashMap<Path, TreeFileNode> pathToTreeMap) {
+    public FilesTypeStatistics(ObservableMap<Path, TreeFileNode> pathToTreeMap) {
         typeStatistics = FXCollections.observableArrayList();
         this.pathToTreeMap = pathToTreeMap;
         this.statisticsSet = false;

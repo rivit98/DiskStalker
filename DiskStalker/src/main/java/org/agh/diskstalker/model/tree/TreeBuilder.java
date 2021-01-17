@@ -1,18 +1,19 @@
 package org.agh.diskstalker.model.tree;
 
 import io.reactivex.rxjava3.subjects.SingleSubject;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableMap;
 import javafx.scene.control.TreeItem;
 import lombok.Getter;
 import org.agh.diskstalker.model.NodeData;
 
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.Optional;
 
 
 public class TreeBuilder {
     @Getter
-    private final HashMap<Path, TreeFileNode> pathToTreeMap = new HashMap<>();
+    private final ObservableMap<Path, TreeFileNode> pathToTreeMap = FXCollections.observableHashMap();
     @Getter
     private final SingleSubject<TreeFileNode> rootSubject = SingleSubject.create();
     private TreeFileNode root;
