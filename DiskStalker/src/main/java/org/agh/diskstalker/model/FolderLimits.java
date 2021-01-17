@@ -63,7 +63,7 @@ public class FolderLimits {
         return totalSizeLimit > 0 && folder.getSize() > totalSizeLimit;
     }
 
-    public boolean isFileAmountExceeded(){
+    public boolean isFilesAmountExceeded(){
         return filesAmountLimit > 0 && folder.getFilesAmount() > filesAmountLimit;
     }
 
@@ -72,6 +72,6 @@ public class FolderLimits {
     }
 
     public boolean isAnyLimitExceeded(){
-        return isTotalSizeExceeded() || isFileAmountExceeded() || isBiggestFileLimitExceeded();
+        return isTotalSizeExceeded() || isFilesAmountExceeded() || isBiggestFileLimitExceeded();
     }
 }

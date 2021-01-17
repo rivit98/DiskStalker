@@ -12,8 +12,8 @@ public class ObservedFolderFilesAmountChangedEvent extends AbstractObservedFolde
     @Override
     public void dispatch(MainController mainController) {
         var limits = folder.getLimits();
-        if (limits.isFileAmountExceeded()) {
-            if(!limits.isBiggestFileExceededFlag()) {
+        if (limits.isFilesAmountExceeded()) {
+            if(!limits.isFilesAmountExceededFlag()) {
                 Alerts.filesAmountExceededAlert(folder.getPath().toString(), limits.getFilesAmountLimit());
                 limits.setFilesAmountExceededFlag(true);
                 mainController.refreshViews();
