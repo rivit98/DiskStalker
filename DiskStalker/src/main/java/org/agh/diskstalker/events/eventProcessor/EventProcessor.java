@@ -50,7 +50,9 @@ public class EventProcessor implements IEventProcessor {
     private void handleDeleteEventCommon(Path resolvedPath) {
         var affectedNode = treeBuilder.getPathToTreeMap().remove(resolvedPath);
         treeBuilder.removeMappedDirsRecursively(affectedNode);
-        filesTypeStatistics.decrementTypeCounter(affectedNode.getValue());
+        if(affectedNode.getValue().isFile()) {
+            filesTypeStatistics.decrementTypeCounter(affectedNode.getValue());
+        }
         affectedNode.deleteMe();
     }
 
@@ -66,6 +68,8 @@ public class EventProcessor implements IEventProcessor {
         var nodeData = new NodeData(resolvedPath);
         var newTreeNode = new TreeFileNode(nodeData);
         treeBuilder.insertNewNode(newTreeNode);
-        filesTypeStatistics.addNewNodeType(nodeData);
+        if(nodeData.isFile()) {
+            filesTypeStatistics.addNewNodeType(nodeData);
+        }
     }
 }
