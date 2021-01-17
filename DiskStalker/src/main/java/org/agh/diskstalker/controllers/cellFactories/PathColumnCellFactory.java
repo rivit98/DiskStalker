@@ -1,4 +1,4 @@
-package org.agh.diskstalker.cellFactories;
+package org.agh.diskstalker.controllers.cellFactories;
 
 import javafx.scene.control.TreeTableCell;
 import org.agh.diskstalker.controllers.MainController;

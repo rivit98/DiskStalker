@@ -1,6 +1,5 @@
 package org.agh.diskstalker.events.observedFolderEvents;
 
-import lombok.AllArgsConstructor;
 import org.agh.diskstalker.controllers.MainController;
 import org.agh.diskstalker.controllers.alerts.Alerts;
 import org.agh.diskstalker.model.ObservedFolder;

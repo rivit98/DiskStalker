@@ -1,17 +1,19 @@
 package org.agh.diskstalker.model.tree;
 
 import io.reactivex.rxjava3.subjects.SingleSubject;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableMap;
 import javafx.scene.control.TreeItem;
 import lombok.Getter;
 import org.agh.diskstalker.model.NodeData;
 
 import java.nio.file.Path;
-import java.util.HashMap;
+import java.util.Optional;
 
 
 public class TreeBuilder {
     @Getter
-    private final HashMap<Path, TreeFileNode> pathToTreeMap = new HashMap<>();
+    private final ObservableMap<Path, TreeFileNode> pathToTreeMap = FXCollections.observableHashMap();
     @Getter
     private final SingleSubject<TreeFileNode> rootSubject = SingleSubject.create();
     private TreeFileNode root;
@@ -34,6 +36,7 @@ public class TreeBuilder {
         var parentNode = pathToTreeMap.get(parentPath);
         parentNode.insertNode(newNode);
         pathToTreeMap.put(nodeData.getPath(), newNode);
+        nodeData.updateModificationTime();
     }
 
     public boolean containsNode(Path path) {
@@ -46,7 +49,10 @@ public class TreeBuilder {
     }
 
     public void removeMappedDirs(TreeItem<NodeData> node) {
-        pathToTreeMap.remove(node.getValue().getPath());
+        Optional.ofNullable(node)
+                .map(TreeItem::getValue)
+                .map(NodeData::getPath)
+                .ifPresent(pathToTreeMap::remove);
     }
 }
 

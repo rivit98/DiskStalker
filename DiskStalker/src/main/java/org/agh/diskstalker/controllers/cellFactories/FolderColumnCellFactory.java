@@ -1,4 +1,4 @@
-package org.agh.diskstalker.cellFactories;
+package org.agh.diskstalker.controllers.cellFactories;
 
 import javafx.scene.control.ListCell;
 import org.agh.diskstalker.graphics.GraphicsFactory;
@@ -14,10 +14,6 @@ public class FolderColumnCellFactory extends ListCell<ObservedFolder> {
             return;
         }
 
-        fileNamePresentHandler(folder);
-    }
-
-    private void fileNamePresentHandler(ObservedFolder folder) {
         setText(folder.getPath().getFileName().toString()); //FIXME: use getName
         setGraphic(GraphicsFactory.getGraphic(true, folder.isSizeLimitExceeded()));
     }
