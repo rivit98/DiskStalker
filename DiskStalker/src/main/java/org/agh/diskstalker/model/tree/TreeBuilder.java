@@ -16,15 +16,16 @@ public class TreeBuilder {
     private final ObservableMap<Path, TreeFileNode> pathToTreeMap = FXCollections.observableHashMap();
     @Getter
     private final SingleSubject<TreeFileNode> rootSubject = SingleSubject.create();
+    @Getter
     private TreeFileNode root;
 
     public void processNodeData(NodeData nodeData) {
         var insertedNode = new TreeFileNode(nodeData);
-        pathToTreeMap.put(nodeData.getPath(), insertedNode);
 
         if (root != null) {
             insertNewNode(insertedNode);
         } else {
+            pathToTreeMap.put(nodeData.getPath(), insertedNode);
             root = insertedNode;
             rootSubject.onSuccess(root);
         }

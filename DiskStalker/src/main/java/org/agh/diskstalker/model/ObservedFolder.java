@@ -18,6 +18,7 @@ import org.agh.diskstalker.filesystem.dirwatcher.IFilesystemWatcher;
 import org.agh.diskstalker.filesystem.scanner.FileTreeScanner;
 import org.agh.diskstalker.model.statisctics.FilesTypeStatistics;
 import org.agh.diskstalker.model.tree.TreeBuilder;
+import org.agh.diskstalker.model.tree.TreeFileNode;
 
 import java.nio.file.Path;
 import java.util.Objects;
@@ -113,8 +114,12 @@ public class ObservedFolder {
         return treeBuilder.containsNode(path);
     }
 
+    public TreeFileNode getRoot(){
+        return treeBuilder.getRoot();
+    }
+
     public long getSize() {
-        return Optional.ofNullable(treeBuilder.getRootSubject().getValue())
+        return Optional.ofNullable(treeBuilder.getRoot())
                 .map(rootNode -> rootNode.getValue().getSize())
                 .orElse(0L);
     }

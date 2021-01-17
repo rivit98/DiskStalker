@@ -48,7 +48,7 @@ public class EventProcessor implements IEventProcessor {
     }
 
     private void handleDeleteEventCommon(Path resolvedPath) {
-        var affectedNode = treeBuilder.getPathToTreeMap().remove(resolvedPath);
+        var affectedNode = treeBuilder.getPathToTreeMap().get(resolvedPath);
         treeBuilder.removeMappedDirsRecursively(affectedNode);
         if(affectedNode.getValue().isFile()) {
             filesTypeStatistics.decrementTypeCounter(affectedNode.getValue());

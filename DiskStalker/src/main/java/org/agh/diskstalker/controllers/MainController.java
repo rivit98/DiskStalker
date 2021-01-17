@@ -1,12 +1,12 @@
 package org.agh.diskstalker.controllers;
 
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import lombok.Getter;
 import net.rgielen.fxweaver.core.FxmlView;
+import org.agh.diskstalker.controllers.bindings.*;
 import org.agh.diskstalker.controllers.buttonHandlers.*;
 import org.agh.diskstalker.controllers.cellFactories.PathColumnCellFactory;
 import org.agh.diskstalker.controllers.cellFactories.SizeTreeTableColumnCellFactory;
@@ -29,6 +29,7 @@ import java.util.Optional;
 @Component
 @FxmlView("/views/MainView.fxml")
 public class MainController {
+
     @FXML
     private TabPane tabPane;
     @FXML @Getter
@@ -38,23 +39,27 @@ public class MainController {
     @FXML
     private TreeTableColumn<NodeData, Number> sizeColumn;
     @FXML
+    private AbstractTabController filesTypeViewController;
+    @FXML
+    private AbstractTabController fileInfoViewController;
+    @FXML
     private Button addButton;
     @FXML
     private Button stopObserveButton;
     @FXML
-    private Button setSizeButton;
+    private Button setMaxSizeButton;
     @FXML @Getter
     private TextField maxSizeField;
     @FXML
     private Button deleteFromDiskButton;
-    @FXML
-    private AbstractTabController filesTypeViewController;
-    @FXML
-    private AbstractTabController fileInfoViewController;
     @FXML @Getter
     private TextField maxFilesAmountField;
     @FXML
     private Button setMaxFilesAmountButton;
+    @FXML @Getter
+    public TextField biggestFileField;
+    @FXML
+    public Button setBiggestFileSizeButton;
 
     private final DatabaseCommandExecutor commandExecutor = new DatabaseCommandExecutor();
 
@@ -68,8 +73,7 @@ public class MainController {
         prepareColumns();
         initializeTabs();
         initializeButtons();
-        initializeSizeField();
-        initializeFilesAmountField();
+        initializeFields();
         loadSavedFolders();
         initializeStatisticsLoading();
     }
@@ -115,51 +119,26 @@ public class MainController {
     private void initializeButtons() {
         addButton.setOnAction(new AddButtonHandler(this, commandExecutor));
         stopObserveButton.setOnAction(new StopObserveButtonHandler(this));
-        setSizeButton.setOnAction(new SetSizeButtonHandler(this, commandExecutor));
+        setMaxSizeButton.setOnAction(new SetSizeButtonHandler(this, commandExecutor));
         deleteFromDiskButton.setOnAction(new DeleteFromDiskButtonHandler(this));
         setMaxFilesAmountButton.setOnAction(new SetMaxFilesAmountButtonHandler(this, commandExecutor));
 
-        createButtonBindings();
-    }
-
-    private void createButtonBindings() {
         var selectionModel = treeTableView.getSelectionModel();
-
-        deleteFromDiskButton.disableProperty().bind(Bindings.createBooleanBinding(
-                () -> selectionModel.getSelectedItem() == null,
-                selectionModel.selectedItemProperty()
-        ));
-
-        setSizeButton.disableProperty().bind(Bindings.createBooleanBinding(
-                () -> !isMainFolder(selectionModel.getSelectedItem()) || maxSizeField.getText().equals("")
-                , selectionModel.selectedItemProperty(), maxSizeField.textProperty()
-        ));
-
-        setMaxFilesAmountButton.disableProperty().bind(Bindings.createBooleanBinding(
-                () -> !isMainFolder(selectionModel.getSelectedItem()) || maxFilesAmountField.getText().equals("")
-                , selectionModel.selectedItemProperty(), maxFilesAmountField.textProperty()
-        ));
-
-        stopObserveButton.disableProperty().bind(Bindings.createBooleanBinding(
-                () -> !isMainFolder(selectionModel.getSelectedItem()),
-                selectionModel.selectedItemProperty()
-        ));
+        deleteFromDiskButton.disableProperty().bind(new DeleteFromDiskButtonBinding(selectionModel));
+        stopObserveButton.disableProperty().bind(new StopObserveButtonBinding(this, selectionModel));
+        setMaxSizeButton.disableProperty().bind(new SetMaxSizeButtonBinding(this, selectionModel));
+        setMaxFilesAmountButton.disableProperty().bind(new SetMaxFilesAmountButtonBinding(this, selectionModel));
+        setBiggestFileSizeButton.disableProperty().bind(new SetBiggestFileButtonBinding(this, selectionModel));
     }
 
-    private void initializeSizeField() {
+    private void initializeFields() {
         maxSizeField.setTextFormatter(new StringToIntFormatter());
-
-        treeTableView.getSelectionModel()
-                .selectedItemProperty()
-                .addListener(new MaxSizeButtonListener(maxSizeField, folderList));
-    }
-
-    private void initializeFilesAmountField() {
         maxFilesAmountField.setTextFormatter(new StringToIntFormatter());
+        biggestFileField.setTextFormatter(new StringToIntFormatter());
 
-        treeTableView.getSelectionModel()
-                .selectedItemProperty()
-                .addListener(new MaxFilesAmountListener(maxFilesAmountField, folderList));
+        var selectedItemProperty = treeTableView.getSelectionModel().selectedItemProperty();
+        selectedItemProperty.addListener(new MaxSizeButtonListener(maxSizeField, folderList));
+        selectedItemProperty.addListener(new MaxFilesAmountListener(maxFilesAmountField, folderList));
     }
 
     private void loadSavedFolders() { //FIXME: restoring folders take long time

@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 public class PathColumnCellFactory extends TreeTableCell<NodeData, Path> {
+    private final GraphicsFactory graphicsFactory = new GraphicsFactory();
     private final MainController mainController;
 
     public PathColumnCellFactory(MainController mainController) {
@@ -36,7 +37,7 @@ public class PathColumnCellFactory extends TreeTableCell<NodeData, Path> {
         mainController.getFolderList()
                 .getObservedFolderFromTreePath(item)
                 .ifPresent(folder -> {
-                    setGraphic(GraphicsFactory.getGraphic(item.toFile().isDirectory(), folder.getLimits().isAnyLimitExceeded()));
+                    setGraphic(graphicsFactory.getGraphic(folder.getRoot().getValue().isDirectory(), folder.getLimits().isAnyLimitExceeded()));
                 });
     }
 
