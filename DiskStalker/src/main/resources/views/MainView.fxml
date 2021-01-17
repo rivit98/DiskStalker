@@ -71,7 +71,7 @@
                         <Insets left="35.0" />
                     </GridPane.margin>
                 </Button>
-                <Button fx:id="setSizeButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="50.0" text="Set" GridPane.columnIndex="2" GridPane.rowIndex="6">
+                <Button fx:id="setMaxSizeButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="50.0" text="Set" GridPane.columnIndex="2" GridPane.rowIndex="6">
                     <GridPane.margin>
                         <Insets left="10.0" />
                     </GridPane.margin>
@@ -94,7 +94,7 @@
                         <Insets />
                     </GridPane.margin>
                 </Text>
-            <TextField fx:id="maxSizeField" promptText="Size(MB)" prefHeight="25.0" prefWidth="125.0" GridPane.columnIndex="1" GridPane.rowIndex="6">
+            <TextField fx:id="maxSizeField" promptText="Size (MB)" prefHeight="25.0" prefWidth="125.0" GridPane.columnIndex="1" GridPane.rowIndex="6">
                 <GridPane.margin>
                     <Insets left="5.0" />
                 </GridPane.margin>
@@ -104,7 +104,7 @@
                   <Insets left="5.0" />
                </GridPane.margin>
             </TextField>
-            <TextField fx:id="biggestFileField" promptText="Size(MB)" prefHeight="25.0" prefWidth="125.0" GridPane.columnIndex="1" GridPane.rowIndex="12">
+            <TextField fx:id="biggestFileField" promptText="Size (MB)" prefHeight="25.0" prefWidth="125.0" GridPane.columnIndex="1" GridPane.rowIndex="12">
                <GridPane.margin>
                   <Insets left="5.0" />
                </GridPane.margin>
