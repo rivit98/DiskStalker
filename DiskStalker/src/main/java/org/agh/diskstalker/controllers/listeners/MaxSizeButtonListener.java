@@ -32,7 +32,7 @@ public class MaxSizeButtonListener implements ChangeListener<TreeItem<NodeData>>
         var oldFolder = folderList.getObservedFolderFromTreeItem(oldTreeItem);
         if (oldFolder.isEmpty() || !oldFolder.get().equals(newObservedFolder)) {
             Platform.runLater(() ->
-                    maxSizeField.setText(String.valueOf(newObservedFolder.getMaximumSize() / FileUtils.ONE_MB))
+                    maxSizeField.setText(String.valueOf(newObservedFolder.getLimits().getTotalSizeLimit() / FileUtils.ONE_MB))
             );
         }
     }

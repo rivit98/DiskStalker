@@ -8,7 +8,6 @@ import javafx.scene.control.TreeItem;
 import org.agh.diskstalker.model.FolderList;
 import org.agh.diskstalker.model.NodeData;
 import org.agh.diskstalker.model.ObservedFolder;
-import org.apache.commons.io.FileUtils;
 
 public class MaxFilesAmountListener implements ChangeListener<TreeItem<NodeData>> {
 
@@ -32,7 +31,7 @@ public class MaxFilesAmountListener implements ChangeListener<TreeItem<NodeData>
         var oldFolder = folderList.getObservedFolderFromTreeItem(oldTreeItem);
         if (oldFolder.isEmpty() || !oldFolder.get().equals(newObservedFolder)) {
             Platform.runLater(() ->
-                    maxFilesAmountField.setText(String.valueOf(newObservedFolder.getMaximumFilesAmount()))
+                    maxFilesAmountField.setText(String.valueOf(newObservedFolder.getLimits().getFilesAmountLimit()))
             );
         }
     }

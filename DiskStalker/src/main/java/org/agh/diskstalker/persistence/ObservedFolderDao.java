@@ -1,5 +1,6 @@
 package org.agh.diskstalker.persistence;
 
+import org.agh.diskstalker.builders.FolderLimitsBuilder;
 import org.agh.diskstalker.model.ObservedFolder;
 
 import java.nio.file.Files;
@@ -13,10 +14,10 @@ public class ObservedFolderDao implements IObservedFolderDao {
     private static final Logger logger = Logger.getGlobal(); //TODO: inject
 
     @Override
-    public void save(ObservedFolder observedFolder) { //todo: insert maximum files amount exceeded to database
+    public void create(ObservedFolder observedFolder) {
         var path = observedFolder.getPath().toString();
-        var insertIntoDB = "INSERT INTO observedFolders (path, max_size, limit_exceeded) VALUES (?, ?, ?);";
-        Object[] args = {path, 0, observedFolder.isSizeLimitExceeded() ? 1 : 0};
+        var insertIntoDB = "INSERT INTO observedFolders (path) VALUES (?);";
+        Object[] args = {path};
 
         try {
             QueryExecutor.createAndObtainId(insertIntoDB, args);
@@ -28,9 +29,9 @@ public class ObservedFolderDao implements IObservedFolderDao {
     @Override
     public void update(ObservedFolder observedFolder) {
         var path = observedFolder.getPath().toString();
-        var maxSize = observedFolder.getMaximumSize();
-        var updateDB = "UPDATE observedFolders SET max_size = (?), limit_exceeded = (?) WHERE path = (?);";
-        Object[] args = {maxSize, observedFolder.isSizeLimitExceeded() ? 1 : 0, path};
+        var limits = observedFolder.getLimits();
+        var updateDB = "UPDATE observedFolders SET max_size_limit = (?), total_files_limit = (?), biggest_file_limit = (?) WHERE path = (?);";
+        Object[] args = {limits.getTotalSizeLimit(), limits.getFilesAmountLimit(), limits.getBiggestFileLimit(), path};
 
         try {
             QueryExecutor.executeUpdate(updateDB, args);
@@ -61,8 +62,15 @@ public class ObservedFolderDao implements IObservedFolderDao {
             while (rs.next()) {
                 var path = Path.of(rs.getString("path"));
                 if (Files.isDirectory(path)) {
-                    var folder = new ObservedFolder(path, rs.getInt("max_size"));
-                    folder.setSizeExceeded(rs.getInt("limit_exceeded") == 1);
+                    var folder = new ObservedFolder(path);
+                    var limits = new FolderLimitsBuilder()
+                            .withFolder(folder)
+                            .withTotalSize(rs.getInt("max_size_limit"))
+                            .withFileAmount(rs.getInt("total_files_limit"))
+                            .withBiggestFileSize(rs.getInt("biggest_file_limit"))
+                            .build();
+
+                    folder.setLimits(limits);
                     resultList.add(folder);
                 } else {
                     var delete = "DELETE FROM observedFolders WHERE path = (?);";

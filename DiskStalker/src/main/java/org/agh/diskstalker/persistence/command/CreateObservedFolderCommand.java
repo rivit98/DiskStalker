@@ -4,12 +4,12 @@ import lombok.AllArgsConstructor;
 import org.agh.diskstalker.model.ObservedFolder;
 
 @AllArgsConstructor
-public class SaveObservedFolderCommand extends AbstractObservedFolderCommand{
+public class CreateObservedFolderCommand extends AbstractObservedFolderCommand{
     private final ObservedFolder observedFolder;
 
     @Override
     public CommandResult get() {
-        observedFolderDao.save(observedFolder);
+        observedFolderDao.create(observedFolder);
         return CommandResult.empty();
     }
 }

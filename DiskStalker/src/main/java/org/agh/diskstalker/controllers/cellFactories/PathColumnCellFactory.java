@@ -36,8 +36,7 @@ public class PathColumnCellFactory extends TreeTableCell<NodeData, Path> {
         mainController.getFolderList()
                 .getObservedFolderFromTreePath(item)
                 .ifPresent(folder -> {
-                    setGraphic(GraphicsFactory.getGraphic(item.toFile().isDirectory(), folder.isSizeLimitExceeded(),
-                            folder.isFilesAmountExceeded()));
+                    setGraphic(GraphicsFactory.getGraphic(item.toFile().isDirectory(), folder.getLimits().isAnyLimitExceeded()));
                 });
     }
 

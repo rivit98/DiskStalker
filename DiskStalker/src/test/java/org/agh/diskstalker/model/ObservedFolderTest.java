@@ -36,10 +36,10 @@ public class ObservedFolderTest {
         var maxSize = 15L;
 
         //when
-        folder.setMaximumSize(maxSize);
+        folder.getLimits().setMaxTotalSize(maxSize);
 
         //then
-        Assertions.assertEquals(folder.getMaximumSize(), maxSize);
+        Assertions.assertEquals(folder.getLimits().getTotalSizeLimit(), maxSize);
     }
 
     @Test
@@ -47,7 +47,7 @@ public class ObservedFolderTest {
         //given
         var maxSize = 2L;
         var exceededSize = 5L;
-        folder.setMaximumSize(maxSize);
+        folder.getLimits().setMaxTotalSize(maxSize);
         NodeData nodeData = new NodeData(path);
         nodeData.setSize(exceededSize);
 
@@ -55,6 +55,6 @@ public class ObservedFolderTest {
         folder.getTreeBuilder().processNodeData(nodeData);
 
         //then
-        Assertions.assertTrue(folder.isSizeLimitExceeded());
+        Assertions.assertTrue(folder.getLimits().isTotalSizeExceeded());
     }
 }

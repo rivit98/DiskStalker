@@ -14,9 +14,10 @@ public class QueryExecutor {
         try {
             create("CREATE TABLE IF NOT EXISTS observedFolders (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "path VARCHAR(1024) NOT NULL, " +
-                    "max_size INT NOT NULL, " +
-                    "limit_exceeded INT NOT NULL" +
+                    "path VARCHAR(1024) NOT NULL," +
+                    "max_size_limit INT NOT NULL DEFAULT 0," +
+                    "total_files_limit INT NOT NULL DEFAULT 0," +
+                    "biggest_file_limit INT NOT NULL DEFAULT 0" +
                     ");");
 
         } catch (SQLException e) {

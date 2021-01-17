@@ -6,7 +6,6 @@ import org.agh.diskstalker.controllers.MainController;
 import org.agh.diskstalker.controllers.alerts.Alerts;
 import org.agh.diskstalker.persistence.DatabaseCommandExecutor;
 import org.agh.diskstalker.persistence.command.UpdateObservedFolderCommand;
-import org.apache.commons.io.FileUtils;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -37,7 +36,7 @@ public class SetMaxFilesAmountButtonHandler implements EventHandler<ActionEvent>
         mainController.getFolderList()
                 .getObservedFolderFromTreePath(path)
                 .ifPresent(observedFolder -> {
-                    observedFolder.setMaximumFilesAmount(maximumAmount);
+                    observedFolder.getLimits().setMaxFilesAmount(maximumAmount);
                     commandExecutor.executeCommand(new UpdateObservedFolderCommand(observedFolder));
                     Alerts.setMaxFilesAmountAlert(path.toString(), maximumAmount);
                 });

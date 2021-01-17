@@ -9,7 +9,7 @@ import org.agh.diskstalker.controllers.MainController;
 import org.agh.diskstalker.controllers.alerts.Alerts;
 import org.agh.diskstalker.model.ObservedFolder;
 import org.agh.diskstalker.persistence.DatabaseCommandExecutor;
-import org.agh.diskstalker.persistence.command.SaveObservedFolderCommand;
+import org.agh.diskstalker.persistence.command.CreateObservedFolderCommand;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -43,7 +43,7 @@ public class AddButtonHandler implements EventHandler<ActionEvent> {
             var folder = new ObservedFolder(path);
             mainController.observeFolderEvents(folder);
 
-            commandExecutor.executeCommand(new SaveObservedFolderCommand(folder));
+            commandExecutor.executeCommand(new CreateObservedFolderCommand(folder));
         }
     }
 

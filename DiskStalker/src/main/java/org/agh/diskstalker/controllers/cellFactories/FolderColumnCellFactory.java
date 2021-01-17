@@ -14,7 +14,7 @@ public class FolderColumnCellFactory extends ListCell<ObservedFolder> {
             return;
         }
 
-        setText(folder.getPath().getFileName().toString()); //FIXME: use getName
-        setGraphic(GraphicsFactory.getGraphic(true, folder.isSizeLimitExceeded(), folder.isFilesAmountExceeded()));
+        setText(folder.getPath().getFileName().toString());
+        setGraphic(GraphicsFactory.getGraphic(true, folder.getLimits().isAnyLimitExceeded()));
     }
 }

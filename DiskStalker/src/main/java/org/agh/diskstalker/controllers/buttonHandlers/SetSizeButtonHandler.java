@@ -37,7 +37,7 @@ public class SetSizeButtonHandler implements EventHandler<ActionEvent> {
         mainController.getFolderList()
                 .getObservedFolderFromTreePath(path)
                 .ifPresent(observedFolder -> {
-                    observedFolder.setMaximumSize(maximumSize);
+                    observedFolder.getLimits().setMaxTotalSize(maximumSize);
                     commandExecutor.executeCommand(new UpdateObservedFolderCommand(observedFolder));
                     Alerts.setMaxSizeAlert(path.toString(), maximumSize);
                 });
