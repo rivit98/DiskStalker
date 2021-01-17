@@ -51,7 +51,7 @@ public class MainController {
     private AbstractTabController filesTypeViewController;
     @FXML
     private AbstractTabController fileInfoViewController;
-    @FXML
+    @FXML @Getter
     private TextField maxFilesAmountField;
     @FXML
     private Button setMaxFilesAmountButton;
@@ -207,16 +207,6 @@ public class MainController {
         commandExecutor.executeCommand(new DeleteObservedFolderCommand(folder));
         return folderList.get().remove(folder);
     }
-
-    public TreeTableView<NodeData> getTreeTableView() {
-        return treeTableView;
-    }
-
-    public TextField getMaxSizeField() {
-        return maxSizeField;
-    }
-
-    public TextField getMaxFilesAmountField() { return maxFilesAmountField; }
 
     public void refreshViews(){
         treeTableView.refresh();
