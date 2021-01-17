@@ -7,27 +7,15 @@ import java.util.Objects;
 
 public final class GraphicsFactory { //TODO: inject as service?
     private static final Image FOLDER_IMAGE =
-            new Image(
-                    Objects.requireNonNull(
-                            GraphicsFactory.class.getResource("/images/folder-16.png")
-                    ).toString()
-            );
+            new Image(GraphicsFactory.class.getResource("/images/folder-16.png").toString());
 
     private static final Image FILE_IMAGE =
-            new Image(
-                    Objects.requireNonNull(
-                            GraphicsFactory.class.getResource("/images/file-16.png")
-                    ).toString()
-            );
+            new Image(GraphicsFactory.class.getResource("/images/file-16.png").toString());
 
     private static final Image FOLDER_IMAGE_RED =
-            new Image(
-                    Objects.requireNonNull(
-                            GraphicsFactory.class.getResource("/images/folder-red-16.png")
-                    ).toString()
-            );
+            new Image(GraphicsFactory.class.getResource("/images/folder-red-16.png").toString());
 
-    public static ImageView getGraphic(boolean isDirectory, boolean sizeExceeded) {
+    public ImageView getGraphic(boolean isDirectory, boolean sizeExceeded) {
         if(isDirectory && sizeExceeded) return new ImageView(FOLDER_IMAGE_RED);
         return isDirectory ? new ImageView(FOLDER_IMAGE) : new ImageView(FILE_IMAGE);
     }

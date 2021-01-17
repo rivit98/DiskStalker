@@ -5,6 +5,7 @@ import org.agh.diskstalker.graphics.GraphicsFactory;
 import org.agh.diskstalker.model.ObservedFolder;
 
 public class FolderColumnCellFactory extends ListCell<ObservedFolder> {
+    private final GraphicsFactory graphicsFactory = new GraphicsFactory();
     @Override
     protected void updateItem(ObservedFolder folder, boolean empty) {
         super.updateItem(folder, empty);
@@ -15,6 +16,6 @@ public class FolderColumnCellFactory extends ListCell<ObservedFolder> {
         }
 
         setText(folder.getPath().getFileName().toString());
-        setGraphic(GraphicsFactory.getGraphic(true, folder.getLimits().isAnyLimitExceeded()));
+        setGraphic(graphicsFactory.getGraphic(true, folder.getLimits().isAnyLimitExceeded()));
     }
 }

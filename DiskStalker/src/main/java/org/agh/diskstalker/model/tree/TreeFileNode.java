@@ -12,11 +12,6 @@ public class TreeFileNode extends TreeItem<NodeData> {
         super(nodeData);
     }
 
-    @Override
-    public boolean isLeaf() {
-        return getValue().isFile();
-    }
-
     // inserts node and keeps proper ordering
     public void insertNode(TreeFileNode node) {
         var value = node.getValue();
