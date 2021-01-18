@@ -58,9 +58,9 @@ public class Alerts {
         Platform.runLater(newAlert::showAndWait);
     }
 
-    public static void biggestFileExceededAlert(String path, Long amount) {
+    public static void biggestFileExceededAlert(String path, Long size) {
         var newAlert = createAlert(
-                "Folder:\n" + path + "\nexceeded biggest file limit:\n" + amount
+                "Folder:\n" + path + "\nexceeded biggest file limit:\n" + FileUtils.byteCountToDisplaySize(size)
         );
         Platform.runLater(newAlert::showAndWait);
     }

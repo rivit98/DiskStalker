@@ -3,6 +3,8 @@ package org.agh.diskstalker.model;
 import lombok.Getter;
 import lombok.Setter;
 import org.agh.diskstalker.events.filesystemEvents.FilesystemEvent;
+import org.agh.diskstalker.events.filesystemEvents.FilesystemEventType;
+import org.agh.diskstalker.events.observedFolderEvents.AbstractObservedFolderEvent;
 import org.agh.diskstalker.events.observedFolderEvents.ObservedBiggestFileChangedEvent;
 import org.agh.diskstalker.events.observedFolderEvents.ObservedFolderFilesAmountChangedEvent;
 import org.agh.diskstalker.events.observedFolderEvents.ObservedFolderSizeChangedEvent;
@@ -27,23 +29,32 @@ public class FolderLimits {
         this.folder = folder;
     }
 
+    private void sendEvent(AbstractObservedFolderEvent event){
+        folder.sendEvent(event);
+    }
+
     private void sendSizeChangedEvent(){
-        folder.sendEvent(new ObservedFolderSizeChangedEvent(folder));
+        sendEvent(new ObservedFolderSizeChangedEvent(folder));
     }
 
     private void sendFileAmountChangedEvent(){
-        folder.sendEvent(new ObservedFolderFilesAmountChangedEvent(folder));
+        sendEvent(new ObservedFolderFilesAmountChangedEvent(folder));
     }
 
     private void sendBiggestFileChangedEvent(){
-        folder.sendEvent(new ObservedBiggestFileChangedEvent(folder));
+        sendEvent(new ObservedBiggestFileChangedEvent(folder));
     }
 
     public void updateIfNecessary(FilesystemEvent event) {
-        //TODO: check which events are required
-        sendSizeChangedEvent(); //size could change on every event
-        sendFileAmountChangedEvent();
-        sendBiggestFileChangedEvent();
+        var eventType = event.getType();
+        if(eventType.isFileEvent()){
+            sendBiggestFileChangedEvent(); //biggest size could change on every file event
+            sendSizeChangedEvent(); //size could change on every file event
+
+            if(eventType != FilesystemEventType.FILE_MODIFIED){ //create or delete
+                sendFileAmountChangedEvent();
+            }
+        }
     }
 
     public void setMaxTotalSize(long limit){

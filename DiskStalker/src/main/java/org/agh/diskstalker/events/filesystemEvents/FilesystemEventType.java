@@ -21,4 +21,12 @@ public enum FilesystemEventType {
     public boolean isModifyEvent(){
         return this == FILE_MODIFIED || this == DIR_MODIFIED;
     }
+
+    public boolean isFileEvent(){
+        return this == FILE_CREATED || this == FILE_DELETED || this == FILE_MODIFIED;
+    }
+
+    public boolean isDirEvent(){
+        return this == DIR_CREATED || this == DIR_DELETED || this == DIR_MODIFIED;
+    }
 }
