@@ -118,6 +118,10 @@ public class ObservedFolder {
         return treeBuilder.getRoot();
     }
 
+    public TreeFileNode getNodeByPath(Path path){
+        return treeBuilder.getPathToTreeMap().get(path);
+    }
+
     public long getSize() {
         return Optional.ofNullable(treeBuilder.getRoot())
                 .map(rootNode -> rootNode.getValue().getSize())
