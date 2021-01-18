@@ -20,7 +20,7 @@ public class TypeDetector {
 
         } catch (IOException e){
             var logger = Logger.getGlobal();
-            logger.log(Level.WARNING, "Cannot detect file:", file);
+            logger.log(Level.WARNING, "Cannot detect file:" + file.toString());
         }
         return null;
     }

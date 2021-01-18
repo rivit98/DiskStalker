@@ -10,6 +10,7 @@ import org.agh.diskstalker.controllers.bindings.*;
 import org.agh.diskstalker.controllers.buttonHandlers.*;
 import org.agh.diskstalker.controllers.cellFactories.PathColumnCellFactory;
 import org.agh.diskstalker.controllers.cellFactories.SizeTreeTableColumnCellFactory;
+import org.agh.diskstalker.controllers.listeners.BiggestFileListener;
 import org.agh.diskstalker.controllers.listeners.MaxFilesAmountListener;
 import org.agh.diskstalker.controllers.listeners.MaxSizeButtonListener;
 import org.agh.diskstalker.formatters.StringToIntFormatter;
@@ -79,6 +80,7 @@ public class MainController {
     }
 
     private void initializeStatisticsLoading() {
+        //TODO: refactor whole type recognizing system
         tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
             if (newTab.getId().equals("filesTypeView")) {
                 folderList.get().forEach(folder -> new Thread(folder::createTypeStatistics).start());
@@ -122,6 +124,7 @@ public class MainController {
         setMaxSizeButton.setOnAction(new SetSizeButtonHandler(this, commandExecutor));
         deleteFromDiskButton.setOnAction(new DeleteFromDiskButtonHandler(this));
         setMaxFilesAmountButton.setOnAction(new SetMaxFilesAmountButtonHandler(this, commandExecutor));
+        setBiggestFileSizeButton.setOnAction(new SetBiggestFileButtonHandler(this, commandExecutor));
 
         var selectionModel = treeTableView.getSelectionModel();
         deleteFromDiskButton.disableProperty().bind(new DeleteFromDiskButtonBinding(selectionModel));
@@ -139,6 +142,7 @@ public class MainController {
         var selectedItemProperty = treeTableView.getSelectionModel().selectedItemProperty();
         selectedItemProperty.addListener(new MaxSizeButtonListener(maxSizeField, folderList));
         selectedItemProperty.addListener(new MaxFilesAmountListener(maxFilesAmountField, folderList));
+        selectedItemProperty.addListener(new BiggestFileListener(biggestFileField, folderList));
     }
 
     private void loadSavedFolders() { //FIXME: restoring folders take long time

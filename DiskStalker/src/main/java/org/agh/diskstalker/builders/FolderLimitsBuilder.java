@@ -33,6 +33,7 @@ public class FolderLimitsBuilder {
         var limits = new FolderLimits(observedFolder);
         limits.setMaxTotalSize(totalSizeLimit);
         limits.setMaxFilesAmount(filesAmountLimit);
+        limits.setBiggestFileLimit(biggestFileLimit);
 
         return limits;
     }

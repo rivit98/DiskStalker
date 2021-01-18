@@ -3,6 +3,7 @@ package org.agh.diskstalker.model;
 import lombok.Getter;
 import lombok.Setter;
 import org.agh.diskstalker.events.filesystemEvents.FilesystemEvent;
+import org.agh.diskstalker.events.observedFolderEvents.ObservedBiggestFileChangedEvent;
 import org.agh.diskstalker.events.observedFolderEvents.ObservedFolderFilesAmountChangedEvent;
 import org.agh.diskstalker.events.observedFolderEvents.ObservedFolderSizeChangedEvent;
 
@@ -35,13 +36,14 @@ public class FolderLimits {
     }
 
     private void sendBiggestFileChangedEvent(){
-        folder.sendEvent(new ObservedFolderFilesAmountChangedEvent(folder));
+        folder.sendEvent(new ObservedBiggestFileChangedEvent(folder));
     }
 
     public void updateIfNecessary(FilesystemEvent event) {
-        //TODO: send with biggest file
+        //TODO: check which events are required
         sendSizeChangedEvent(); //size could change on every event
         sendFileAmountChangedEvent();
+        sendBiggestFileChangedEvent();
     }
 
     public void setMaxTotalSize(long limit){
