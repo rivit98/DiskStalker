@@ -4,6 +4,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
+import javafx.scene.control.TreeItem;
 import lombok.Getter;
 import lombok.Setter;
 import org.agh.diskstalker.events.eventProcessor.EventProcessor;
@@ -124,7 +125,7 @@ public class ObservedFolder {
 
     public long getSize() {
         return Optional.ofNullable(treeBuilder.getRoot())
-                .map(rootNode -> rootNode.getValue().getSize())
+                .map(rootNode -> rootNode.getValue().getAccumulatedSize())
                 .orElse(0L);
     }
 
@@ -136,7 +137,9 @@ public class ObservedFolder {
 
     public long getBiggestFileSize(){
         return treeBuilder.getPathToTreeMap().values().stream()
-                .map(node -> node.getValue().getSize())
+                .map(TreeItem::getValue)
+                .filter(NodeData::isFile)
+                .map(NodeData::getAccumulatedSize)
                 .max(Long::compare)
                 .orElse(0L);
     }

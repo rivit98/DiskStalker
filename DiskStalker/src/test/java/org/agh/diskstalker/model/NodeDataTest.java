@@ -39,6 +39,6 @@ public class NodeDataTest {
         nodeData.setSize(newSize);
 
         //then
-        Assertions.assertEquals(nodeData.getSize(), newSize);
+        Assertions.assertEquals(nodeData.getAccumulatedSize(), newSize);
     }
 }

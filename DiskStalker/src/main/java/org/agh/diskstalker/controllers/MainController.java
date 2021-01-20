@@ -108,7 +108,7 @@ public class MainController {
         sizeColumn.setCellValueFactory(
                 node -> Optional.ofNullable(node.getValue())
                         .map(TreeItem::getValue)
-                        .map(NodeData::getSizeProperty)
+                        .map(NodeData::getAccumulatedSizeProperty)
                         .orElse(null)
         );
     }

@@ -41,7 +41,7 @@ public class TreeFileNode extends TreeItem<NodeData> {
         }
 
         cachedList.add(index, node);
-        updateParentSize(node, value.getSize());
+        updateParentSize(node, value.getAccumulatedSize());
     }
 
     private void updateParentSize(TreeItem<NodeData> node, long deltaSize) {
@@ -56,7 +56,7 @@ public class TreeFileNode extends TreeItem<NodeData> {
     }
 
     public boolean deleteMe() {
-        updateParentSize(this, -getValue().getSize());
+        updateParentSize(this, -getValue().getAccumulatedSize());
         return Optional.ofNullable(this.getParent())
                 .map(TreeItem::getChildren)
                 .map(childrenList -> childrenList.remove(this))
@@ -65,7 +65,7 @@ public class TreeFileNode extends TreeItem<NodeData> {
 
     public void updateMe() {
         var nodeData = getValue();
-        var oldSize = nodeData.getSize();
+        var oldSize = nodeData.getAccumulatedSize();
         nodeData.updateModificationTime();
         updateParentSize(this, nodeData.updateFileSize() - oldSize);
     }

@@ -40,14 +40,14 @@ public class FileInfoController extends AbstractTabController {
     protected void prepareDataTableView() {
         dateColumn.setCellFactory(ttc -> new DateColumnCellFactory());
         dateColumn.setCellValueFactory(node -> Optional.ofNullable(node.getValue())
-                .map(NodeData::getModificationDate)
+                .map(NodeData::getModificationDateProperty)
                 .orElseGet(SimpleObjectProperty::new)
         );
 
         sizeColumn.setCellFactory(val -> new SizeTableColumnCellFactory());
         sizeColumn.setSortType(TableColumn.SortType.DESCENDING);
         sizeColumn.setCellValueFactory(node -> Optional.ofNullable(node.getValue())
-                        .map(NodeData::getSizeProperty)
+                        .map(NodeData::getAccumulatedSizeProperty)
                         .orElse(null)
         );
 
