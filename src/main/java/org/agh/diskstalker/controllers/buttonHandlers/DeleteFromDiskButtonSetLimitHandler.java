@@ -1,7 +1,6 @@
 package org.agh.diskstalker.controllers.buttonHandlers;
 
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.control.ButtonType;
 import lombok.extern.slf4j.Slf4j;
 import org.agh.diskstalker.controllers.MainController;
@@ -10,21 +9,17 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Optional;
 
 @Slf4j
-public class DeleteFromDiskButtonHandler implements EventHandler<ActionEvent> {
-    private final MainController mainController;
+public class DeleteFromDiskButtonSetLimitHandler extends AbstractButtonSetLimitHandler {
 
-    public DeleteFromDiskButtonHandler(MainController mainController) {
-        this.mainController = mainController;
+    public DeleteFromDiskButtonSetLimitHandler(MainController mainController) {
+        super(mainController);
     }
 
     @Override
     public void handle(ActionEvent event) {
-        Optional.ofNullable(
-                mainController.getTreeTableView().getSelectionModel().getSelectedItem()
-        ).ifPresent(item -> {
+        mainController.getSelectedItem().ifPresent(item -> {
             var nodeData = item.getValue();
             var searchedPath = nodeData.getPath();
             if (!askIfDelete(searchedPath)) {

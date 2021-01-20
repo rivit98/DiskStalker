@@ -62,6 +62,7 @@ public class MainController {
     @FXML
     public Button setBiggestFileSizeButton;
 
+    @Getter
     private final DatabaseCommandExecutor commandExecutor = new DatabaseCommandExecutor();
 
     @Getter
@@ -119,12 +120,12 @@ public class MainController {
     }
 
     private void initializeButtons() {
-        addButton.setOnAction(new AddButtonHandler(this, commandExecutor));
+        addButton.setOnAction(new AddButtonHandler(this));
         stopObserveButton.setOnAction(new StopObserveButtonHandler(this));
-        setMaxSizeButton.setOnAction(new SetSizeButtonHandler(this, commandExecutor));
-        deleteFromDiskButton.setOnAction(new DeleteFromDiskButtonHandler(this));
-        setMaxFilesAmountButton.setOnAction(new SetMaxFilesAmountButtonHandler(this, commandExecutor));
-        setBiggestFileSizeButton.setOnAction(new SetBiggestFileButtonHandler(this, commandExecutor));
+        deleteFromDiskButton.setOnAction(new DeleteFromDiskButtonSetLimitHandler(this));
+        setMaxSizeButton.setOnAction(new SetSizeButtonHandler(this));
+        setMaxFilesAmountButton.setOnAction(new SetMaxFilesAmountButtonHandler(this));
+        setBiggestFileSizeButton.setOnAction(new SetBiggestFileButtonHandler(this));
 
         var selectionModel = treeTableView.getSelectionModel();
         deleteFromDiskButton.disableProperty().bind(new DeleteFromDiskButtonBinding(selectionModel));
@@ -195,6 +196,10 @@ public class MainController {
         treeTableView.refresh();
         fileInfoViewController.refresh();
         filesTypeViewController.refresh();
+    }
+
+    public Optional<TreeItem<NodeData>> getSelectedItem(){
+        return Optional.ofNullable(treeTableView.getSelectionModel().getSelectedItem());
     }
 
     public void onExit() {

@@ -9,6 +9,9 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 public class DateColumnCellFactory extends TableCell<NodeData, FileTime> {
+
+    public static final String dateFormat = "uuuu-MM-dd HH:mm:ss";
+
     public DateColumnCellFactory() {
         pseudoClassStateChanged(PseudoClass.getPseudoClass("centered"), true);
     }
@@ -19,7 +22,7 @@ public class DateColumnCellFactory extends TableCell<NodeData, FileTime> {
         if (value == null || empty) {
             setText(null);
         } else {
-            var formattedDate = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss")
+            var formattedDate = DateTimeFormatter.ofPattern(dateFormat)
                     .withZone(ZoneId.systemDefault())
                     .format(value.toInstant());
             setText(formattedDate);

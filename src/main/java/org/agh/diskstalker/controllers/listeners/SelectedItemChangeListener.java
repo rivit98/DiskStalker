@@ -24,7 +24,7 @@ public class SelectedItemChangeListener implements ChangeListener<ObservedFolder
 
     public SelectedItemChangeListener(FileInfoController fileInfoController) {
         this.fileInfoController = fileInfoController;
-        dataTableView = fileInfoController.getDataTableView();
+        this.dataTableView = fileInfoController.getDataTableView();
     }
 
     @Override
