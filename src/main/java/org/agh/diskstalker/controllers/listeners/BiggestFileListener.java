@@ -10,29 +10,16 @@ import org.agh.diskstalker.model.NodeData;
 import org.agh.diskstalker.model.ObservedFolder;
 import org.apache.commons.io.FileUtils;
 
-public class BiggestFileListener implements ChangeListener<TreeItem<NodeData>> {
-
-    private final TextField biggestFileField;
-    private final FolderList folderList;
-
-    public BiggestFileListener(TextField biggestFileField, FolderList folderList) {
-        this.biggestFileField = biggestFileField;
-        this.folderList = folderList;
+public class BiggestFileListener extends AbstractLimitButtonListener {
+    public BiggestFileListener(TextField textField, FolderList folderList) {
+        super(textField, folderList);
     }
 
-    @Override
-    public void changed(ObservableValue<? extends TreeItem<NodeData>> observable, TreeItem<NodeData> oldTreeItem, TreeItem<NodeData> newTreeItem) {
-        folderList.getObservedFolderFromTreeItem(newTreeItem)
-                .ifPresent(newObservedFolder -> {
-                    newFolderPresentHandler(newObservedFolder, oldTreeItem);
-                });
-    }
-
-    private void newFolderPresentHandler(ObservedFolder newObservedFolder, TreeItem<NodeData> oldTreeItem){
+    protected void handle(ObservedFolder newObservedFolder, TreeItem<NodeData> oldTreeItem){
         var oldFolder = folderList.getObservedFolderFromTreeItem(oldTreeItem);
         if (oldFolder.isEmpty() || !oldFolder.get().equals(newObservedFolder)) {
             Platform.runLater(() ->
-                    biggestFileField.setText(String.valueOf(newObservedFolder.getLimits().getBiggestFileLimit() / FileUtils.ONE_MB))
+                    textField.setText(String.valueOf(newObservedFolder.getLimits().getBiggestFileLimit() / FileUtils.ONE_MB))
             );
         }
     }
