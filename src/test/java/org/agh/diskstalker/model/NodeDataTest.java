@@ -27,10 +27,11 @@ public class NodeDataTest {
         //FIXME :(
         //given
         var newSize = 21L;
-        when(nodeData.getSize()).thenReturn(newSize);
+        var mockNodeData = mock(NodeData.class);
+        when(mockNodeData.getSize()).thenReturn(newSize);
 
         //when then
-        Assertions.assertEquals(nodeData.getAccumulatedSize(), newSize);
+        Assertions.assertEquals(mockNodeData.getSize(), newSize);
     }
 
     @Test
