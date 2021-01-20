@@ -49,7 +49,7 @@ public class ObservedFolderTest {
         var exceededSize = 5L;
         folder.getLimits().setMaxTotalSize(maxSize);
         NodeData nodeData = new NodeData(path);
-        nodeData.setAccumulatedSize(exceededSize);
+        nodeData.modifyAccumulatedSize(exceededSize);
 
         //when
         folder.getTreeBuilder().processNodeData(nodeData);

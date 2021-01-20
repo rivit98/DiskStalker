@@ -1,8 +1,6 @@
 package org.agh.diskstalker.controllers.listeners;
 
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import org.agh.diskstalker.model.FolderList;

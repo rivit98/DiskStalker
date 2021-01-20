@@ -5,10 +5,12 @@ import org.agh.diskstalker.model.NodeData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.io.File;
 import java.nio.file.Path;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class TreeBuilderTest {
     Path path;
@@ -16,9 +18,9 @@ public class TreeBuilderTest {
 
     @BeforeEach
     public void setUp() {
-        path = Mockito.mock(Path.class);
-        Mockito.when(path.toFile()).thenReturn(Mockito.mock(File.class));
-        Mockito.when(path.getFileName()).thenReturn(Mockito.mock(Path.class));
+        path = mock(Path.class);
+        when(path.toFile()).thenReturn(mock(File.class));
+        when(path.getFileName()).thenReturn(mock(Path.class));
     }
 
     @Test
@@ -30,16 +32,16 @@ public class TreeBuilderTest {
 
         //then
         Assertions.assertTrue(builder.containsNode(path));
-        Assertions.assertFalse(builder.containsNode(Mockito.mock(Path.class)));
+        Assertions.assertFalse(builder.containsNode(mock(Path.class)));
     }
 
     @Test
     public void insertNode() {
         //given
-        var parentPath = Mockito.mock(Path.class);
-        Mockito.when(parentPath.toFile()).thenReturn(Mockito.mock(File.class));
-        Mockito.when(parentPath.getFileName()).thenReturn(Mockito.mock(Path.class));
-        Mockito.when(path.getParent()).thenReturn(parentPath);
+        var parentPath = mock(Path.class);
+        when(parentPath.toFile()).thenReturn(mock(File.class));
+        when(parentPath.getFileName()).thenReturn(mock(Path.class));
+        when(path.getParent()).thenReturn(parentPath);
         builder.processNodeData(new NodeData(parentPath));
 
         //when

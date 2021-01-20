@@ -3,31 +3,34 @@ package org.agh.diskstalker.model;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.io.File;
 import java.nio.file.Path;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 public class NodeDataTest {
 
-    NodeData nodeData;
+    private NodeData nodeData;
 
     @BeforeEach
     public void setUp() {
-        var path = Mockito.mock(Path.class);
-        Mockito.when(path.toFile()).thenReturn(Mockito.mock(File.class));
-        Mockito.when(path.getFileName()).thenReturn(Mockito.mock(Path.class));
+        var path = mock(Path.class);
+        when(path.toFile()).thenReturn(mock(File.class));
+        when(path.getFileName()).thenReturn(mock(Path.class));
         nodeData = new NodeData(path);
     }
 
     @Test
     public void updateFileSize() {
+        //FIXME :(
         //given
         var newSize = 21L;
-        Mockito.when(nodeData.getActualSize()).thenReturn(newSize);
+        when(nodeData.getSize()).thenReturn(newSize);
 
         //when then
-        Assertions.assertEquals(nodeData.updateFileSize(), newSize);
+        Assertions.assertEquals(nodeData.getAccumulatedSize(), newSize);
     }
 
     @Test
@@ -36,7 +39,7 @@ public class NodeDataTest {
         var newSize = 14L;
 
         //when
-        nodeData.setAccumulatedSize(newSize);
+        nodeData.modifyAccumulatedSize(newSize);
 
         //then
         Assertions.assertEquals(nodeData.getAccumulatedSize(), newSize);

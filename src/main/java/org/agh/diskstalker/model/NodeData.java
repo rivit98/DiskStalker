@@ -21,9 +21,9 @@ public class NodeData {
     private final SimpleLongProperty accumulatedSizeProperty;
     private final SimpleStringProperty filename;
     private final SimpleObjectProperty<FileTime> modificationDateProperty;
+    private long size;
     @Setter
     private String type;
-    private long size;
 
     public NodeData(Path path) {
         this(path, null);
@@ -36,11 +36,11 @@ public class NodeData {
             this.accumulatedSizeProperty = new SimpleLongProperty(isFile() ? attributes.size() : 0);
             this.modificationDateProperty = new SimpleObjectProperty<>(attributes.lastModifiedTime());
         }else{
-            var f = path.toFile();
-            this.isDirectory = f.isDirectory();
-            this.accumulatedSizeProperty = new SimpleLongProperty(isFile() ? f.length() : 0);
+            var file = path.toFile();
+            this.isDirectory = file.isDirectory();
+            this.accumulatedSizeProperty = new SimpleLongProperty(isFile() ? file.length() : 0);
             this.modificationDateProperty = new SimpleObjectProperty<>(
-                    FileTime.from(f.lastModified()  / MILLIS_IN_SECOND, TimeUnit.SECONDS)
+                    FileTime.from(file.lastModified()  / MILLIS_IN_SECOND, TimeUnit.SECONDS)
             );
         }
         this.filename = new SimpleStringProperty(path.getFileName().toString());
@@ -51,29 +51,23 @@ public class NodeData {
         return !isDirectory;
     }
 
-    public void updateModificationTime() {
-        modificationDateProperty.set(
-                FileTime.from(path.toFile().lastModified() / MILLIS_IN_SECOND, TimeUnit.SECONDS)
-        );
+    public void updateFileData() {
+        if(isFile()){ //because folders are not displayed in additional tabs
+            var file = path.toFile();
+            modificationDateProperty.set(
+                    FileTime.from(file.lastModified() / MILLIS_IN_SECOND, TimeUnit.SECONDS)
+            );
+            size = file.length();
+            accumulatedSizeProperty.set(size);
+        }
+    }
+
+    public void modifyAccumulatedSize(long size) {
+        accumulatedSizeProperty.add(size);
     }
 
     public long getAccumulatedSize() {
-        return accumulatedSizeProperty.getValue();
-    }
-
-    public long getActualSize() { //TODO: eliminate this, track actual size in constructor and event processor
-        return path.toFile().length();
-    }
-
-    public long updateFileSize() { // update size and return the old one
-        var actualSize = getActualSize();
-        accumulatedSizeProperty.set(actualSize);
-        return actualSize;
-    }
-
-    public void setAccumulatedSize(long size) {
-        var newSize = getAccumulatedSize() + size;
-        accumulatedSizeProperty.set(newSize);
+        return accumulatedSizeProperty.get();
     }
 
     @Override
