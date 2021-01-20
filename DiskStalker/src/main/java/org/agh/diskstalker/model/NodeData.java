@@ -57,7 +57,7 @@ public class NodeData {
         return accumulatedSizeProperty.getValue();
     }
 
-    public long getActualSize() {
+    public long getActualSize() { //TODO: eliminate this, track actual size in constructor and event processor
         return path.toFile().length();
     }
 

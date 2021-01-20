@@ -1,5 +1,6 @@
 package org.agh.diskstalker.persistence;
 
+import lombok.extern.slf4j.Slf4j;
 import org.agh.diskstalker.builders.FolderLimitsBuilder;
 import org.agh.diskstalker.model.ObservedFolder;
 
@@ -8,11 +9,9 @@ import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
 
+@Slf4j
 public class ObservedFolderDao implements IObservedFolderDao {
-    private static final Logger logger = Logger.getGlobal(); //TODO: inject
-
     @Override
     public void create(ObservedFolder observedFolder) {
         var path = observedFolder.getPath().toString();
@@ -22,7 +21,7 @@ public class ObservedFolderDao implements IObservedFolderDao {
         try {
             QueryExecutor.createAndObtainId(insertIntoDB, args);
         } catch (SQLException e) {
-            logger.info("Error during saving to database: " + e.getMessage());
+            log.error("Error during saving to database: " + e.getMessage());
         }
     }
 
@@ -36,7 +35,7 @@ public class ObservedFolderDao implements IObservedFolderDao {
         try {
             QueryExecutor.executeUpdate(updateDB, args);
         } catch (SQLException e) {
-            logger.info("Error during updating in database: " + e.getMessage());
+            log.error("Error during updating in database: " + e.getMessage());
         }
     }
 
@@ -49,7 +48,7 @@ public class ObservedFolderDao implements IObservedFolderDao {
         try {
             QueryExecutor.delete(deleteObservedFolder, args);
         } catch (SQLException e) {
-            logger.info("Error during deleting from database: " + e.getMessage());
+            log.error("Error during deleting from database: " + e.getMessage());
         }
     }
 
@@ -80,7 +79,7 @@ public class ObservedFolderDao implements IObservedFolderDao {
                 }
             }
         } catch (SQLException e) {
-            logger.info("Error during executing database query: " + e.getMessage());
+            log.error("Error during executing database query: " + e.getMessage());
         }
         return resultList;
     }

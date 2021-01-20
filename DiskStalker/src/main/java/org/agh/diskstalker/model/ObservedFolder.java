@@ -7,6 +7,7 @@ import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
 import javafx.scene.control.TreeItem;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.agh.diskstalker.events.eventProcessor.EventProcessor;
 import org.agh.diskstalker.events.eventProcessor.IEventProcessor;
 import org.agh.diskstalker.events.filesystemEvents.FilesystemEvent;
@@ -25,7 +26,7 @@ import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
 
-
+@Slf4j
 public class ObservedFolder {
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
     private final IFilesystemWatcher filesystemWatcher;
@@ -60,7 +61,7 @@ public class ObservedFolder {
     }
 
     private void errorHandler(Throwable t) {
-        t.printStackTrace();
+        log.error("ObservedFolder Error", t);
         eventStream.onNext(new ObservedFolderErrorEvent(this, t.getClass().getCanonicalName()));
     }
 
@@ -113,10 +114,6 @@ public class ObservedFolder {
 
     public boolean containsNode(Path path) {
         return treeBuilder.containsNode(path);
-    }
-
-    public TreeFileNode getRoot(){
-        return treeBuilder.getRoot();
     }
 
     public TreeFileNode getNodeByPath(Path path){

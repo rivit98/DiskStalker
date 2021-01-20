@@ -1,14 +1,14 @@
 package org.agh.diskstalker.model.statisctics;
 
 import javafx.collections.ObservableList;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+@Slf4j
 public class TypeDetector {
     private final Tika fileTypeDetector = new Tika(); //TODO: Service with thread pool
 
@@ -19,8 +19,7 @@ public class TypeDetector {
             return typeName;
 
         } catch (IOException e){
-            var logger = Logger.getGlobal();
-            logger.log(Level.WARNING, "Cannot detect file:" + file.toString());
+            log.info("Cannot detect file:" + file.toString());
         }
         return null;
     }

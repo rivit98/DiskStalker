@@ -1,15 +1,14 @@
 package org.agh.diskstalker.persistence;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.logging.Logger;
 
+@Slf4j
 public class QueryExecutor {
-
-    private static final Logger logger = Logger.getGlobal(); //TODO: inject
-
     static {
         try {
             create("CREATE TABLE IF NOT EXISTS observedFolders (" +
@@ -21,7 +20,7 @@ public class QueryExecutor {
                     ");");
 
         } catch (SQLException e) {
-            logger.info("Error during creating tables: " + e.getMessage());
+            log.error("Error during creating tables: " + e.getMessage());
             throw new RuntimeException("Cannot create tables");
         }
     }

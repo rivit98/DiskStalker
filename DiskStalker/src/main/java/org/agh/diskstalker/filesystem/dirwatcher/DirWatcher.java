@@ -2,6 +2,7 @@ package org.agh.diskstalker.filesystem.dirwatcher;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
+import lombok.extern.slf4j.Slf4j;
 import org.agh.diskstalker.events.filesystemEvents.FilesystemEvent;
 import org.agh.diskstalker.events.filesystemEvents.FilesystemEventType;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
@@ -9,6 +10,7 @@ import org.apache.commons.io.monitor.FileAlterationObserver;
 
 import java.nio.file.Path;
 
+@Slf4j
 public class DirWatcher implements IFilesystemWatcher {
     private final PublishSubject<FilesystemEvent> subject = PublishSubject.create();
     private final FileAlterationMonitor monitor;
@@ -32,6 +34,7 @@ public class DirWatcher implements IFilesystemWatcher {
             subject.onComplete();
             monitor.stop();
         } catch (Exception ignored) {
+            log.warn("Cannot stop DirWatcher");
         }
     }
 
@@ -40,6 +43,7 @@ public class DirWatcher implements IFilesystemWatcher {
         try {
             monitor.start();
         } catch (Exception ignored) {
+            log.warn("Cannot start DirWatcher");
         }
         return subject;
     }

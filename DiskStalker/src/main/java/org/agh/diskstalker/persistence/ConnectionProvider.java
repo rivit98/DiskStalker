@@ -1,16 +1,18 @@
 package org.agh.diskstalker.persistence;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Optional;
-import java.util.logging.Logger;
 
-//TODO: singleton logger? injecting, service spring
+//TODO: service spring, inject this to class
+@Slf4j
+@Service
 public final class ConnectionProvider {
     private static final String JDBC_DRIVER = "org.sqlite.JDBC";
-    private static final Logger logger = Logger.getGlobal(); //TODO: inject
-
     private static Optional<Connection> connection = Optional.empty();
 
     private ConnectionProvider() {
@@ -21,8 +23,9 @@ public final class ConnectionProvider {
             close();
             Class.forName(JDBC_DRIVER);
             connection = Optional.of(DriverManager.getConnection(jdbcAddress));
+            log.info("Connected to DB");
         } catch (Exception e) {
-            logger.info("Error during database initialization: " + e.getMessage());
+            log.error("Error during database initialization: " + e.getMessage());
         }
     }
 
@@ -32,7 +35,7 @@ public final class ConnectionProvider {
 
     public static void close() throws SQLException {
         if (connection.isPresent()) {
-            logger.info("Closing connection");
+            log.info("Closing connection");
             connection.get().close();
             connection = Optional.empty();
         }

@@ -1,14 +1,15 @@
 package org.agh.diskstalker.controllers.bindings;
 
-import com.sun.javafx.binding.Logging;
 import com.sun.javafx.collections.ImmutableObservableList;
 import javafx.beans.Observable;
 import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.Callable;
 
+@Slf4j
 public class AbstractButtonBinding extends BooleanBinding {
     private final Observable[] dependencies;
     private final Callable<Boolean> func;
@@ -24,7 +25,7 @@ public class AbstractButtonBinding extends BooleanBinding {
         try {
             return func.call();
         } catch (Exception e) {
-            Logging.getLogger().warning("Exception while evaluating binding", e);
+            log.warn("Exception while evaluating binding", e);
             return false;
         }
     }

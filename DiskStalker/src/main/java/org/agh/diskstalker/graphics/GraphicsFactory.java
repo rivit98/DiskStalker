@@ -2,7 +2,6 @@ package org.agh.diskstalker.graphics;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import lombok.Getter;
 import org.springframework.stereotype.Service;
 
 @Service

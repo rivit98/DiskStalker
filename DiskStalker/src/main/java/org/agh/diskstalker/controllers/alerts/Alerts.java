@@ -5,10 +5,12 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import org.apache.commons.io.FileUtils;
+import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
 
 //TODO: inject as spring service
+@Service
 public class Alerts {
     private Alerts() {
     }

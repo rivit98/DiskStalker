@@ -3,6 +3,7 @@ package org.agh.diskstalker.controllers.buttonHandlers;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ButtonType;
+import lombok.extern.slf4j.Slf4j;
 import org.agh.diskstalker.controllers.MainController;
 import org.agh.diskstalker.controllers.alerts.Alerts;
 import org.apache.commons.io.FileUtils;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
 
+@Slf4j
 public class DeleteFromDiskButtonHandler implements EventHandler<ActionEvent> {
     private final MainController mainController;
 
@@ -40,7 +42,7 @@ public class DeleteFromDiskButtonHandler implements EventHandler<ActionEvent> {
                 mainController.removeTreeItem(item);
             } catch (IOException | IllegalArgumentException e) {
                 Alerts.genericErrorAlert(searchedPath, "Cannot delete file");
-                e.printStackTrace(); //TODO: logger
+                log.error("Cannot delete file" + searchedPath, e);
             }
         });
     }
