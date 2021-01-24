@@ -62,8 +62,8 @@ public class NodeData {
         }
     }
 
-    public void modifyAccumulatedSize(long size) {
-        accumulatedSizeProperty.add(size);
+    public void modifyAccumulatedSize(long addSize) {
+        accumulatedSizeProperty.set(getAccumulatedSize() + addSize);
     }
 
     public long getAccumulatedSize() {
