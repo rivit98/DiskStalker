@@ -13,14 +13,11 @@ import java.nio.file.Path;
 @Slf4j
 public class DirWatcher implements IFilesystemWatcher {
     private final PublishSubject<FilesystemEvent> subject = PublishSubject.create();
-    private final FileAlterationMonitor monitor;
-    private final long pollingInterval = 1700;
+    private final Path path;
+    private FileAlterationMonitor monitor;
 
     public DirWatcher(Path path) {
-        var listener = new FileChangeListener(this);
-        var observer = new FileAlterationObserver(path.toFile());
-        observer.addListener(listener);
-        monitor = new FileAlterationMonitor(pollingInterval, observer);
+        this.path = path;
     }
 
     @Override
@@ -39,8 +36,16 @@ public class DirWatcher implements IFilesystemWatcher {
     }
 
     @Override
-    public Observable<FilesystemEvent> start() {
+    public Observable<FilesystemEvent> start(int pollingTimeMs) {
         try {
+            if(pollingTimeMs <= 500){
+                throw new IllegalArgumentException("polling time cannot be less than 500");
+            }
+
+            var listener = new FileChangeListener(this);
+            var observer = new FileAlterationObserver(path.toFile());
+            observer.addListener(listener);
+            monitor = new FileAlterationMonitor(pollingTimeMs, observer);
             monitor.start();
         } catch (Exception ignored) {
             log.warn("Cannot start DirWatcher");

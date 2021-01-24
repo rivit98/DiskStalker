@@ -11,5 +11,5 @@ public interface IFilesystemWatcher {
 
     void stop();
 
-    Observable<FilesystemEvent> start();
+    Observable<FilesystemEvent> start(int pollingTimeMs);
 }

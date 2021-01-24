@@ -73,11 +73,12 @@ public class ObservedFolder {
         var scanDisposable = scanner
                 .scan()
                 .subscribeOn(Schedulers.io())
+                .doOnComplete(this::startMonitoring)
                 .observeOn(JavaFxScheduler.platform())
                 .subscribe(
                         treeBuilder::processNodeData,
-                        this::errorHandler,
-                        this::startMonitoring
+                        this::errorHandler
+//                        ,this::startMonitoring
                 );
 
         compositeDisposable.addAll(rootDisposable, scanDisposable);
@@ -93,8 +94,10 @@ public class ObservedFolder {
     }
 
     private void startMonitoring() {
+        var pollingTime = 2000 + treeBuilder.getPathToTreeMap().size() / 10000;
+
         var watchDisposable = filesystemWatcher
-                .start()
+                .start(pollingTime)
                 .subscribeOn(Schedulers.io())
                 .observeOn(JavaFxScheduler.platform())
                 .subscribe(
