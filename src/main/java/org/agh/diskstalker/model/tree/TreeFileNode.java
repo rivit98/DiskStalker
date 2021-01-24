@@ -12,36 +12,13 @@ public class TreeFileNode extends TreeItem<NodeData> {
         super(nodeData);
     }
 
-    // inserts node and keeps proper ordering
     public void insertNode(TreeFileNode node) {
-        var value = node.getValue();
-        var isDir = value.isDirectory();
-        var targetName = value.getPath();
-        var index = 0;
+        var currentValue = node.getValue();
         var cachedList = getChildren();
-        for (var childNode : cachedList) {
-            var tnodeIsDir = childNode.getValue().isDirectory();
+        var index = cachedList.stream().takeWhile(childNode -> currentValue.compareTo(childNode.getValue()) > 0).count();
 
-            if (!isDir && tnodeIsDir) { // we want to put file, so skip all dirs
-                index++;
-                continue;
-            }
-
-            if (isDir && !tnodeIsDir) { // no more dirs, so our is last
-                break;
-            }
-            index++;
-
-            var tnodeName = childNode.getValue().getPath();
-            if (targetName.compareTo(tnodeName) > 0) { //compare names to determine order
-                continue;
-            }
-
-            break;
-        }
-
-        cachedList.add(index, node);
-        updateParentSize(node, value.getAccumulatedSize());
+        cachedList.add((int) index, node);
+        updateParentSize(node, currentValue.getAccumulatedSize());
     }
 
     private void updateParentSize(TreeItem<NodeData> node, long deltaSize) {

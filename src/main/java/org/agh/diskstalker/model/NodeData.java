@@ -9,11 +9,12 @@ import lombok.Setter;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Getter
-public class NodeData {
+public class NodeData implements Comparable<NodeData>{
     private static final int MILLIS_IN_SECOND = 1000;
 
     private final Path path;
@@ -76,5 +77,19 @@ public class NodeData {
         if (o == null || getClass() != o.getClass()) return false;
         var nodeData = (NodeData) o;
         return Objects.equals(path, nodeData.path);
+    }
+
+    @Override
+    public int compareTo(NodeData other) {
+        var isFile1 = isFile() ? 1 : 0;
+        var isFile2 = other.isFile() ? 1 : 0;
+
+        if((isFile1 ^ isFile2) == 0){ // both files or both directories
+            return Comparator.comparingLong(NodeData::getSize).reversed()
+                    .thenComparing(nodeData -> nodeData.getFilename().get())
+                    .compare(this, other);
+        }
+
+        return isFile() ? 1 : -1;
     }
 }
