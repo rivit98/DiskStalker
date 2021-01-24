@@ -17,11 +17,11 @@ import java.util.concurrent.TimeUnit;
 public class NodeData implements Comparable<NodeData>{
     private static final int MILLIS_IN_SECOND = 1000;
 
+    private final SimpleLongProperty accumulatedSizeProperty = new SimpleLongProperty();
+    private final SimpleStringProperty filename = new SimpleStringProperty();
+    private final SimpleObjectProperty<FileTime> modificationDateProperty = new SimpleObjectProperty<>();
     private final Path path;
     private final boolean isDirectory;
-    private final SimpleLongProperty accumulatedSizeProperty;
-    private final SimpleStringProperty filename;
-    private final SimpleObjectProperty<FileTime> modificationDateProperty;
     private long size;
     @Setter
     private String type;
@@ -34,17 +34,17 @@ public class NodeData implements Comparable<NodeData>{
         this.path = path;
         if(attributes != null){
             this.isDirectory = attributes.isDirectory();
-            this.accumulatedSizeProperty = new SimpleLongProperty(isFile() ? attributes.size() : 0);
-            this.modificationDateProperty = new SimpleObjectProperty<>(attributes.lastModifiedTime());
+            this.accumulatedSizeProperty.set(isFile() ? attributes.size() : 0);
+            this.modificationDateProperty.set(attributes.lastModifiedTime());
         }else{
             var file = path.toFile();
             this.isDirectory = file.isDirectory();
-            this.accumulatedSizeProperty = new SimpleLongProperty(isFile() ? file.length() : 0);
-            this.modificationDateProperty = new SimpleObjectProperty<>(
+            this.accumulatedSizeProperty.set(isFile() ? file.length() : 0);
+            this.modificationDateProperty.set(
                     FileTime.from(file.lastModified()  / MILLIS_IN_SECOND, TimeUnit.SECONDS)
             );
         }
-        this.filename = new SimpleStringProperty(path.getFileName().toString());
+        this.filename.set(path.getFileName().toString());
         this.size = accumulatedSizeProperty.get();
     }
 
@@ -86,7 +86,7 @@ public class NodeData implements Comparable<NodeData>{
 
         if((isFile1 ^ isFile2) == 0){ // both files or both directories
             return Comparator.comparingLong(NodeData::getAccumulatedSize).reversed()
-                    .thenComparing(nodeData -> nodeData.getFilename().get())
+                    .thenComparing(nodeData -> nodeData.getFilename().get().toLowerCase())
                     .compare(this, other);
         }
 
