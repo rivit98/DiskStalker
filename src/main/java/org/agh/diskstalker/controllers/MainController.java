@@ -25,6 +25,7 @@ import org.agh.diskstalker.persistence.command.GetAllObservedFolderCommand;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.Optional;
 
 @Component
@@ -112,6 +113,17 @@ public class MainController {
                         .map(NodeData::getAccumulatedSizeProperty)
                         .orElse(null)
         );
+
+        treeTableView.sortPolicyProperty().set(
+                treeTableView  -> {
+                    Comparator<TreeItem<NodeData>> comparator = Comparator
+                                    .comparing((TreeItem<NodeData> treeItem) -> treeItem
+                                            .getValue()
+                                            .getPath()
+                                            .getFileName());
+                    treeTableView.getRoot().getChildren().sort(comparator);
+                    return true;
+                });
     }
 
     private void initializeTabs() {
@@ -156,6 +168,7 @@ public class MainController {
     public void addToMainTree(ObservedFolder folder, TreeFileNode node) {
         treeTableView.getRoot().getChildren().add(node);
         folderList.get().add(folder);
+        treeTableView.sort();
     }
 
     public void observeFolderEvents(ObservedFolder folder) { //TODO: this might be problematic, we should subscribe folder before scanner starts
