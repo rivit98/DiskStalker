@@ -3,6 +3,7 @@ package org.agh.diskstalker.model.tree;
 import javafx.scene.control.TreeItem;
 import org.agh.diskstalker.model.NodeData;
 
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -23,12 +24,15 @@ public class TreeFileNode extends TreeItem<NodeData> {
 
     private void updateParentSize(TreeItem<NodeData> node, long deltaSize) {
         Optional.ofNullable(node.getParent())
-                .ifPresent(parent -> {
-                    Optional.ofNullable(parent.getValue())
-                            .ifPresent(value -> {
-                                value.modifyAccumulatedSize(deltaSize);
-                                updateParentSize(parent, deltaSize);
-                            });
+                .ifPresent(parent -> updateParentSizeWorker(parent, deltaSize));
+    }
+
+    private void updateParentSizeWorker(TreeItem<NodeData> parent, long deltaSize){
+        Optional.ofNullable(parent.getValue())
+                .ifPresent(value -> {
+                    value.modifyAccumulatedSize(deltaSize);
+                    parent.getChildren().sort(Comparator.comparing(TreeItem::getValue));
+                    updateParentSize(parent, deltaSize);
                 });
     }
 
