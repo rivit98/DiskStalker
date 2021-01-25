@@ -1,21 +1,19 @@
 package org.agh.diskstalker.model;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import com.sun.javafx.collections.ObservableListWrapper;
 import javafx.scene.control.TreeItem;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Optional;
 
-public class FolderList {
-    private final ObservableList<ObservedFolder> folderList = FXCollections.observableArrayList();
-
-    public ObservableList<ObservedFolder> get(){
-        return folderList;
+public class FolderList extends ObservableListWrapper<ObservedFolder> {
+    public FolderList() {
+        super(new ArrayList<>());
     }
 
     public Optional<ObservedFolder> getObservedFolderFromTreePath(Path searchedPath) {
-        return folderList.stream()
+        return stream()
                 .filter(observedFolder -> observedFolder.containsNode(searchedPath))
                 .findFirst();
     }

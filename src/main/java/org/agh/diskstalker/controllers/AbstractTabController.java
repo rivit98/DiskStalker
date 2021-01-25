@@ -27,7 +27,7 @@ public abstract class AbstractTabController {
 
     protected void setModel(FolderList folders) {
         folderList = folders;
-        foldersTableView.setItems(folderList.get());
+        foldersTableView.setItems(folderList);
     }
 
     public void refresh(){

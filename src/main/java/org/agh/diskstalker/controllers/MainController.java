@@ -84,7 +84,7 @@ public class MainController {
         //TODO: refactor whole type recognizing system
         tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
             if (newTab.getId().equals("filesTypeView")) {
-                folderList.get().forEach(folder -> new Thread(folder::createTypeStatistics).start());
+                folderList.forEach(folder -> new Thread(folder::createTypeStatistics).start());
             }
         });
     }
@@ -155,7 +155,7 @@ public class MainController {
 
     public void addToMainTree(ObservedFolder folder, TreeFileNode node) {
         treeTableView.getRoot().getChildren().add(node);
-        folderList.get().add(folder);
+        folderList.add(folder);
     }
 
     public void observeFolderEvents(ObservedFolder folder) { //TODO: this might be problematic, we should subscribe folder before scanner starts
@@ -189,7 +189,7 @@ public class MainController {
             treeTableView.getSelectionModel().clearSelection();
         }
         commandExecutor.executeCommand(new DeleteObservedFolderCommand(folder));
-        return folderList.get().remove(folder);
+        return folderList.remove(folder);
     }
 
     public void refreshViews(){
@@ -203,7 +203,7 @@ public class MainController {
     }
 
     public void onExit() {
-        folderList.get().forEach(ObservedFolder::destroy);
+        folderList.forEach(ObservedFolder::destroy);
         commandExecutor.stop();
     }
 }
