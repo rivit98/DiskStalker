@@ -13,14 +13,14 @@ public class ObservedFolderSizeChangedEvent extends AbstractObservedFolderEvent 
     public void dispatch(MainController mainController) {
         var limits = folder.getLimits();
         if (limits.isTotalSizeExceeded()) {
-            if(!limits.isTotalSizeExceededFlag()) {
+            if(!limits.isTotalSizeFlagShown()) {
                 Alerts.sizeExceededAlert(folder.getPath().toString(), limits.getTotalSizeLimit());
-                limits.setTotalSizeExceededFlag(true);
+                limits.setTotalSizeFlagShown(true);
                 mainController.refreshViews();
             }
         }
         else {
-            limits.setTotalSizeExceededFlag(false);
+            limits.setTotalSizeFlagShown(false);
             mainController.refreshViews();
         }
     }
