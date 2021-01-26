@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import lombok.Getter;
 import net.rgielen.fxweaver.core.FxmlView;
+import org.agh.diskstalker.comparators.MainControllerComparator;
 import org.agh.diskstalker.controllers.bindings.*;
 import org.agh.diskstalker.controllers.buttonHandlers.*;
 import org.agh.diskstalker.controllers.cellFactories.PathColumnCellFactory;
@@ -25,7 +26,6 @@ import org.agh.diskstalker.persistence.command.GetAllObservedFolderCommand;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
-import java.util.Comparator;
 import java.util.Optional;
 
 @Component
@@ -116,11 +116,7 @@ public class MainController {
 
         treeTableView.sortPolicyProperty().set(
                 treeTableView  -> {
-                    Comparator<TreeItem<NodeData>> comparator = Comparator
-                                    .comparing((TreeItem<NodeData> treeItem) -> treeItem
-                                            .getValue()
-                                            .getPath()
-                                            .getFileName());
+                    var comparator = MainControllerComparator.getComparator();
                     treeTableView.getRoot().getChildren().sort(comparator);
                     return true;
                 });
@@ -168,6 +164,7 @@ public class MainController {
     public void addToMainTree(ObservedFolder folder, TreeFileNode node) {
         treeTableView.getRoot().getChildren().add(node);
         folderList.add(folder);
+        treeTableView.sort();
     }
 
     public void observeFolderEvents(ObservedFolder folder) { //TODO: this might be problematic, we should subscribe folder before scanner starts
