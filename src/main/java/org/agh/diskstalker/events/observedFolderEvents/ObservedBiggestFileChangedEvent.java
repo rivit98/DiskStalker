@@ -13,14 +13,14 @@ public class ObservedBiggestFileChangedEvent extends AbstractObservedFolderEvent
     public void dispatch(MainController mainController) {
         var limits = folder.getLimits();
         if (limits.isBiggestFileLimitExceeded()) {
-            if(!limits.isBiggestFileExceededFlag()) {
+            if(!limits.isBiggestFileFlagShown()) {
                 Alerts.biggestFileExceededAlert(folder.getPath().toString(), limits.getBiggestFileLimit());
-                limits.setBiggestFileExceededFlag(true);
+                limits.setBiggestFileFlagShown(true);
                 mainController.refreshViews();
             }
         }
         else {
-            limits.setBiggestFileExceededFlag(false);
+            limits.setBiggestFileFlagShown(false);
             mainController.refreshViews();
         }
     }

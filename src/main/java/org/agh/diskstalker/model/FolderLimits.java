@@ -14,11 +14,11 @@ public class FolderLimits {
     private final ObservedFolder folder;
 
     @Setter
-    private boolean totalSizeExceededFlag = false;
+    private boolean totalSizeFlagShown = false;
     @Setter
-    private boolean filesAmountExceededFlag = false;
+    private boolean filesAmountFlagShown = false;
     @Setter
-    private boolean biggestFileExceededFlag = false;
+    private boolean biggestFileFlagShown = false;
 
     private long totalSizeLimit = 0;
     private long filesAmountLimit = 0;

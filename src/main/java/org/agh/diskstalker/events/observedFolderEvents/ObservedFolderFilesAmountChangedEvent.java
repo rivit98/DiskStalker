@@ -13,14 +13,14 @@ public class ObservedFolderFilesAmountChangedEvent extends AbstractObservedFolde
     public void dispatch(MainController mainController) {
         var limits = folder.getLimits();
         if (limits.isFilesAmountExceeded()) {
-            if(!limits.isFilesAmountExceededFlag()) {
+            if(!limits.isFilesAmountFlagShown()) {
                 Alerts.filesAmountExceededAlert(folder.getPath().toString(), limits.getFilesAmountLimit());
-                limits.setFilesAmountExceededFlag(true);
+                limits.setFilesAmountFlagShown(true);
                 mainController.refreshViews();
             }
         }
         else {
-            limits.setFilesAmountExceededFlag(false);
+            limits.setFilesAmountFlagShown(false);
             mainController.refreshViews();
         }
     }

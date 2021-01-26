@@ -4,21 +4,24 @@ import javafx.scene.control.TreeItem;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.Optional;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class FolderListTest {
-    FolderList folderList = new FolderList();
-    Path path = Mockito.mock(Path.class);
-    ObservedFolder folder;
+    private FolderList folderList;
+    private Path path;
+    private ObservedFolder folder;
 
     @BeforeEach
     public void setUp() {
-        Mockito.when(path.toFile()).thenReturn(Mockito.mock(File.class));
-        Mockito.when(path.getFileName()).thenReturn(Mockito.mock(Path.class));
+        folderList = new FolderList();
+        path = mock(Path.class);
+        when(path.toFile()).thenReturn(mock(File.class));
+        when(path.getFileName()).thenReturn(mock(Path.class));
         folder = new ObservedFolder(path);
         folder.getTreeBuilder().processNodeData(new NodeData(path));
     }
@@ -28,33 +31,33 @@ public class FolderListTest {
         //given
 
         //when
-        folderList.get().add(folder);
+        folderList.add(folder);
 
         //then
-        Assertions.assertFalse(folderList.get().isEmpty());
-        Assertions.assertTrue(folderList.get().contains(folder));
+        Assertions.assertFalse(folderList.isEmpty());
+        Assertions.assertTrue(folderList.contains(folder));
     }
 
     @Test
     public void removeFromList() {
         //given
-        folderList.get().add(folder);
+        folderList.add(folder);
 
         //when
-        folderList.get().remove(folder);
+        folderList.remove(folder);
 
         //then
-        Assertions.assertTrue(folderList.get().isEmpty());
-        Assertions.assertFalse(folderList.get().contains(folder));
+        Assertions.assertTrue(folderList.isEmpty());
+        Assertions.assertFalse(folderList.contains(folder));
     }
 
     @Test
-    public void getObservedFolderFromTreePath() { //todo: more folders test
+    public void getObservedFolderFromTreePath() {
         //given
-        folderList.get().add(folder);
+        folderList.add(folder);
 
         //when
-        Optional<ObservedFolder> observedFolder = folderList.getObservedFolderFromTreePath(path);
+        var observedFolder = folderList.getObservedFolderFromTreePath(path);
 
         //then
         Assertions.assertTrue(observedFolder.isPresent());
@@ -63,10 +66,10 @@ public class FolderListTest {
     @Test
     public void getObservedFolderFromTreeItem() {
         //given
-        folderList.get().add(folder);
+        folderList.add(folder);
 
         //when
-        Optional<ObservedFolder> observedFolder = folderList
+        var observedFolder = folderList
                 .getObservedFolderFromTreeItem(new TreeItem<>(new NodeData(path)));
 
         //then

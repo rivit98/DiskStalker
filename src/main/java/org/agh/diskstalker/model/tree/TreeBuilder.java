@@ -43,12 +43,12 @@ public class TreeBuilder {
         return pathToTreeMap.containsKey(path);
     }
 
-    public void removeMappedDirsRecursively(TreeItem<NodeData> node) {
-        removeMappedDirs(node);
-        node.getChildren().forEach(this::removeMappedDirsRecursively);
+    public void removeMappedDirs(TreeItem<NodeData> node) {
+        removeMappedDirsSingle(node);
+        node.getChildren().forEach(this::removeMappedDirs);
     }
 
-    public void removeMappedDirs(TreeItem<NodeData> node) {
+    private void removeMappedDirsSingle(TreeItem<NodeData> node) {
         Optional.ofNullable(node)
                 .map(TreeItem::getValue)
                 .map(NodeData::getPath)

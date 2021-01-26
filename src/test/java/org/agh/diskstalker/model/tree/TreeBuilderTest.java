@@ -13,11 +13,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class TreeBuilderTest {
-    Path path;
-    TreeBuilder builder = new TreeBuilder();
+    private Path path;
+    private TreeBuilder builder;
 
     @BeforeEach
     public void setUp() {
+        builder = new TreeBuilder();
         path = mock(Path.class);
         when(path.toFile()).thenReturn(mock(File.class));
         when(path.getFileName()).thenReturn(mock(Path.class));
@@ -25,8 +26,6 @@ public class TreeBuilderTest {
 
     @Test
     public void processNodeData() {
-        //given
-
         //when
         builder.processNodeData(new NodeData(path));
 
@@ -58,9 +57,21 @@ public class TreeBuilderTest {
         var nodeData = new NodeData(path);
         builder.processNodeData(nodeData);
         //when
-        builder.removeMappedDirsRecursively(new TreeItem<>(nodeData));
+        builder.removeMappedDirs(new TreeItem<>(nodeData));
 
         //then
         Assertions.assertFalse(builder.containsNode(path));
+    }
+
+    @Test
+    public void rootEmitted(){
+        var subscriber = builder.getRootSubject().test();
+        subscriber.assertEmpty();
+
+        builder.processNodeData(new NodeData(path));
+
+        subscriber.assertValueCount(1);
+        subscriber.assertComplete();
+        subscriber.assertNoErrors();
     }
 }
