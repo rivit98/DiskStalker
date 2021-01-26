@@ -6,7 +6,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import lombok.Getter;
 import net.rgielen.fxweaver.core.FxmlView;
-import org.agh.diskstalker.comparators.MainControllerComparator;
+import org.agh.diskstalker.controllers.sortPolicies.MainControllerSortPolicy;
 import org.agh.diskstalker.controllers.bindings.*;
 import org.agh.diskstalker.controllers.buttonHandlers.*;
 import org.agh.diskstalker.controllers.cellFactories.PathColumnCellFactory;
@@ -113,13 +113,8 @@ public class MainController {
                         .map(NodeData::getAccumulatedSizeProperty)
                         .orElse(null)
         );
-
-        treeTableView.sortPolicyProperty().set(
-                treeTableView  -> {
-                    var comparator = MainControllerComparator.getComparator();
-                    treeTableView.getRoot().getChildren().sort(comparator);
-                    return true;
-                });
+        
+        treeTableView.sortPolicyProperty().set(new MainControllerSortPolicy());
     }
 
     private void initializeTabs() {

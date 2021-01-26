@@ -5,11 +5,11 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import lombok.Getter;
 import lombok.Setter;
-import org.agh.diskstalker.comparators.NodeDataComparator;
 
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -85,7 +85,8 @@ public class NodeData implements Comparable<NodeData>{
         var isFile2 = other.isFile() ? 1 : 0;
 
         if((isFile1 ^ isFile2) == 0){ // both files or both directories
-            return NodeDataComparator.getComparator()
+            return Comparator.comparingLong(NodeData::getAccumulatedSize).reversed()
+                    .thenComparing(nodeData -> nodeData.getFilename().get().toLowerCase())
                     .compare(this, other);
         }
 
