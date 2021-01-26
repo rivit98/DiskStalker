@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import lombok.Getter;
 import net.rgielen.fxweaver.core.FxmlView;
+import org.agh.diskstalker.controllers.sortPolicies.MainControllerSortPolicy;
 import org.agh.diskstalker.controllers.bindings.*;
 import org.agh.diskstalker.controllers.buttonHandlers.*;
 import org.agh.diskstalker.controllers.cellFactories.PathColumnCellFactory;
@@ -112,6 +113,8 @@ public class MainController {
                         .map(NodeData::getAccumulatedSizeProperty)
                         .orElse(null)
         );
+        
+        treeTableView.sortPolicyProperty().set(new MainControllerSortPolicy());
     }
 
     private void initializeTabs() {
@@ -156,6 +159,7 @@ public class MainController {
     public void addToMainTree(ObservedFolder folder, TreeFileNode node) {
         treeTableView.getRoot().getChildren().add(node);
         folderList.add(folder);
+        treeTableView.sort();
     }
 
     public void observeFolderEvents(ObservedFolder folder) { //TODO: this might be problematic, we should subscribe folder before scanner starts
