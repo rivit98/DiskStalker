@@ -5,7 +5,12 @@ import org.agh.diskstalker.graphics.GraphicsFactory;
 import org.agh.diskstalker.model.ObservedFolder;
 
 public class FolderColumnCellFactory extends ListCell<ObservedFolder> {
-    private final GraphicsFactory graphicsFactory = new GraphicsFactory();
+    private final GraphicsFactory graphicsFactory;
+
+    public FolderColumnCellFactory(GraphicsFactory graphicsFactory) {
+        this.graphicsFactory = graphicsFactory;
+    }
+
     @Override
     protected void updateItem(ObservedFolder folder, boolean empty) {
         super.updateItem(folder, empty);

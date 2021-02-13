@@ -1,6 +1,7 @@
 package org.agh.diskstalker.persistence;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
@@ -8,20 +9,18 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Optional;
 
-//TODO: service spring
 @Slf4j
 @Service
-public final class ConnectionProvider {
-    private static final String JDBC_DRIVER = "org.sqlite.JDBC";
-    private static Optional<Connection> connection = Optional.empty();
+public class ConnectionProvider {
+    private final String jdbcAddress;
+    private Optional<Connection> connection = Optional.empty();
 
-    private ConnectionProvider() {
+    public ConnectionProvider(@Value("${dbFileName}") String jdbcAddress) {
+        this.jdbcAddress = jdbcAddress;
     }
 
-    public static void init(final String jdbcAddress) {
+    public void init() {
         try {
-            close();
-            Class.forName(JDBC_DRIVER);
             connection = Optional.of(DriverManager.getConnection(jdbcAddress));
             log.info("Connected to DB");
         } catch (Exception e) {
@@ -29,14 +28,14 @@ public final class ConnectionProvider {
         }
     }
 
-    public static Connection getConnection() {
+    public Connection getConnection() {
         return connection.orElseThrow(() -> new RuntimeException("Connection is not valid."));
     }
 
-    public static void close() throws SQLException {
+    public void close() throws SQLException {
         if (connection.isPresent()) {
-            log.info("Closing connection");
             connection.get().close();
+            log.info("DB connection closed");
             connection = Optional.empty();
         }
     }

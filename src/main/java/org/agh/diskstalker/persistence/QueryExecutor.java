@@ -1,6 +1,8 @@
 package org.agh.diskstalker.persistence;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,8 +10,16 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 @Slf4j
+@Service
 public class QueryExecutor {
-    public QueryExecutor() {
+    @Getter
+    private final ConnectionProvider connectionProvider;
+
+    public QueryExecutor(ConnectionProvider connectionProvider) {
+        this.connectionProvider = connectionProvider;
+    }
+
+    public void createTables(){
         try {
             create("CREATE TABLE IF NOT EXISTS observedFolders (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -26,10 +36,10 @@ public class QueryExecutor {
     }
 
     public int createAndObtainId(final String insertSql, Object... args) throws SQLException {
-        PreparedStatement statement = ConnectionProvider.getConnection().prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
-        mapParams(statement, args);
-        statement.execute();
-        try (final ResultSet resultSet = statement.getGeneratedKeys()) {
+        var ps = connectionProvider.getConnection().prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
+        mapParams(ps, args);
+        ps.execute();
+        try (var resultSet = ps.getGeneratedKeys()) {
             return readIdFromResultSet(resultSet);
         }
     }
@@ -39,37 +49,37 @@ public class QueryExecutor {
     }
 
     public void create(final String insertSql, Object... args) throws SQLException {
-        PreparedStatement ps = ConnectionProvider.getConnection().prepareStatement(insertSql);
+        var ps = connectionProvider.getConnection().prepareStatement(insertSql);
         mapParams(ps, args);
         ps.execute();
     }
 
     public ResultSet read(final String sql, Object... args) throws SQLException {
-        PreparedStatement ps = ConnectionProvider.getConnection().prepareStatement(sql);
+        var ps = connectionProvider.getConnection().prepareStatement(sql);
         mapParams(ps, args);
         return ps.executeQuery();
     }
 
     public void delete(final String sql, Object... args) throws SQLException {
-        PreparedStatement ps = ConnectionProvider.getConnection().prepareStatement(sql);
+        var ps = connectionProvider.getConnection().prepareStatement(sql);
         mapParams(ps, args);
         ps.executeUpdate();
     }
 
     public void executeUpdate(final String sql, Object... args) throws SQLException {
-        ConnectionProvider.getConnection().setAutoCommit(false);
+        connectionProvider.getConnection().setAutoCommit(false);
 
-        PreparedStatement ps = ConnectionProvider.getConnection().prepareStatement(sql);
+        var ps = connectionProvider.getConnection().prepareStatement(sql);
         mapParams(ps, args);
         ps.executeUpdate();
 
-        ConnectionProvider.getConnection().commit();
-        ConnectionProvider.getConnection().setAutoCommit(true);
+        connectionProvider.getConnection().commit();
+        connectionProvider.getConnection().setAutoCommit(true);
     }
 
     public void mapParams(PreparedStatement ps, Object... args) throws SQLException {
-        int i = 1;
-        for (Object arg : args) {
+        var i = 1;
+        for (var arg : args) {
             if (arg instanceof Integer) {
                 ps.setInt(i++, (Integer) arg);
             } else if (arg instanceof Long) {

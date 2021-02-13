@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import net.rgielen.fxweaver.core.FxmlView;
+import org.agh.diskstalker.graphics.GraphicsFactory;
 import org.agh.diskstalker.model.statisctics.Type;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +20,9 @@ public class FilesTypeController extends AbstractTabController {
     @FXML
     private TableColumn<Type, String> typeColumn;
 
+    public FilesTypeController(GraphicsFactory graphicsFactory) {
+        super(graphicsFactory);
+    }
 
     protected void configureSelectionModelListener() {
         foldersTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {

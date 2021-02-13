@@ -2,7 +2,7 @@ package org.agh.diskstalker.controllers.buttonHandlers;
 
 import javafx.event.ActionEvent;
 import org.agh.diskstalker.controllers.MainController;
-import org.agh.diskstalker.controllers.alerts.Alerts;
+import org.agh.diskstalker.controllers.alerts.AlertsFactory;
 import org.agh.diskstalker.persistence.command.UpdateObservedFolderCommand;
 
 import java.nio.file.Path;
@@ -28,7 +28,7 @@ public class SetMaxFilesAmountButtonHandler extends AbstractButtonSetLimitHandle
                 .ifPresent(observedFolder -> {
                     observedFolder.getLimits().setMaxFilesAmount(maximumAmount);
                     mainController.getCommandExecutor().executeCommand(new UpdateObservedFolderCommand(observedFolder));
-                    Alerts.setMaxFilesAmountAlert(path.toString(), maximumAmount);
+                    mainController.getAlertsFactory().setMaxFilesAmountAlert(path.toString(), maximumAmount);
                 });
     }
 }

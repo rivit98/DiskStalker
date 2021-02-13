@@ -9,6 +9,7 @@ import net.rgielen.fxweaver.core.FxmlView;
 import org.agh.diskstalker.controllers.cellFactories.DateColumnCellFactory;
 import org.agh.diskstalker.controllers.cellFactories.SizeTableColumnCellFactory;
 import org.agh.diskstalker.controllers.listeners.SelectedItemChangeListener;
+import org.agh.diskstalker.graphics.GraphicsFactory;
 import org.agh.diskstalker.model.NodeData;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +28,10 @@ public class FileInfoController extends AbstractTabController {
     private TableColumn<NodeData, Number> sizeColumn;
     @FXML
     private TableColumn<NodeData, String> fileNameColumn;
+
+    protected FileInfoController(GraphicsFactory graphicsFactory) {
+        super(graphicsFactory);
+    }
 
     protected void configureSelectionModelListener() {
         var selectionModel = foldersTableView.getSelectionModel();
@@ -54,3 +59,6 @@ public class FileInfoController extends AbstractTabController {
         fileNameColumn.setCellValueFactory(val -> val.getValue().getFilename());
     }
 }
+
+//TODO: sth is wrong with date sorting, probably miliseconds
+//TODO: only biggest 50 files

@@ -1,7 +1,7 @@
 package org.agh.diskstalker.events.observedFolderEvents;
 
 import org.agh.diskstalker.controllers.MainController;
-import org.agh.diskstalker.controllers.alerts.Alerts;
+import org.agh.diskstalker.controllers.alerts.AlertsFactory;
 import org.agh.diskstalker.model.ObservedFolder;
 
 public class ObservedBiggestFileChangedEvent extends AbstractObservedFolderEvent {
@@ -14,7 +14,7 @@ public class ObservedBiggestFileChangedEvent extends AbstractObservedFolderEvent
         var limits = folder.getLimits();
         if (limits.isBiggestFileLimitExceeded()) {
             if(!limits.isBiggestFileFlagShown()) {
-                Alerts.biggestFileExceededAlert(folder.getPath().toString(), limits.getBiggestFileLimit());
+                mainController.getAlertsFactory().biggestFileExceededAlert(folder.getPath().toString(), limits.getBiggestFileLimit());
                 limits.setBiggestFileFlagShown(true);
                 mainController.refreshViews();
             }

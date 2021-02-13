@@ -6,7 +6,7 @@ import javafx.scene.control.TreeItem;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import org.agh.diskstalker.controllers.MainController;
-import org.agh.diskstalker.controllers.alerts.Alerts;
+import org.agh.diskstalker.controllers.alerts.AlertsFactory;
 import org.agh.diskstalker.model.ObservedFolder;
 import org.agh.diskstalker.persistence.command.CreateObservedFolderCommand;
 
@@ -35,7 +35,7 @@ public class AddButtonHandler implements EventHandler<ActionEvent> {
 
     private void addPath(Path path) {
         if (checkIfFolderAlreadyExists(path)) {
-            Alerts.tryingToAddSameFolderToObservedAlert();
+            mainController.getAlertsFactory().tryingToAddSameFolderToObservedAlert();
         } else {
             var folder = new ObservedFolder(path);
             mainController.observeFolderEvents(folder);

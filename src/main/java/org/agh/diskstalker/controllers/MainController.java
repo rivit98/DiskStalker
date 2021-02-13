@@ -7,6 +7,7 @@ import javafx.scene.control.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.rgielen.fxweaver.core.FxmlView;
+import org.agh.diskstalker.controllers.alerts.AlertsFactory;
 import org.agh.diskstalker.controllers.bindings.*;
 import org.agh.diskstalker.controllers.buttonHandlers.*;
 import org.agh.diskstalker.controllers.cellFactories.PathColumnCellFactory;
@@ -16,6 +17,7 @@ import org.agh.diskstalker.controllers.listeners.MaxFilesAmountListener;
 import org.agh.diskstalker.controllers.listeners.MaxSizeButtonListener;
 import org.agh.diskstalker.controllers.sortPolicies.MainControllerSortPolicy;
 import org.agh.diskstalker.formatters.StringToIntFormatter;
+import org.agh.diskstalker.graphics.GraphicsFactory;
 import org.agh.diskstalker.model.FolderList;
 import org.agh.diskstalker.model.NodeData;
 import org.agh.diskstalker.model.ObservedFolder;
@@ -71,9 +73,20 @@ public class MainController {
     @Getter
     private final FolderList folderList;
 
-    public MainController(DatabaseCommandExecutor commandExecutor, FolderList folderList) {
+    @Getter
+    private final GraphicsFactory graphicsFactory;
+
+    @Getter
+    private final AlertsFactory alertsFactory;
+
+    public MainController(DatabaseCommandExecutor commandExecutor,
+                          FolderList folderList,
+                          GraphicsFactory graphicsFactory,
+                          AlertsFactory alertsFactory) {
         this.commandExecutor = commandExecutor;
         this.folderList = folderList;
+        this.graphicsFactory = graphicsFactory;
+        this.alertsFactory = alertsFactory;
     }
 
     @FXML

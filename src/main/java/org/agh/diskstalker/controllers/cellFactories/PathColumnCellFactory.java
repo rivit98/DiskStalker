@@ -9,11 +9,12 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 public class PathColumnCellFactory extends TreeTableCell<NodeData, Path> {
-    private final GraphicsFactory graphicsFactory = new GraphicsFactory();
+    private final GraphicsFactory graphicsFactory;
     private final MainController mainController;
 
     public PathColumnCellFactory(MainController mainController) {
         this.mainController = mainController;
+        this.graphicsFactory = mainController.getGraphicsFactory();
     }
 
     @Override

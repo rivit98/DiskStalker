@@ -5,7 +5,7 @@ import javafx.scene.image.ImageView;
 import org.springframework.stereotype.Service;
 
 @Service
-public final class GraphicsFactory { //TODO: inject as service?
+public final class GraphicsFactory {
     private static final Image APPLICATION_ICON =
             new Image(GraphicsFactory.class.getResource("/images/app_icon.png").toString());
 

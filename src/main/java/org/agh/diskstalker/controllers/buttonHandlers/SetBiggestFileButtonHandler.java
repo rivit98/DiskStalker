@@ -2,7 +2,7 @@ package org.agh.diskstalker.controllers.buttonHandlers;
 
 import javafx.event.ActionEvent;
 import org.agh.diskstalker.controllers.MainController;
-import org.agh.diskstalker.controllers.alerts.Alerts;
+import org.agh.diskstalker.controllers.alerts.AlertsFactory;
 import org.agh.diskstalker.persistence.command.UpdateObservedFolderCommand;
 import org.apache.commons.io.FileUtils;
 
@@ -29,7 +29,7 @@ public class SetBiggestFileButtonHandler extends AbstractButtonSetLimitHandler {
                 .ifPresent(observedFolder -> {
                     observedFolder.getLimits().setBiggestFileLimit(maximumSize);
                     mainController.getCommandExecutor().executeCommand(new UpdateObservedFolderCommand(observedFolder));
-                    Alerts.setBiggestFileAlert(path.toString(), maximumSize);
+                    mainController.getAlertsFactory().setBiggestFileAlert(path.toString(), maximumSize);
                 });
     }
 }

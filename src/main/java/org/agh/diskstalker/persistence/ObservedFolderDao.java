@@ -3,6 +3,7 @@ package org.agh.diskstalker.persistence;
 import lombok.extern.slf4j.Slf4j;
 import org.agh.diskstalker.builders.FolderLimitsBuilder;
 import org.agh.diskstalker.model.ObservedFolder;
+import org.springframework.stereotype.Service;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,8 +12,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Slf4j
+@Service
 public class ObservedFolderDao implements IObservedFolderDao {
-    private final QueryExecutor queryExecutor = new QueryExecutor();
+    private final QueryExecutor queryExecutor;
+
+    public ObservedFolderDao(QueryExecutor queryExecutor) {
+        this.queryExecutor = queryExecutor;
+    }
 
     @Override
     public void create(ObservedFolder observedFolder) {

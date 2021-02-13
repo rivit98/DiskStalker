@@ -36,7 +36,7 @@ public class DirWatcher implements IFilesystemWatcher {
     }
 
     @Override
-    public Observable<FilesystemEvent> start(int pollingTimeMs) {
+    public Observable<FilesystemEvent> start(long pollingTimeMs) {
         try {
             if(pollingTimeMs < 500){
                 log.info("polling time cannot be less than 500");

@@ -28,6 +28,8 @@ import java.util.Optional;
 
 @Slf4j
 public class ObservedFolder {
+    private static final long pollingInterval = 2000; //ms
+
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
     private final IFilesystemWatcher filesystemWatcher;
     private final IEventProcessor eventProcessor;
@@ -94,10 +96,8 @@ public class ObservedFolder {
     }
 
     private void startMonitoring() {
-        var pollingTime = 2000 + treeBuilder.getPathToTreeMap().size() / 10000;
-
         var watchDisposable = filesystemWatcher
-                .start(pollingTime)
+                .start(pollingInterval)
                 .subscribeOn(Schedulers.io())
                 .observeOn(JavaFxScheduler.platform())
                 .subscribe(

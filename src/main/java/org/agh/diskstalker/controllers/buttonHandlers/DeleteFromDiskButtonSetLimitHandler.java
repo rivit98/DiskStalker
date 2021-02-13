@@ -4,7 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.ButtonType;
 import lombok.extern.slf4j.Slf4j;
 import org.agh.diskstalker.controllers.MainController;
-import org.agh.diskstalker.controllers.alerts.Alerts;
+import org.agh.diskstalker.controllers.alerts.AlertsFactory;
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
@@ -36,14 +36,14 @@ public class DeleteFromDiskButtonSetLimitHandler extends AbstractButtonSetLimitH
 
                 mainController.removeTreeItem(item);
             } catch (IOException | IllegalArgumentException e) {
-                Alerts.genericErrorAlert(searchedPath, "Cannot delete file");
+                mainController.getAlertsFactory().genericErrorAlert(searchedPath, "Cannot delete file");
                 log.error("Cannot delete file" + searchedPath, e);
             }
         });
     }
 
     private boolean askIfDelete(Path toDeletePath) {
-        var buttonType = Alerts.yesNoDeleteAlert(toDeletePath);
+        var buttonType = mainController.getAlertsFactory().yesNoDeleteAlert(toDeletePath);
         return buttonType.equals(ButtonType.YES);
     }
 }

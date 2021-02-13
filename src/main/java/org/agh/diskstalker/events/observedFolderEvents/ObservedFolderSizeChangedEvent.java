@@ -1,7 +1,7 @@
 package org.agh.diskstalker.events.observedFolderEvents;
 
 import org.agh.diskstalker.controllers.MainController;
-import org.agh.diskstalker.controllers.alerts.Alerts;
+import org.agh.diskstalker.controllers.alerts.AlertsFactory;
 import org.agh.diskstalker.model.ObservedFolder;
 
 public class ObservedFolderSizeChangedEvent extends AbstractObservedFolderEvent {
@@ -14,7 +14,7 @@ public class ObservedFolderSizeChangedEvent extends AbstractObservedFolderEvent 
         var limits = folder.getLimits();
         if (limits.isTotalSizeExceeded()) {
             if(!limits.isTotalSizeFlagShown()) {
-                Alerts.sizeExceededAlert(folder.getPath().toString(), limits.getTotalSizeLimit());
+                mainController.getAlertsFactory().sizeExceededAlert(folder.getPath().toString(), limits.getTotalSizeLimit());
                 limits.setTotalSizeFlagShown(true);
                 mainController.refreshViews();
             }
