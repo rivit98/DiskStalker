@@ -8,7 +8,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Optional;
 
-//TODO: service spring, inject this to class
+//TODO: service spring
 @Slf4j
 @Service
 public final class ConnectionProvider {

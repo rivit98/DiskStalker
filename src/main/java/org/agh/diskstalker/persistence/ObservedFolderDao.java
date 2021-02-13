@@ -12,6 +12,8 @@ import java.util.List;
 
 @Slf4j
 public class ObservedFolderDao implements IObservedFolderDao {
+    private final QueryExecutor queryExecutor = new QueryExecutor();
+
     @Override
     public void create(ObservedFolder observedFolder) {
         var path = observedFolder.getPath().toString();
@@ -19,7 +21,7 @@ public class ObservedFolderDao implements IObservedFolderDao {
         Object[] args = {path};
 
         try {
-            QueryExecutor.createAndObtainId(insertIntoDB, args);
+            queryExecutor.createAndObtainId(insertIntoDB, args);
         } catch (SQLException e) {
             log.error("Error during saving to database: " + e.getMessage());
         }
@@ -33,7 +35,7 @@ public class ObservedFolderDao implements IObservedFolderDao {
         Object[] args = {limits.getTotalSizeLimit(), limits.getFilesAmountLimit(), limits.getBiggestFileLimit(), path};
 
         try {
-            QueryExecutor.executeUpdate(updateDB, args);
+            queryExecutor.executeUpdate(updateDB, args);
         } catch (SQLException e) {
             log.error("Error during updating in database: " + e.getMessage());
         }
@@ -46,7 +48,7 @@ public class ObservedFolderDao implements IObservedFolderDao {
         Object[] args = {path};
 
         try {
-            QueryExecutor.delete(deleteObservedFolder, args);
+            queryExecutor.delete(deleteObservedFolder, args);
         } catch (SQLException e) {
             log.error("Error during deleting from database: " + e.getMessage());
         }
@@ -57,7 +59,7 @@ public class ObservedFolderDao implements IObservedFolderDao {
         var findObservedFolders = "SELECT * FROM observedFolders;";
 
         var resultList = new LinkedList<ObservedFolder>();
-        try (var rs = QueryExecutor.read(findObservedFolders)) {
+        try (var rs = queryExecutor.read(findObservedFolders)) {
             while (rs.next()) {
                 var path = Path.of(rs.getString("path"));
                 if (Files.isDirectory(path)) {
@@ -75,7 +77,7 @@ public class ObservedFolderDao implements IObservedFolderDao {
                     var delete = "DELETE FROM observedFolders WHERE path = (?);";
                     Object[] args = {path.toString()};
 
-                    QueryExecutor.delete(delete, args);
+                    queryExecutor.delete(delete, args);
                 }
             }
         } catch (SQLException e) {

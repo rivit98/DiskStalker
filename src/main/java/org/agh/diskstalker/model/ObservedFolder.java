@@ -111,7 +111,7 @@ public class ObservedFolder {
     public void destroy() {
         compositeDisposable.dispose();
         scanner.stop();
-        filesystemWatcher.stop();
+        filesystemWatcher.stop(); //FIXME: this takes quite much time
         eventStream.onComplete();
     }
 

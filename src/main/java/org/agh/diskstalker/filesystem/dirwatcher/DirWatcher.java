@@ -38,8 +38,9 @@ public class DirWatcher implements IFilesystemWatcher {
     @Override
     public Observable<FilesystemEvent> start(int pollingTimeMs) {
         try {
-            if(pollingTimeMs <= 500){
-                throw new IllegalArgumentException("polling time cannot be less than 500");
+            if(pollingTimeMs < 500){
+                log.info("polling time cannot be less than 500");
+                pollingTimeMs = 500;
             }
 
             var listener = new FileChangeListener(this);
@@ -48,7 +49,7 @@ public class DirWatcher implements IFilesystemWatcher {
             monitor = new FileAlterationMonitor(pollingTimeMs, observer);
             monitor.start();
         } catch (Exception ignored) {
-            log.warn("Cannot start DirWatcher");
+            log.error("Cannot start DirWatcher");
         }
         return subject;
     }

@@ -5,8 +5,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import net.rgielen.fxweaver.core.FxmlView;
-import org.agh.diskstalker.controllers.sortPolicies.MainControllerSortPolicy;
 import org.agh.diskstalker.controllers.bindings.*;
 import org.agh.diskstalker.controllers.buttonHandlers.*;
 import org.agh.diskstalker.controllers.cellFactories.PathColumnCellFactory;
@@ -14,6 +14,7 @@ import org.agh.diskstalker.controllers.cellFactories.SizeTreeTableColumnCellFact
 import org.agh.diskstalker.controllers.listeners.BiggestFileListener;
 import org.agh.diskstalker.controllers.listeners.MaxFilesAmountListener;
 import org.agh.diskstalker.controllers.listeners.MaxSizeButtonListener;
+import org.agh.diskstalker.controllers.sortPolicies.MainControllerSortPolicy;
 import org.agh.diskstalker.formatters.StringToIntFormatter;
 import org.agh.diskstalker.model.FolderList;
 import org.agh.diskstalker.model.NodeData;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Component;
 import java.nio.file.Path;
 import java.util.Optional;
 
+@Slf4j
 @Component
 @FxmlView("/views/MainView.fxml")
 public class MainController {
@@ -64,10 +66,15 @@ public class MainController {
     public Button setBiggestFileSizeButton;
 
     @Getter
-    private final DatabaseCommandExecutor commandExecutor = new DatabaseCommandExecutor();
+    private final DatabaseCommandExecutor commandExecutor;
 
     @Getter
-    private final FolderList folderList = new FolderList();
+    private final FolderList folderList;
+
+    public MainController(DatabaseCommandExecutor commandExecutor, FolderList folderList) {
+        this.commandExecutor = commandExecutor;
+        this.folderList = folderList;
+    }
 
     @FXML
     public void initialize() {
@@ -148,6 +155,8 @@ public class MainController {
         selectedItemProperty.addListener(new MaxFilesAmountListener(maxFilesAmountField, folderList));
         selectedItemProperty.addListener(new BiggestFileListener(biggestFileField, folderList));
     }
+
+
 
     private void loadSavedFolders() { //FIXME: restoring folders take long time
         commandExecutor.executeCommand(new GetAllObservedFolderCommand())

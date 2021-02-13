@@ -2,11 +2,13 @@ package org.agh.diskstalker.model;
 
 import com.sun.javafx.collections.ObservableListWrapper;
 import javafx.scene.control.TreeItem;
+import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Optional;
 
+@Component
 public class FolderList extends ObservableListWrapper<ObservedFolder> {
     public FolderList() {
         super(new ArrayList<>());

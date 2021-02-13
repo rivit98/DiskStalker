@@ -9,7 +9,7 @@ import java.sql.Statement;
 
 @Slf4j
 public class QueryExecutor {
-    static {
+    public QueryExecutor() {
         try {
             create("CREATE TABLE IF NOT EXISTS observedFolders (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -25,10 +25,7 @@ public class QueryExecutor {
         }
     }
 
-    private QueryExecutor() {
-    }
-
-    public static int createAndObtainId(final String insertSql, Object... args) throws SQLException {
+    public int createAndObtainId(final String insertSql, Object... args) throws SQLException {
         PreparedStatement statement = ConnectionProvider.getConnection().prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
         mapParams(statement, args);
         statement.execute();
@@ -37,29 +34,29 @@ public class QueryExecutor {
         }
     }
 
-    private static int readIdFromResultSet(final ResultSet resultSet) throws SQLException {
+    private int readIdFromResultSet(final ResultSet resultSet) throws SQLException {
         return resultSet.next() ? resultSet.getInt(1) : -1;
     }
 
-    public static void create(final String insertSql, Object... args) throws SQLException {
+    public void create(final String insertSql, Object... args) throws SQLException {
         PreparedStatement ps = ConnectionProvider.getConnection().prepareStatement(insertSql);
         mapParams(ps, args);
         ps.execute();
     }
 
-    public static ResultSet read(final String sql, Object... args) throws SQLException {
+    public ResultSet read(final String sql, Object... args) throws SQLException {
         PreparedStatement ps = ConnectionProvider.getConnection().prepareStatement(sql);
         mapParams(ps, args);
         return ps.executeQuery();
     }
 
-    public static void delete(final String sql, Object... args) throws SQLException {
+    public void delete(final String sql, Object... args) throws SQLException {
         PreparedStatement ps = ConnectionProvider.getConnection().prepareStatement(sql);
         mapParams(ps, args);
         ps.executeUpdate();
     }
 
-    public static void executeUpdate(final String sql, Object... args) throws SQLException {
+    public void executeUpdate(final String sql, Object... args) throws SQLException {
         ConnectionProvider.getConnection().setAutoCommit(false);
 
         PreparedStatement ps = ConnectionProvider.getConnection().prepareStatement(sql);
@@ -70,7 +67,7 @@ public class QueryExecutor {
         ConnectionProvider.getConnection().setAutoCommit(true);
     }
 
-    public static void mapParams(PreparedStatement ps, Object... args) throws SQLException {
+    public void mapParams(PreparedStatement ps, Object... args) throws SQLException {
         int i = 1;
         for (Object arg : args) {
             if (arg instanceof Integer) {
