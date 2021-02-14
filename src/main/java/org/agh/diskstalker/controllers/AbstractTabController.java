@@ -1,5 +1,6 @@
 package org.agh.diskstalker.controllers;
 
+import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import lombok.Getter;
@@ -8,12 +9,13 @@ import org.agh.diskstalker.graphics.GraphicsFactory;
 import org.agh.diskstalker.model.FolderList;
 import org.agh.diskstalker.model.ObservedFolder;
 
+import java.util.Comparator;
+
 public abstract class AbstractTabController {
     @FXML
     protected ListView<ObservedFolder> foldersTableView;
 
-    @Getter
-    protected FolderList folderList;
+    protected SortedList<ObservedFolder> sortedList;
 
     private final GraphicsFactory graphicsFactory;
 
@@ -32,9 +34,9 @@ public abstract class AbstractTabController {
         foldersTableView.setCellFactory(cell -> new FolderColumnCellFactory(graphicsFactory));
     }
 
-    protected void setModel(FolderList folders) {
-        folderList = folders;
-        foldersTableView.setItems(folderList);
+    protected void setModel(FolderList folderList) {
+        sortedList = new SortedList<>(folderList, Comparator.comparing(ObservedFolder::getName));
+        foldersTableView.setItems(sortedList);
     }
 
     public void refresh(){

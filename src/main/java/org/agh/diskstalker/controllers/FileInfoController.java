@@ -39,7 +39,7 @@ public class FileInfoController extends AbstractTabController {
     }
 
     public void setSortOrder(){
-        dataTableView.getSortOrder().addAll(List.of(dateColumn, sizeColumn, fileNameColumn));
+        dataTableView.getSortOrder().addAll(List.of(sizeColumn, fileNameColumn, dateColumn));
     }
 
     protected void prepareDataTableView() {
@@ -59,6 +59,3 @@ public class FileInfoController extends AbstractTabController {
         fileNameColumn.setCellValueFactory(val -> val.getValue().getFilename());
     }
 }
-
-//TODO: sth is wrong with date sorting, probably miliseconds
-//TODO: only biggest 50 files

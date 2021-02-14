@@ -14,6 +14,7 @@ import org.agh.diskstalker.model.ObservedFolder;
 import org.agh.diskstalker.model.tree.TreeFileNode;
 
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.stream.Collectors;
 
 public class SelectedItemChangeListener implements ChangeListener<ObservedFolder> {
@@ -73,6 +74,8 @@ public class SelectedItemChangeListener implements ChangeListener<ObservedFolder
                 nodesMap.values().stream()
                         .map(TreeItem::getValue)
                         .filter(NodeData::isFile)
+                        .sorted((o1, o2) -> Comparator.comparingLong(NodeData::getSize).reversed().compare(o1, o2))
+                        .limit(100)
                         .collect(Collectors.toList())
         );
     }

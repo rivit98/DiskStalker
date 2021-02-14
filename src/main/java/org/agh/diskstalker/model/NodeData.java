@@ -86,7 +86,7 @@ public class NodeData implements Comparable<NodeData>{
 
         if((isFile1 ^ isFile2) == 0){ // both files or both directories
             return Comparator.comparingLong(NodeData::getAccumulatedSize).reversed()
-                    .thenComparing(nodeData -> nodeData.getFilename().get().toLowerCase())
+                    .thenComparing(nodeData -> nodeData.getFilename().get())
                     .compare(this, other);
         }
 
