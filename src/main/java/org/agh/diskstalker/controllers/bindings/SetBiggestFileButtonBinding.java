@@ -11,7 +11,7 @@ public class SetBiggestFileButtonBinding extends AbstractButtonBooleanBinding {
     ) {
         super(
                 () -> (
-                        !mainController.isMainFolder(selectionModel.getSelectedItem())
+                        !mainController.canSetLimitOnNode(selectionModel.getSelectedItem())
                                 || mainController.getBiggestFileField().getText().isEmpty()
                 ),
                 selectionModel.selectedItemProperty(),

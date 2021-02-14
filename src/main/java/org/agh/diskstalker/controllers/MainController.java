@@ -118,10 +118,10 @@ public class MainController {
 
         pathColumn.setCellValueFactory(
                 node -> Optional.ofNullable(node.getValue())
-                    .flatMap(v -> Optional.ofNullable(v.getValue()))
-                    .map(NodeData::getPath)
-                    .map(SimpleObjectProperty::new)
-                    .orElseGet(SimpleObjectProperty::new)
+                        .flatMap(v -> Optional.ofNullable(v.getValue()))
+                        .map(NodeData::getPath)
+                        .map(SimpleObjectProperty::new)
+                        .orElseGet(SimpleObjectProperty::new)
         );
 
         sizeColumn.setCellValueFactory(
@@ -130,7 +130,7 @@ public class MainController {
                         .map(NodeData::getAccumulatedSizeProperty)
                         .orElse(null)
         );
-        
+
         treeTableView.sortPolicyProperty().set(new MainControllerSortPolicy());
     }
 
@@ -166,8 +166,6 @@ public class MainController {
         selectedItemProperty.addListener(new BiggestFileListener(biggestFileField, folderList));
     }
 
-
-    //TODO: disable buttons when folder is in scanning state
     private void loadSavedFolders() {
         commandExecutor.executeCommand(new GetAllObservedFolderCommand())
                 .thenAccept(folders -> Platform.runLater(() -> {
@@ -217,6 +215,11 @@ public class MainController {
         return treeTableView.getRoot().getChildren().contains(node);
     }
 
+    public boolean canSetLimitOnNode(TreeItem<NodeData> node) {
+        return isMainFolder(node)
+                && !folderList.getObservedFolderFromTreeItem(node).map(ObservedFolder::isScanning).orElse(false);
+    }
+
     public boolean removeMainFolder(ObservedFolder folder, TreeItem<NodeData> nodeToRemove) {
         folder.destroy();
 
@@ -229,13 +232,13 @@ public class MainController {
         return folderList.remove(folder);
     }
 
-    public void refreshViews(){
+    public void refreshViews() {
         treeTableView.refresh();
         fileInfoViewController.refresh();
         filesTypeViewController.refresh();
     }
 
-    public Optional<TreeItem<NodeData>> getSelectedItem(){
+    public Optional<TreeItem<NodeData>> getSelectedItem() {
         return Optional.ofNullable(treeTableView.getSelectionModel().getSelectedItem());
     }
 

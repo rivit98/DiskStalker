@@ -11,7 +11,7 @@ public class SetMaxFilesAmountButtonBinding extends AbstractButtonBooleanBinding
     ) {
         super(
                 () -> (
-                        !mainController.isMainFolder(selectionModel.getSelectedItem())
+                        !mainController.canSetLimitOnNode(selectionModel.getSelectedItem())
                                 || mainController.getMaxFilesAmountField().getText().isEmpty()
                 ),
                 selectionModel.selectedItemProperty(),

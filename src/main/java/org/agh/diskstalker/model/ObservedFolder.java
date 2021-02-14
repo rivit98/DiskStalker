@@ -58,7 +58,7 @@ public class ObservedFolder {
 
     public void scanDirectory() {
         scanning = true;
-        System.out.println("scanDirectory" + Thread.currentThread());
+        log.info(String.format("scanDirectory %s - %s", path, Thread.currentThread()));
 
         eventStream.onNext(new ObservedFolderScanStartedEvent(this));
 
@@ -76,8 +76,7 @@ public class ObservedFolder {
     }
 
     private void processEvent(FilesystemEvent event) {
-        System.out.println("processEvent " + Thread.currentThread());
-
+        log.info(String.format("processEvent %s | %s - %s", path, event, Thread.currentThread()));
         eventProcessor.processEvent(event);
         limits.updateIfNecessary(event);
     }
@@ -87,8 +86,8 @@ public class ObservedFolder {
     }
 
     private void startMonitoring() {
+        log.info(String.format("startMonitoring %s - %s", path, Thread.currentThread()));
         scanning = false;
-        System.out.println("startMonitoring" + Thread.currentThread());
         eventStream.onNext(new ObservedFolderScanFinishedEvent(this, nodesTree.getRoot()));
 
         var watchDisposable = filesystemWatcher
@@ -100,10 +99,11 @@ public class ObservedFolder {
                         this::errorHandler
                 );
 
-        compositeDisposable.addAll(watchDisposable);
+        compositeDisposable.add(watchDisposable);
     }
 
     public void destroy() {
+        log.info("ObservedFolder.destroy " + path);
         compositeDisposable.dispose();
         scanner.stop();
         filesystemWatcher.stop(); //FIXME: this takes quite much time (onAppExit)

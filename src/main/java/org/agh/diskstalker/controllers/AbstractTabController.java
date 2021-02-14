@@ -3,7 +3,6 @@ package org.agh.diskstalker.controllers;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
-import lombok.Getter;
 import org.agh.diskstalker.controllers.cellFactories.FolderColumnCellFactory;
 import org.agh.diskstalker.graphics.GraphicsFactory;
 import org.agh.diskstalker.model.FolderList;

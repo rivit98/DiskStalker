@@ -11,7 +11,7 @@ public class SetMaxSizeButtonBinding extends AbstractButtonBooleanBinding {
     ) {
         super(
                 () -> (
-                        !mainController.isMainFolder(selectionModel.getSelectedItem())
+                        !mainController.canSetLimitOnNode(selectionModel.getSelectedItem())
                                 || mainController.getMaxSizeField().getText().isEmpty()
                 ),
                 selectionModel.selectedItemProperty(),
