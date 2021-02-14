@@ -4,7 +4,6 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.ButtonType;
 import lombok.extern.slf4j.Slf4j;
 import org.agh.diskstalker.controllers.MainController;
-import org.agh.diskstalker.controllers.alerts.AlertsFactory;
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;

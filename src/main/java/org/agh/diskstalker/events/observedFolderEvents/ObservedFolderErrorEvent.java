@@ -1,7 +1,6 @@
 package org.agh.diskstalker.events.observedFolderEvents;
 
 import org.agh.diskstalker.controllers.MainController;
-import org.agh.diskstalker.controllers.alerts.AlertsFactory;
 import org.agh.diskstalker.model.ObservedFolder;
 
 public class ObservedFolderErrorEvent extends AbstractObservedFolderEvent{
