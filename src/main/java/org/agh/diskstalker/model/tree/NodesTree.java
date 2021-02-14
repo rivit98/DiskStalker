@@ -11,7 +11,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 
-public class TreeBuilder {
+public class NodesTree {
     @Getter
     private final ObservableMap<Path, TreeFileNode> pathToTreeMap = FXCollections.observableHashMap();
     @Getter
@@ -53,6 +53,27 @@ public class TreeBuilder {
                 .map(TreeItem::getValue)
                 .map(NodeData::getPath)
                 .ifPresent(pathToTreeMap::remove);
+    }
+
+    public long getSize() {
+        return Optional.ofNullable(root)
+                .map(rootNode -> rootNode.getValue().getAccumulatedSize())
+                .orElse(0L);
+    }
+
+    public long getFilesAmount() {
+        return pathToTreeMap.values().stream()
+                .filter(node -> !node.getValue().isDirectory())
+                .count();
+    }
+
+    public long getBiggestFileSize(){
+        return pathToTreeMap.values().stream()
+                .map(TreeItem::getValue)
+                .filter(NodeData::isFile)
+                .map(NodeData::getAccumulatedSize)
+                .max(Long::compare)
+                .orElse(0L);
     }
 }
 

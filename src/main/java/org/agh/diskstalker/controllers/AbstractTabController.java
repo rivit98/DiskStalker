@@ -15,6 +15,7 @@ public abstract class AbstractTabController {
     @FXML
     protected ListView<ObservedFolder> foldersTableView;
 
+    protected FolderList folderList;
     protected SortedList<ObservedFolder> sortedList;
 
     private final GraphicsFactory graphicsFactory;
@@ -35,6 +36,7 @@ public abstract class AbstractTabController {
     }
 
     protected void setModel(FolderList folderList) {
+        this.folderList = folderList;
         sortedList = new SortedList<>(folderList, Comparator.comparing(ObservedFolder::getName));
         foldersTableView.setItems(sortedList);
     }

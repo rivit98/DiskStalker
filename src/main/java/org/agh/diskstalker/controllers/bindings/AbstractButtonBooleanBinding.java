@@ -10,11 +10,11 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.concurrent.Callable;
 
 @Slf4j
-public abstract class AbstractButtonBinding extends BooleanBinding {
+public abstract class AbstractButtonBooleanBinding extends BooleanBinding {
     private final Observable[] dependencies;
     private final Callable<Boolean> func;
 
-    public AbstractButtonBinding(Callable<Boolean> func, Observable... dependencies) {
+    public AbstractButtonBooleanBinding(Callable<Boolean> func, Observable... dependencies) {
         bind(dependencies);
         this.dependencies = dependencies;
         this.func = func;

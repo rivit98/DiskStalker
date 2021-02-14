@@ -21,6 +21,10 @@ public class FolderColumnCellFactory extends ListCell<ObservedFolder> {
         }
 
         setText(folder.getPath().getFileName().toString());
-        setGraphic(graphicsFactory.getGraphic(true, folder.getLimits().isAnyLimitExceeded()));
+        if(folder.isScanning()){
+            setGraphic(graphicsFactory.getLoadingGraphics());
+        }else{
+            setGraphic(graphicsFactory.getGraphic(true, folder.getLimits().isAnyLimitExceeded()));
+        }
     }
 }

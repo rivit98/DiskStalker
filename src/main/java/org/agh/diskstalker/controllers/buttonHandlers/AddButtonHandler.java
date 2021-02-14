@@ -38,6 +38,7 @@ public class AddButtonHandler implements EventHandler<ActionEvent> {
         } else {
             var folder = new ObservedFolder(path);
             mainController.observeFolderEvents(folder);
+            folder.scanDirectory();
 
             mainController.getCommandExecutor().executeCommand(new CreateObservedFolderCommand(folder));
         }

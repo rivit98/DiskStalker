@@ -15,6 +15,7 @@ public class DirWatcher implements IFilesystemWatcher {
     private final PublishSubject<FilesystemEvent> subject = PublishSubject.create();
     private final Path path;
     private FileAlterationMonitor monitor;
+    private boolean running = false;
 
     public DirWatcher(Path path) {
         this.path = path;
@@ -27,6 +28,10 @@ public class DirWatcher implements IFilesystemWatcher {
 
     @Override
     public void stop() {
+        if(!running){
+            return;
+        }
+
         try {
             subject.onComplete();
             monitor.stop();
@@ -48,6 +53,7 @@ public class DirWatcher implements IFilesystemWatcher {
             observer.addListener(listener);
             monitor = new FileAlterationMonitor(pollingTimeMs, observer);
             monitor.start();
+            running = true;
         } catch (Exception ignored) {
             log.error("Cannot start DirWatcher");
         }

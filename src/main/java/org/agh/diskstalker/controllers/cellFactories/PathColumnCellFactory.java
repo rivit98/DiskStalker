@@ -4,6 +4,7 @@ import javafx.scene.control.TreeTableCell;
 import org.agh.diskstalker.controllers.MainController;
 import org.agh.diskstalker.graphics.GraphicsFactory;
 import org.agh.diskstalker.model.NodeData;
+import org.agh.diskstalker.model.ObservedFolder;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -38,10 +39,23 @@ public class PathColumnCellFactory extends TreeTableCell<NodeData, Path> {
         setText(fileName);
         mainController.getFolderList()
                 .getObservedFolderFromTreePath(item)
-                .ifPresent(folder -> {
-                    var node = folder.getNodeByPath(item);
-                    setGraphic(graphicsFactory.getGraphic(node.getValue().isDirectory(), folder.getLimits().isAnyLimitExceeded()));
-                });
+                .ifPresent(
+                        folder -> setGraphics(folder, item)
+                );
+    }
+
+    private void setGraphics(ObservedFolder folder, Path item){
+        if(folder.isScanning()){
+            setLoadingGraphics();
+        }else{
+            var node = folder.getNodeByPath(item);
+            var image = graphicsFactory.getGraphic(node.getValue().isDirectory(), folder.getLimits().isAnyLimitExceeded());
+            setGraphic(image);
+        }
+    }
+
+    private void setLoadingGraphics(){
+        setGraphic(graphicsFactory.getLoadingGraphics());
     }
 
     private void fileNameEmptyHandler(Path item) {

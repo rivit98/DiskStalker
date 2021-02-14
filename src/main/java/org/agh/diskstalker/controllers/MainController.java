@@ -1,6 +1,7 @@
 package org.agh.diskstalker.controllers;
 
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -29,8 +30,10 @@ import org.agh.diskstalker.persistence.command.GetAllObservedFolderCommand;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.Optional;
 
+@Getter
 @Slf4j
 @Component
 @FxmlView("/views/MainView.fxml")
@@ -38,7 +41,7 @@ public class MainController {
 
     @FXML
     private TabPane tabPane;
-    @FXML @Getter
+    @FXML
     private TreeTableView<NodeData> treeTableView;
     @FXML
     private TreeTableColumn<NodeData, Path> pathColumn;
@@ -54,29 +57,23 @@ public class MainController {
     private Button stopObserveButton;
     @FXML
     private Button setMaxSizeButton;
-    @FXML @Getter
+    @FXML
     private TextField maxSizeField;
     @FXML
     private Button deleteFromDiskButton;
-    @FXML @Getter
+    @FXML
     private TextField maxFilesAmountField;
     @FXML
     private Button setMaxFilesAmountButton;
-    @FXML @Getter
+    @FXML
     public TextField biggestFileField;
     @FXML
     public Button setBiggestFileSizeButton;
 
-    @Getter
+    private final HashMap<Path, TreeFileNode> loadingFolderList = new HashMap<>();
     private final DatabaseCommandExecutor commandExecutor;
-
-    @Getter
     private final FolderList folderList;
-
-    @Getter
     private final GraphicsFactory graphicsFactory;
-
-    @Getter
     private final AlertsFactory alertsFactory;
 
     public MainController(DatabaseCommandExecutor commandExecutor,
@@ -145,7 +142,7 @@ public class MainController {
     private void initializeButtons() {
         addButton.setOnAction(new AddButtonHandler(this));
         stopObserveButton.setOnAction(new StopObserveButtonHandler(this));
-        deleteFromDiskButton.setOnAction(new DeleteFromDiskButtonSetLimitHandler(this));
+        deleteFromDiskButton.setOnAction(new DeleteFromDiskButtonHandler(this)); //if folder is big then removing time is really long
         setMaxSizeButton.setOnAction(new SetSizeButtonHandler(this));
         setMaxFilesAmountButton.setOnAction(new SetMaxFilesAmountButtonHandler(this));
         setBiggestFileSizeButton.setOnAction(new SetBiggestFileButtonHandler(this));
@@ -170,21 +167,33 @@ public class MainController {
     }
 
 
-
-    private void loadSavedFolders() { //FIXME: restoring folders take long time
+    //TODO: disable buttons when folder is in scanning state
+    private void loadSavedFolders() {
         commandExecutor.executeCommand(new GetAllObservedFolderCommand())
-                .thenAccept(folders -> {
+                .thenAccept(folders -> Platform.runLater(() -> {
                     folders.getFolderList().forEach(this::observeFolderEvents);
-                });
+                    folders.getFolderList().forEach(ObservedFolder::scanDirectory);
+                }));
     }
 
-    public void addToMainTree(ObservedFolder folder, TreeFileNode node) {
+    // replace fake folder with real one
+    public void replaceLoadingFolderWithRealOne(ObservedFolder folder, TreeFileNode node) {
+        var fakeNode = loadingFolderList.remove(folder.getPath());
+        treeTableView.getRoot().getChildren().remove(fakeNode);
         treeTableView.getRoot().getChildren().add(node);
+        treeTableView.sort();
+        refreshViews();
+    }
+
+    public void addLoadingFolder(ObservedFolder folder) {
+        var node = new TreeFileNode(new NodeData(folder.getPath()));
+        loadingFolderList.put(folder.getPath(), node);
         folderList.add(folder);
+        treeTableView.getRoot().getChildren().add(node);
         treeTableView.sort();
     }
 
-    public void observeFolderEvents(ObservedFolder folder) { //TODO: this might be problematic, we should subscribe folder before scanner starts
+    public void observeFolderEvents(ObservedFolder folder) {
         folder.getEventStream()
                 .observeOn(JavaFxScheduler.platform())
                 .subscribe(event -> event.dispatch(this));
@@ -210,6 +219,8 @@ public class MainController {
 
     public boolean removeMainFolder(ObservedFolder folder, TreeItem<NodeData> nodeToRemove) {
         folder.destroy();
+
+        loadingFolderList.remove(folder.getPath());
         treeTableView.getRoot().getChildren().remove(nodeToRemove);
         if (treeTableView.getRoot().getChildren().isEmpty()) {
             treeTableView.getSelectionModel().clearSelection();
@@ -229,7 +240,9 @@ public class MainController {
     }
 
     public void onExit() {
+        log.info("MainController onExit");
         folderList.forEach(ObservedFolder::destroy);
         commandExecutor.stop();
     }
+
 }

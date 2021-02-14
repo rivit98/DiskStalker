@@ -12,13 +12,13 @@ import java.nio.file.Path;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class TreeBuilderTest {
+public class NodesTreeTest {
     private Path path;
-    private TreeBuilder builder;
+    private NodesTree builder;
 
     @BeforeEach
     public void setUp() {
-        builder = new TreeBuilder();
+        builder = new NodesTree();
         path = mock(Path.class);
         when(path.toFile()).thenReturn(mock(File.class));
         when(path.getFileName()).thenReturn(mock(Path.class));

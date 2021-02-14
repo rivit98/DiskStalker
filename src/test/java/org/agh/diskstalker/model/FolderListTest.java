@@ -23,7 +23,7 @@ public class FolderListTest {
         when(path.toFile()).thenReturn(mock(File.class));
         when(path.getFileName()).thenReturn(mock(Path.class));
         folder = new ObservedFolder(path);
-        folder.getTreeBuilder().processNodeData(new NodeData(path));
+        folder.getNodesTree().processNodeData(new NodeData(path));
     }
 
     @Test

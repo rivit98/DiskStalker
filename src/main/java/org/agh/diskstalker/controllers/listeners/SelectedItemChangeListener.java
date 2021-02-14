@@ -34,7 +34,7 @@ public class SelectedItemChangeListener implements ChangeListener<ObservedFolder
             clearOldListeners();
         }
 
-        if (newValue != null) {
+        if (newValue != null && !newValue.isScanning()) {
             setItems(newValue);
         } else {
             clearItems();
@@ -42,7 +42,7 @@ public class SelectedItemChangeListener implements ChangeListener<ObservedFolder
     }
 
     private void setItems(ObservedFolder selectedFolder) {
-        var nodesMap = selectedFolder.getTreeBuilder().getPathToTreeMap();
+        var nodesMap = selectedFolder.getNodesTree().getPathToTreeMap();
         var items = createFileList(nodesMap);
         var listener = createListener(items);
 
@@ -81,6 +81,8 @@ public class SelectedItemChangeListener implements ChangeListener<ObservedFolder
     }
 
     private void clearOldListeners() {
-        previousMap.removeListener(previousListener);
+        if(previousMap != null){
+            previousMap.removeListener(previousListener);
+        }
     }
 }

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
 
-//TODO: inject as spring service
 @Service
 public class AlertsFactory {
     public void tryingToAddSameFolderToObservedAlert() {

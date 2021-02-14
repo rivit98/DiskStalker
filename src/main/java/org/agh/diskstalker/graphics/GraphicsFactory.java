@@ -12,6 +12,9 @@ public final class GraphicsFactory {
     private static final Image FOLDER_IMAGE =
             new Image(GraphicsFactory.class.getResource("/images/folder-16.png").toString());
 
+    private static final Image FOLDER_LOADING_IMAGE =
+            new Image(GraphicsFactory.class.getResource("/images/Rolling-1s-16px.gif").toString());
+
     private static final Image FILE_IMAGE =
             new Image(GraphicsFactory.class.getResource("/images/file-16.png").toString());
 
@@ -25,5 +28,9 @@ public final class GraphicsFactory {
 
     public Image getApplicationIcon(){
         return APPLICATION_ICON;
+    }
+
+    public ImageView getLoadingGraphics() {
+        return new ImageView(FOLDER_LOADING_IMAGE);
     }
 }
