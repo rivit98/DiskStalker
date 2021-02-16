@@ -6,6 +6,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TreeItem;
 import org.agh.diskstalker.controllers.FileInfoController;
@@ -18,6 +19,7 @@ import java.util.Comparator;
 import java.util.stream.Collectors;
 
 public class SelectedItemChangeListener implements ChangeListener<ObservedFolder> {
+    private static final String LOADING_LABEL = "Loading...";
     private final FileInfoController fileInfoController;
     private final TableView<NodeData> dataTableView;
     private MapChangeListener<Path, TreeFileNode> previousListener;
@@ -37,6 +39,7 @@ public class SelectedItemChangeListener implements ChangeListener<ObservedFolder
         if (newValue != null && !newValue.isScanning()) {
             setItems(newValue);
         } else {
+            dataTableView.setPlaceholder(new Label(LOADING_LABEL));
             clearItems();
         }
     }

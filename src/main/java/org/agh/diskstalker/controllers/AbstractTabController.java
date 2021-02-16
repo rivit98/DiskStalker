@@ -42,6 +42,16 @@ public abstract class AbstractTabController {
 
     public void refresh(){
         foldersTableView.refresh();
+        refreshSelection();
+    }
+
+    public void refreshSelection(){
+        var selectionModel = foldersTableView.getSelectionModel();
+        var item = selectionModel.getSelectedItem();
+        if(item != null){
+            selectionModel.clearSelection();
+            selectionModel.select(item);
+        }
     }
 
     protected abstract void configureSelectionModelListener();
