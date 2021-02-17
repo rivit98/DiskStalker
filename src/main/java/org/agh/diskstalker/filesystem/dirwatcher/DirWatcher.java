@@ -34,7 +34,7 @@ public class DirWatcher implements IFilesystemWatcher {
 
         try {
             subject.onComplete();
-            monitor.stop();
+            monitor.stop(1);
         } catch (Exception ignored) {
             log.warn("Cannot stop DirWatcher");
         }
