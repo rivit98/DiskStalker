@@ -1,5 +1,6 @@
 package org.agh.diskstalker.controllers;
 
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
@@ -175,19 +176,19 @@ public class MainController {
     }
 
     // replace fake folder with real one
-    public void replaceLoadingFolderWithRealOne(ObservedFolder folder, TreeFileNode node) {
+    public void replaceLoadingFolderWithRealOne(ObservedFolder folder, TreeFileNode realRoot) {
         var fakeNode = loadingFolderList.remove(folder.getPath());
         treeTableView.getRoot().getChildren().remove(fakeNode);
-        treeTableView.getRoot().getChildren().add(node);
+        treeTableView.getRoot().getChildren().add(realRoot);
         treeTableView.sort();
         refreshViews();
     }
 
     public void addLoadingFolder(ObservedFolder folder) {
-        var node = new TreeFileNode(new NodeData(folder.getPath()));
-        loadingFolderList.put(folder.getPath(), node);
+        var fakeNode = new TreeFileNode(new NodeData(folder.getPath()));
+        loadingFolderList.put(folder.getPath(), fakeNode);
         folderList.add(folder);
-        treeTableView.getRoot().getChildren().add(node);
+        treeTableView.getRoot().getChildren().add(fakeNode);
         treeTableView.sort();
     }
 
@@ -247,5 +248,4 @@ public class MainController {
         folderList.forEach(ObservedFolder::destroy);
         commandExecutor.stop();
     }
-
 }

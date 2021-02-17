@@ -24,7 +24,7 @@ import java.util.Objects;
 @Slf4j
 @Getter
 public class ObservedFolder {
-    private static final long pollingInterval = 2000; //ms
+    private static final long pollingInterval = 3000; //ms
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
     private final PublishSubject<ObservedFolderEvent> eventStream = PublishSubject.create();
@@ -43,7 +43,7 @@ public class ObservedFolder {
 
     public ObservedFolder(Path path) {
         this.path = path;
-        this.filesystemWatcher = new DirWatcher(path);
+        this.filesystemWatcher = new DirWatcher(path, pollingInterval);
         this.filesTypeStatistics = new FilesTypeStatistics(nodesTree.getPathToTreeMap());
         this.eventProcessor = new EventProcessor(nodesTree, filesTypeStatistics);
         this.name = path.getFileName().toString();
@@ -52,15 +52,26 @@ public class ObservedFolder {
     }
 
     private void errorHandler(Throwable t) {
-        log.error("ObservedFolder Error ", t);
+        log.error("ObservedFolder error ", t);
         eventStream.onNext(new ObservedFolderErrorEvent(this, t.getClass().getCanonicalName()));
     }
 
     public void scanDirectory() {
         scanning = true;
-        log.info(String.format("scanDirectory %s - %s", path, Thread.currentThread()));
-
         eventStream.onNext(new ObservedFolderScanStartedEvent(this));
+
+        log.info(String.format("Initial scan started %s | %s", path, Thread.currentThread()));
+
+        var initScanDisposable = filesystemWatcher
+                .initScan()
+                .doOnComplete(this::performFullScan)
+                .subscribe();
+
+        compositeDisposable.add(initScanDisposable);
+    }
+
+    private void performFullScan() {
+        log.info(String.format("Initial scan finished %s | %s -> full scan performed", path, Thread.currentThread()));
 
         var scanDisposable = scanner
                 .scan()
@@ -76,12 +87,11 @@ public class ObservedFolder {
     }
 
     private void processEvent(FilesystemEvent event) {
-        log.info(String.format("processEvent %s | %s - %s", path, event, Thread.currentThread()));
         eventProcessor.processEvent(event);
         limits.updateIfNecessary(event);
     }
 
-    public void sendEvent(AbstractObservedFolderEvent event){
+    public void sendEvent(AbstractObservedFolderEvent event) {
         eventStream.onNext(event);
     }
 
@@ -91,7 +101,7 @@ public class ObservedFolder {
         eventStream.onNext(new ObservedFolderScanFinishedEvent(this, nodesTree.getRoot()));
 
         var watchDisposable = filesystemWatcher
-                .start(pollingInterval)
+                .start()
                 .subscribeOn(Schedulers.io())
                 .observeOn(JavaFxScheduler.platform())
                 .subscribe(
@@ -103,18 +113,17 @@ public class ObservedFolder {
     }
 
     public void destroy() {
-        log.info("ObservedFolder.destroy " + path);
+        eventStream.onComplete();
         compositeDisposable.dispose();
         scanner.stop();
-        filesystemWatcher.stop(); //FIXME: this takes quite much time (onAppExit)
-        eventStream.onComplete();
+        filesystemWatcher.stop();
     }
 
     public boolean containsNode(Path path) {
         return nodesTree.containsNode(path);
     }
 
-    public TreeFileNode getNodeByPath(Path path){
+    public TreeFileNode getNodeByPath(Path path) {
         return nodesTree.getPathToTreeMap().get(path);
     }
 
@@ -126,7 +135,7 @@ public class ObservedFolder {
         return nodesTree.getFilesAmount();
     }
 
-    public long getBiggestFileSize(){
+    public long getBiggestFileSize() {
         return nodesTree.getBiggestFileSize();
     }
 

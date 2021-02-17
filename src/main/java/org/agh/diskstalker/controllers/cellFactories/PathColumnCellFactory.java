@@ -39,8 +39,9 @@ public class PathColumnCellFactory extends TreeTableCell<NodeData, Path> {
         setText(fileName);
         mainController.getFolderList()
                 .getObservedFolderFromTreePath(item)
-                .ifPresent(
-                        folder -> setGraphics(folder, item)
+                .ifPresentOrElse(
+                        folder -> setGraphics(folder, item),
+                        this::setLoadingGraphics
                 );
     }
 
