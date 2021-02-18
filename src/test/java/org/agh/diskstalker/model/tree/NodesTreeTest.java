@@ -1,7 +1,6 @@
 package org.agh.diskstalker.model.tree;
 
 import javafx.scene.control.TreeItem;
-import org.agh.diskstalker.model.NodeData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

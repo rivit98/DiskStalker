@@ -1,15 +1,16 @@
 package org.agh.diskstalker.persistence;
 
-import org.agh.diskstalker.model.ObservedFolder;
+import org.agh.diskstalker.model.interfaces.ILimitableObservableFolder;
+import org.agh.diskstalker.model.interfaces.IObservedFolder;
 
 import java.util.List;
 
 public interface IObservedFolderDao {
-    void create(ObservedFolder observedFolder);
+    void create(IObservedFolder IObservedFolder);
 
-    void update(ObservedFolder observedFolder);
+    void update(ILimitableObservableFolder observedFolder);
 
-    void delete(ObservedFolder observedFolder);
+    void delete(IObservedFolder IObservedFolder);
 
-    List<ObservedFolder> getAll();
+    List<IObservedFolder> getAll();
 }

@@ -2,7 +2,7 @@ package org.agh.diskstalker.controllers.cellFactories;
 
 import javafx.css.PseudoClass;
 import javafx.scene.control.TreeTableCell;
-import org.agh.diskstalker.model.NodeData;
+import org.agh.diskstalker.model.tree.NodeData;
 import org.apache.commons.io.FileUtils;
 
 public class SizeTreeTableColumnCellFactory extends TreeTableCell<NodeData, Number> {

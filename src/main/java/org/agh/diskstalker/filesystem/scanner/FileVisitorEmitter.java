@@ -1,7 +1,7 @@
 package org.agh.diskstalker.filesystem.scanner;
 
 import io.reactivex.rxjava3.core.ObservableEmitter;
-import org.agh.diskstalker.model.NodeData;
+import org.agh.diskstalker.model.tree.NodeData;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;

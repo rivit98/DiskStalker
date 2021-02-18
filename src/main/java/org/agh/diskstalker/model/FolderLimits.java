@@ -30,7 +30,7 @@ public class FolderLimits {
     }
 
     private void sendEvent(AbstractObservedFolderEvent event){
-        folder.sendEvent(event);
+        folder.emitEvent(event);
     }
 
     private void sendSizeChangedEvent(){
@@ -86,5 +86,14 @@ public class FolderLimits {
 
     public boolean isAnyLimitExceeded(){
         return isTotalSizeExceeded() || isFilesAmountExceeded() || isBiggestFileLimitExceeded();
+    }
+
+    @Override
+    public String toString() {
+        return "FolderLimits{" +
+                "totalSizeLimit=" + totalSizeLimit +
+                ", filesAmountLimit=" + filesAmountLimit +
+                ", biggestFileLimit=" + biggestFileLimit +
+                '}';
     }
 }

@@ -6,16 +6,17 @@ import javafx.scene.control.ListView;
 import org.agh.diskstalker.controllers.cellFactories.FolderColumnCellFactory;
 import org.agh.diskstalker.graphics.GraphicsFactory;
 import org.agh.diskstalker.model.FolderList;
-import org.agh.diskstalker.model.ObservedFolder;
+import org.agh.diskstalker.model.interfaces.ILimitableObservableFolder;
+import org.agh.diskstalker.model.interfaces.IObservedFolder;
 
 import java.util.Comparator;
 
 public abstract class AbstractTabController {
     @FXML
-    protected ListView<ObservedFolder> foldersTableView;
+    protected ListView<ILimitableObservableFolder> foldersTableView;
 
     protected FolderList folderList;
-    protected SortedList<ObservedFolder> sortedList;
+    protected SortedList<ILimitableObservableFolder> sortedList;
 
     private final GraphicsFactory graphicsFactory;
 
@@ -36,7 +37,7 @@ public abstract class AbstractTabController {
 
     protected void setModel(FolderList folderList) {
         this.folderList = folderList;
-        sortedList = new SortedList<>(folderList, Comparator.comparing(ObservedFolder::getName));
+        sortedList = new SortedList<>(folderList, Comparator.comparing(IObservedFolder::getName));
         foldersTableView.setItems(sortedList);
     }
 

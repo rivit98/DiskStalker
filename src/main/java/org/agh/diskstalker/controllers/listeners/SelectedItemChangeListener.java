@@ -6,32 +6,37 @@ import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TreeItem;
 import org.agh.diskstalker.controllers.FileInfoController;
-import org.agh.diskstalker.model.NodeData;
-import org.agh.diskstalker.model.ObservedFolder;
+import org.agh.diskstalker.model.interfaces.IObservedFolder;
+import org.agh.diskstalker.model.tree.NodeData;
 import org.agh.diskstalker.model.tree.TreeFileNode;
 
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
-public class SelectedItemChangeListener implements ChangeListener<ObservedFolder> {
+public class SelectedItemChangeListener implements ChangeListener<IObservedFolder> {
     private static final String LOADING_LABEL = "Loading...";
     private final FileInfoController fileInfoController;
     private final TableView<NodeData> dataTableView;
+    private final Node originalLabel;
+    private final Node loadingLabel;
     private MapChangeListener<Path, TreeFileNode> previousListener;
     private ObservableMap<Path, TreeFileNode> previousMap;
 
     public SelectedItemChangeListener(FileInfoController fileInfoController) {
         this.fileInfoController = fileInfoController;
         this.dataTableView = fileInfoController.getDataTableView();
+        this.originalLabel = dataTableView.getPlaceholder();
+        this.loadingLabel = new Label(LOADING_LABEL);
     }
 
     @Override
-    public void changed(ObservableValue<? extends ObservedFolder> observable, ObservedFolder oldValue, ObservedFolder newValue) {
+    public void changed(ObservableValue<? extends IObservedFolder> observable, IObservedFolder oldValue, IObservedFolder newValue) {
         if (oldValue != null) {
             clearOldListeners();
         }
@@ -39,12 +44,12 @@ public class SelectedItemChangeListener implements ChangeListener<ObservedFolder
         if (newValue != null && !newValue.isScanning()) {
             setItems(newValue);
         } else {
-            dataTableView.setPlaceholder(new Label(LOADING_LABEL));
+            dataTableView.setPlaceholder((newValue != null) ? loadingLabel : originalLabel);
             clearItems();
         }
     }
 
-    private void setItems(ObservedFolder selectedFolder) {
+    private void setItems(IObservedFolder selectedFolder) {
         var nodesMap = selectedFolder.getNodesTree().getPathToTreeMap();
         var items = createFileList(nodesMap);
         var listener = createListener(items);

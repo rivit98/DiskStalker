@@ -24,9 +24,9 @@ public class QueryExecutor {
             create("CREATE TABLE IF NOT EXISTS observedFolders (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "path VARCHAR(1024) NOT NULL," +
-                    "max_size_limit INT NOT NULL DEFAULT 0," +
-                    "total_files_limit INT NOT NULL DEFAULT 0," +
-                    "biggest_file_limit INT NOT NULL DEFAULT 0" +
+                    "max_size_limit VARCHAR(128) NOT NULL DEFAULT '0'," +
+                    "total_files_limit VARCHAR(128) NOT NULL DEFAULT '0'," +
+                    "biggest_file_limit VARCHAR(128) NOT NULL DEFAULT '0'" +
                     ");");
 
         } catch (SQLException e) {
@@ -36,7 +36,7 @@ public class QueryExecutor {
     }
 
     public int createAndObtainId(final String insertSql, Object... args) throws SQLException {
-        var ps = connectionProvider.getConnection().prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
+        var ps = connectionProvider.get().prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
         mapParams(ps, args);
         ps.execute();
         try (var resultSet = ps.getGeneratedKeys()) {
@@ -49,32 +49,32 @@ public class QueryExecutor {
     }
 
     public void create(final String insertSql, Object... args) throws SQLException {
-        var ps = connectionProvider.getConnection().prepareStatement(insertSql);
+        var ps = connectionProvider.get().prepareStatement(insertSql);
         mapParams(ps, args);
         ps.execute();
     }
 
     public ResultSet read(final String sql, Object... args) throws SQLException {
-        var ps = connectionProvider.getConnection().prepareStatement(sql);
+        var ps = connectionProvider.get().prepareStatement(sql);
         mapParams(ps, args);
         return ps.executeQuery();
     }
 
     public void delete(final String sql, Object... args) throws SQLException {
-        var ps = connectionProvider.getConnection().prepareStatement(sql);
+        var ps = connectionProvider.get().prepareStatement(sql);
         mapParams(ps, args);
         ps.executeUpdate();
     }
 
     public void executeUpdate(final String sql, Object... args) throws SQLException {
-        connectionProvider.getConnection().setAutoCommit(false);
+        connectionProvider.get().setAutoCommit(false);
 
-        var ps = connectionProvider.getConnection().prepareStatement(sql);
+        var ps = connectionProvider.get().prepareStatement(sql);
         mapParams(ps, args);
         ps.executeUpdate();
 
-        connectionProvider.getConnection().commit();
-        connectionProvider.getConnection().setAutoCommit(true);
+        connectionProvider.get().commit();
+        connectionProvider.get().setAutoCommit(true);
     }
 
     public void mapParams(PreparedStatement ps, Object... args) throws SQLException {

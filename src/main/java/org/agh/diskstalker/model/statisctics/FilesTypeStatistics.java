@@ -3,7 +3,7 @@ package org.agh.diskstalker.model.statisctics;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
-import org.agh.diskstalker.model.NodeData;
+import org.agh.diskstalker.model.tree.NodeData;
 import org.agh.diskstalker.model.tree.TreeFileNode;
 
 import java.nio.file.Path;

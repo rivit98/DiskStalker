@@ -27,7 +27,7 @@ public class DeleteFromDiskButtonHandler extends AbstractButtonSetLimitHandler {
 
             mainController.removeTreeItem(item);
 
-            new Thread(() -> {
+            new Thread(() -> { //might be problematic...
                 log.info("Starting thread. Remove " + searchedPath);
                 try {
                     var searchedFile = searchedPath.toFile();

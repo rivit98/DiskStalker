@@ -1,6 +1,5 @@
 package org.agh.diskstalker.controllers;
 
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
@@ -20,9 +19,11 @@ import org.agh.diskstalker.controllers.listeners.MaxSizeButtonListener;
 import org.agh.diskstalker.controllers.sortPolicies.MainControllerSortPolicy;
 import org.agh.diskstalker.formatters.StringToIntFormatter;
 import org.agh.diskstalker.graphics.GraphicsFactory;
+import org.agh.diskstalker.model.FakeObservedFolder;
 import org.agh.diskstalker.model.FolderList;
-import org.agh.diskstalker.model.NodeData;
-import org.agh.diskstalker.model.ObservedFolder;
+import org.agh.diskstalker.model.interfaces.ILimitableObservableFolder;
+import org.agh.diskstalker.model.interfaces.IObservedFolder;
+import org.agh.diskstalker.model.tree.NodeData;
 import org.agh.diskstalker.model.tree.TreeFileNode;
 import org.agh.diskstalker.persistence.DatabaseCommandExecutor;
 import org.agh.diskstalker.persistence.command.ConnectToDbCommand;
@@ -34,16 +35,13 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Optional;
 
-@Getter
 @Slf4j
 @Component
 @FxmlView("/views/MainView.fxml")
 public class MainController {
 
     @FXML
-    private TabPane tabPane;
-    @FXML
-    private TreeTableView<NodeData> treeTableView;
+    @Getter private TreeTableView<NodeData> treeTableView;
     @FXML
     private TreeTableColumn<NodeData, Path> pathColumn;
     @FXML
@@ -59,23 +57,22 @@ public class MainController {
     @FXML
     private Button setMaxSizeButton;
     @FXML
-    private TextField maxSizeField;
+    @Getter private TextField maxSizeField;
     @FXML
     private Button deleteFromDiskButton;
     @FXML
-    private TextField maxFilesAmountField;
+    @Getter private TextField maxFilesAmountField;
     @FXML
     private Button setMaxFilesAmountButton;
     @FXML
-    public TextField biggestFileField;
+    @Getter public TextField biggestFileField;
     @FXML
     public Button setBiggestFileSizeButton;
 
-    private final HashMap<Path, TreeFileNode> loadingFolderList = new HashMap<>();
-    private final DatabaseCommandExecutor commandExecutor;
-    private final FolderList folderList;
-    private final GraphicsFactory graphicsFactory;
-    private final AlertsFactory alertsFactory;
+    @Getter private final DatabaseCommandExecutor commandExecutor;
+    @Getter private final FolderList folderList;
+    @Getter private final GraphicsFactory graphicsFactory;
+    @Getter private final AlertsFactory alertsFactory;
 
     public MainController(DatabaseCommandExecutor commandExecutor,
                           FolderList folderList,
@@ -101,11 +98,11 @@ public class MainController {
 
     private void initializeStatisticsLoading() {
         //TODO: refactor whole type recognizing system
-        tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
-            if (newTab.getId().equals("filesTypeView")) {
-                folderList.forEach(folder -> new Thread(folder::createTypeStatistics).start());
-            }
-        });
+//        tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
+//            if (newTab.getId().equals("filesTypeView")) {
+//                folderList.forEach(folder -> new Thread(folder::createTypeStatistics).start());
+//            }
+//        });
     }
 
     private void createRoot() {
@@ -171,34 +168,43 @@ public class MainController {
         commandExecutor.executeCommand(new GetAllObservedFolderCommand())
                 .thenAccept(folders -> Platform.runLater(() -> {
                     folders.getFolderList().forEach(this::observeFolderEvents);
-                    folders.getFolderList().forEach(ObservedFolder::scanDirectory);
+                    folders.getFolderList().forEach(IObservedFolder::scan);
                 }));
     }
 
     // replace fake folder with real one
-    public void replaceLoadingFolderWithRealOne(ObservedFolder folder, TreeFileNode realRoot) {
-        var fakeNode = loadingFolderList.remove(folder.getPath());
-        treeTableView.getRoot().getChildren().remove(fakeNode);
+    public void replaceLoadingFolderWithRealOne(IObservedFolder folder, TreeFileNode realRoot) {
+        var searchedPath = folder.getPath();
+        var fakeFolder = (FakeObservedFolder) folderList.stream()
+                .filter(f -> f.getPath().equals(searchedPath))
+                .findFirst()
+                .orElseThrow();
+
+        var indexToReplace = folderList.indexOf(fakeFolder);
+        folderList.set(indexToReplace, fakeFolder.getRealObservedFolder());
+        treeTableView.getRoot().getChildren().remove(fakeFolder.getFakeNode());
         treeTableView.getRoot().getChildren().add(realRoot);
         treeTableView.sort();
         refreshViews();
     }
 
-    public void addLoadingFolder(ObservedFolder folder) {
-        var fakeNode = new TreeFileNode(new NodeData(folder.getPath()));
-        loadingFolderList.put(folder.getPath(), fakeNode);
-        folderList.add(folder);
-        treeTableView.getRoot().getChildren().add(fakeNode);
+    public void addLoadingFolder(ILimitableObservableFolder folder) {
+        var fakeFolder = new FakeObservedFolder(folder);
+        folderList.add(fakeFolder);
+        treeTableView.getRoot().getChildren().add(fakeFolder.getFakeNode());
         treeTableView.sort();
     }
 
-    public void observeFolderEvents(ObservedFolder folder) {
+    public void observeFolderEvents(IObservedFolder folder) {
         folder.getEventStream()
                 .observeOn(JavaFxScheduler.platform())
-                .subscribe(event -> event.dispatch(this));
+                .subscribe(
+                        event -> event.dispatch(this),
+                        t -> log.warn(t.getMessage())
+                );
     }
 
-    public boolean removeFolder(ObservedFolder folder, TreeItem<NodeData> treeItem) {
+    public boolean removeFolder(ILimitableObservableFolder folder, TreeItem<NodeData> treeItem) {
         if (isMainFolder(treeItem)) {
             return removeMainFolder(folder, treeItem);
         } else {
@@ -218,13 +224,12 @@ public class MainController {
 
     public boolean canSetLimitOnNode(TreeItem<NodeData> node) {
         return isMainFolder(node)
-                && !folderList.getObservedFolderFromTreeItem(node).map(ObservedFolder::isScanning).orElse(false);
+                && !folderList.getObservedFolderFromTreeItem(node).map(IObservedFolder::isScanning).orElse(false);
     }
 
-    public boolean removeMainFolder(ObservedFolder folder, TreeItem<NodeData> nodeToRemove) {
+    public boolean removeMainFolder(ILimitableObservableFolder folder, TreeItem<NodeData> nodeToRemove) {
         folder.destroy();
 
-        loadingFolderList.remove(folder.getPath());
         treeTableView.getRoot().getChildren().remove(nodeToRemove);
         if (treeTableView.getRoot().getChildren().isEmpty()) {
             treeTableView.getSelectionModel().clearSelection();
@@ -245,7 +250,7 @@ public class MainController {
 
     public void onExit() {
         log.info("MainController onExit");
-        folderList.forEach(ObservedFolder::destroy);
+        folderList.forEach(IObservedFolder::destroy);
         commandExecutor.stop();
     }
 }

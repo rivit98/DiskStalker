@@ -1,4 +1,4 @@
-package org.agh.diskstalker.model;
+package org.agh.diskstalker.model.tree;
 
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;

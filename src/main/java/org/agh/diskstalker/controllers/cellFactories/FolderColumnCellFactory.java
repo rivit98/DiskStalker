@@ -2,9 +2,9 @@ package org.agh.diskstalker.controllers.cellFactories;
 
 import javafx.scene.control.ListCell;
 import org.agh.diskstalker.graphics.GraphicsFactory;
-import org.agh.diskstalker.model.ObservedFolder;
+import org.agh.diskstalker.model.interfaces.ILimitableObservableFolder;
 
-public class FolderColumnCellFactory extends ListCell<ObservedFolder> {
+public class FolderColumnCellFactory extends ListCell<ILimitableObservableFolder> {
     private final GraphicsFactory graphicsFactory;
 
     public FolderColumnCellFactory(GraphicsFactory graphicsFactory) {
@@ -12,7 +12,7 @@ public class FolderColumnCellFactory extends ListCell<ObservedFolder> {
     }
 
     @Override
-    protected void updateItem(ObservedFolder folder, boolean empty) {
+    protected void updateItem(ILimitableObservableFolder folder, boolean empty) {
         super.updateItem(folder, empty);
         if(empty) {
             setText(null);

@@ -1,6 +1,8 @@
 package org.agh.diskstalker.model;
 
 import javafx.scene.control.TreeItem;
+import org.agh.diskstalker.model.interfaces.ILimitableObservableFolder;
+import org.agh.diskstalker.model.tree.NodeData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,7 +16,7 @@ import static org.mockito.Mockito.when;
 public class FolderListTest {
     private FolderList folderList;
     private Path path;
-    private ObservedFolder folder;
+    private ILimitableObservableFolder folder;
 
     @BeforeEach
     public void setUp() {

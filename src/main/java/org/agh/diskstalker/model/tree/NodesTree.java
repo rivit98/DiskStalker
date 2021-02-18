@@ -5,7 +5,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.scene.control.TreeItem;
 import lombok.Getter;
-import org.agh.diskstalker.model.NodeData;
 
 import java.nio.file.Path;
 import java.util.Optional;

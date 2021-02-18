@@ -1,6 +1,5 @@
 package org.agh.diskstalker.model.tree;
 
-import org.agh.diskstalker.model.NodeData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

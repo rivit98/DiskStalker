@@ -93,24 +93,24 @@
                         <Insets />
                     </GridPane.margin>
                 </Text>
-            <TextField fx:id="maxSizeField" promptText="Size (MB)" prefHeight="25.0" prefWidth="125.0" GridPane.columnIndex="1" GridPane.rowIndex="6">
+            <TextField fx:id="maxSizeField" prefHeight="25.0" prefWidth="125.0" GridPane.columnIndex="1" GridPane.rowIndex="6">
                 <GridPane.margin>
                     <Insets left="5.0" />
                 </GridPane.margin>
             </TextField>
-            <TextField fx:id="maxFilesAmountField" promptText="Number" prefHeight="25.0" prefWidth="125.0" GridPane.columnIndex="1" GridPane.rowIndex="9">
+            <TextField fx:id="maxFilesAmountField" prefHeight="25.0" prefWidth="125.0" GridPane.columnIndex="1" GridPane.rowIndex="9">
                <GridPane.margin>
                   <Insets left="5.0" />
                </GridPane.margin>
             </TextField>
-            <TextField fx:id="biggestFileField" promptText="Size (MB)" prefHeight="25.0" prefWidth="125.0" GridPane.columnIndex="1" GridPane.rowIndex="12">
+            <TextField fx:id="biggestFileField" prefHeight="25.0" prefWidth="125.0" GridPane.columnIndex="1" GridPane.rowIndex="12">
                <GridPane.margin>
                   <Insets left="5.0" />
                </GridPane.margin>
             </TextField>
-            <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Total size limit" textAlignment="CENTER" wrappingWidth="193.5" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+            <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Total size limit (MB)" textAlignment="CENTER" wrappingWidth="193.5" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
             <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Number of files limit" textAlignment="CENTER" wrappingWidth="193.5" GridPane.columnIndex="1" GridPane.rowIndex="8" />
-            <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Biggest file size limit" textAlignment="CENTER" wrappingWidth="194.0" GridPane.columnIndex="1" GridPane.rowIndex="11" />
+            <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Biggest file size limit (MB)" textAlignment="CENTER" wrappingWidth="194.0" GridPane.columnIndex="1" GridPane.rowIndex="11" />
             </GridPane>
         </Tab>
         <fx:include fx:id="filesTypeView" source="FilesTypeView.fxml" />

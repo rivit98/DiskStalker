@@ -40,13 +40,9 @@ public class DirWatcher implements IFilesystemWatcher {
             return;
         }
 
-        try {
-            subject.onComplete();
-            monitoringDisposable.dispose();
-            monitor.stop();
-        } catch (Exception ignored) {
-            log.warn("Cannot stop DirWatcher");
-        }
+        subject.onComplete();
+        monitoringDisposable.dispose();
+        monitor.stop();
     }
 
     @Override
@@ -56,10 +52,10 @@ public class DirWatcher implements IFilesystemWatcher {
 
     @Override
     public Observable<FilesystemEvent> start() {
-        try{
+        try {
             monitoringDisposable = monitor.start().subscribe();
             running = true;
-        }catch (IllegalStateException e){
+        } catch (IllegalStateException e) {
             log.warn("DirWatcher" + e.getMessage());
         }
 

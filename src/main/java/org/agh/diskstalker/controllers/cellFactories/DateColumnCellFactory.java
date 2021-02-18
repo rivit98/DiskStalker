@@ -2,14 +2,13 @@ package org.agh.diskstalker.controllers.cellFactories;
 
 import javafx.css.PseudoClass;
 import javafx.scene.control.TableCell;
-import org.agh.diskstalker.model.NodeData;
+import org.agh.diskstalker.model.tree.NodeData;
 
 import java.nio.file.attribute.FileTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 public class DateColumnCellFactory extends TableCell<NodeData, FileTime> {
-
     public static final String dateFormat = "uuuu-MM-dd HH:mm:ss";
 
     public DateColumnCellFactory() {
@@ -21,11 +20,13 @@ public class DateColumnCellFactory extends TableCell<NodeData, FileTime> {
         super.updateItem(value, empty);
         if (value == null || empty) {
             setText(null);
-        } else {
-            var formattedDate = DateTimeFormatter.ofPattern(dateFormat)
-                    .withZone(ZoneId.systemDefault())
-                    .format(value.toInstant());
-            setText(formattedDate);
+            return;
         }
+
+        var formattedDate = DateTimeFormatter.ofPattern(dateFormat)
+                .withZone(ZoneId.systemDefault())
+                .format(value.toInstant());
+
+        setText(formattedDate);
     }
 }

@@ -8,8 +8,6 @@ import org.agh.diskstalker.graphics.GraphicsFactory;
 import org.agh.diskstalker.model.statisctics.Type;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
-
 @Component
 @FxmlView("/views/FilesTypeView.fxml")
 public class FilesTypeController extends AbstractTabController {
@@ -25,14 +23,14 @@ public class FilesTypeController extends AbstractTabController {
     }
 
     protected void configureSelectionModelListener() {
-        foldersTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if(newValue != null) {
-                dataTableView.setItems(newValue.getFilesTypeStatistics().getTypeStatistics());
-                dataTableView.getSortOrder().addAll(Collections.singletonList(quantityColumn));
-            } else {
-                dataTableView.getItems().clear();
-            }
-        });
+//        foldersTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+//            if(newValue != null) {
+//                dataTableView.setItems(newValue.getFilesTypeStatistics().getTypeStatistics());
+//                dataTableView.getSortOrder().addAll(Collections.singletonList(quantityColumn));
+//            } else {
+//                dataTableView.getItems().clear();
+//            }
+//        });
     }
 
     protected void prepareDataTableView() {

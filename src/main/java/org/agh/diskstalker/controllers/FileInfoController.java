@@ -10,7 +10,7 @@ import org.agh.diskstalker.controllers.cellFactories.DateColumnCellFactory;
 import org.agh.diskstalker.controllers.cellFactories.SizeTableColumnCellFactory;
 import org.agh.diskstalker.controllers.listeners.SelectedItemChangeListener;
 import org.agh.diskstalker.graphics.GraphicsFactory;
-import org.agh.diskstalker.model.NodeData;
+import org.agh.diskstalker.model.tree.NodeData;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.attribute.FileTime;

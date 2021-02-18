@@ -3,6 +3,8 @@ package org.agh.diskstalker.persistence;
 import lombok.extern.slf4j.Slf4j;
 import org.agh.diskstalker.builders.FolderLimitsBuilder;
 import org.agh.diskstalker.model.ObservedFolder;
+import org.agh.diskstalker.model.interfaces.ILimitableObservableFolder;
+import org.agh.diskstalker.model.interfaces.IObservedFolder;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Files;
@@ -21,8 +23,8 @@ public class ObservedFolderDao implements IObservedFolderDao {
     }
 
     @Override
-    public void create(ObservedFolder observedFolder) {
-        var path = observedFolder.getPath().toString();
+    public void create(IObservedFolder IObservedFolder) {
+        var path = IObservedFolder.getPath().toString();
         var insertIntoDB = "INSERT INTO observedFolders (path) VALUES (?);";
         Object[] args = {path};
 
@@ -34,11 +36,16 @@ public class ObservedFolderDao implements IObservedFolderDao {
     }
 
     @Override
-    public void update(ObservedFolder observedFolder) {
+    public void update(ILimitableObservableFolder observedFolder) {
         var path = observedFolder.getPath().toString();
         var limits = observedFolder.getLimits();
         var updateDB = "UPDATE observedFolders SET max_size_limit = (?), total_files_limit = (?), biggest_file_limit = (?) WHERE path = (?);";
-        Object[] args = {limits.getTotalSizeLimit(), limits.getFilesAmountLimit(), limits.getBiggestFileLimit(), path};
+        Object[] args = {
+                String.valueOf(limits.getTotalSizeLimit()),
+                String.valueOf(limits.getFilesAmountLimit()),
+                String.valueOf(limits.getBiggestFileLimit()),
+                path
+        };
 
         try {
             queryExecutor.executeUpdate(updateDB, args);
@@ -48,10 +55,13 @@ public class ObservedFolderDao implements IObservedFolderDao {
     }
 
     @Override
-    public void delete(ObservedFolder observedFolder) {
-        var path = observedFolder.getPath().toString();
+    public void delete(IObservedFolder IObservedFolder) {
+        deletePath(IObservedFolder.getPath());
+    }
+
+    private void deletePath(Path path){
         var deleteObservedFolder = "DELETE FROM observedFolders WHERE path = (?);";
-        Object[] args = {path};
+        Object[] args = {path.toString()};
 
         try {
             queryExecutor.delete(deleteObservedFolder, args);
@@ -61,10 +71,11 @@ public class ObservedFolderDao implements IObservedFolderDao {
     }
 
     @Override
-    public List<ObservedFolder> getAll() {
+    public List<IObservedFolder> getAll() {
         var findObservedFolders = "SELECT * FROM observedFolders;";
 
-        var resultList = new LinkedList<ObservedFolder>();
+        var resultList = new LinkedList<IObservedFolder>();
+        var toDelete = new LinkedList<Path>();
         try (var rs = queryExecutor.read(findObservedFolders)) {
             while (rs.next()) {
                 var path = Path.of(rs.getString("path"));
@@ -72,23 +83,23 @@ public class ObservedFolderDao implements IObservedFolderDao {
                     var folder = new ObservedFolder(path);
                     var limits = new FolderLimitsBuilder()
                             .withFolder(folder)
-                            .withTotalSize(rs.getInt("max_size_limit"))
-                            .withFileAmount(rs.getInt("total_files_limit"))
-                            .withBiggestFileSize(rs.getInt("biggest_file_limit"))
+                            .withTotalSize(Long.parseLong(rs.getString("max_size_limit")))
+                            .withFileAmount(Long.parseLong(rs.getString("total_files_limit")))
+                            .withBiggestFileSize(Long.parseLong(rs.getString("biggest_file_limit")))
                             .build();
 
                     folder.setLimits(limits);
                     resultList.add(folder);
+                    log.info("Loaded " + folder.getPath() + " with limits: " + limits);
                 } else {
-                    var delete = "DELETE FROM observedFolders WHERE path = (?);";
-                    Object[] args = {path.toString()};
-
-                    queryExecutor.delete(delete, args);
+                    toDelete.add(path);
                 }
             }
         } catch (SQLException e) {
             log.error("Error during executing database query: " + e.getMessage());
         }
+        toDelete.forEach(this::deletePath);
+
         return resultList;
     }
 }

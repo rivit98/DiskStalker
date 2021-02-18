@@ -14,6 +14,7 @@ import org.agh.diskstalker.events.observedFolderEvents.*;
 import org.agh.diskstalker.filesystem.dirwatcher.DirWatcher;
 import org.agh.diskstalker.filesystem.dirwatcher.IFilesystemWatcher;
 import org.agh.diskstalker.filesystem.scanner.FileTreeScanner;
+import org.agh.diskstalker.model.interfaces.ILimitableObservableFolder;
 import org.agh.diskstalker.model.statisctics.FilesTypeStatistics;
 import org.agh.diskstalker.model.tree.NodesTree;
 import org.agh.diskstalker.model.tree.TreeFileNode;
@@ -22,23 +23,21 @@ import java.nio.file.Path;
 import java.util.Objects;
 
 @Slf4j
-@Getter
-public class ObservedFolder {
-    private static final long pollingInterval = 3000; //ms
+public class ObservedFolder implements ILimitableObservableFolder {
+    private static final long pollingInterval = 4000; //ms
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
-    private final PublishSubject<ObservedFolderEvent> eventStream = PublishSubject.create();
-    private final NodesTree nodesTree = new NodesTree();
+    @Getter private final PublishSubject<ObservedFolderEvent> eventStream = PublishSubject.create();
+    @Getter private final NodesTree nodesTree = new NodesTree();
 
-    private final Path path;
+    @Getter private final Path path;
     private final IFilesystemWatcher filesystemWatcher;
     private final IEventProcessor eventProcessor;
     private final FileTreeScanner scanner;
-    private final FilesTypeStatistics filesTypeStatistics;
-    private final String name;
-    @Setter
-    private FolderLimits limits;
-    private boolean scanning = false;
+    @Getter private final FilesTypeStatistics filesTypeStatistics;
+    @Getter private final String name;
+    @Getter @Setter private FolderLimits limits;
+    @Getter private boolean scanning = false;
 
 
     public ObservedFolder(Path path) {
@@ -51,12 +50,8 @@ public class ObservedFolder {
         this.limits = new FolderLimits(this);
     }
 
-    private void errorHandler(Throwable t) {
-        log.error("ObservedFolder error ", t);
-        eventStream.onNext(new ObservedFolderErrorEvent(this, t.getClass().getCanonicalName()));
-    }
-
-    public void scanDirectory() {
+    @Override
+    public void scan() {
         scanning = true;
         eventStream.onNext(new ObservedFolderScanStartedEvent(this));
 
@@ -71,28 +66,18 @@ public class ObservedFolder {
     }
 
     private void performFullScan() {
-        log.info(String.format("Initial scan finished %s | %s -> full scan performed", path, Thread.currentThread()));
+        log.info(String.format("performFullScan %s | %s", path, Thread.currentThread()));
 
         var scanDisposable = scanner
                 .scan()
                 .subscribeOn(Schedulers.io())
                 .doOnComplete(this::startMonitoring)
-//                .observeOn(JavaFxScheduler.platform())
                 .subscribe(
                         nodesTree::processNodeData,
                         this::errorHandler
                 );
 
         compositeDisposable.add(scanDisposable);
-    }
-
-    private void processEvent(FilesystemEvent event) {
-        eventProcessor.processEvent(event);
-        limits.updateIfNecessary(event);
-    }
-
-    public void sendEvent(AbstractObservedFolderEvent event) {
-        eventStream.onNext(event);
     }
 
     private void startMonitoring() {
@@ -112,29 +97,51 @@ public class ObservedFolder {
         compositeDisposable.add(watchDisposable);
     }
 
+    private void errorHandler(Throwable t) {
+        log.error("ObservedFolder error ", t);
+        eventStream.onNext(new ObservedFolderErrorEvent(this, t.getClass().getCanonicalName()));
+    }
+
+    private void processEvent(FilesystemEvent event) {
+        eventProcessor.processEvent(event);
+        limits.updateIfNecessary(event);
+    }
+
+    @Override
     public void destroy() {
+        log.info("Destroying ObservedFolder " + path);
         eventStream.onComplete();
         compositeDisposable.dispose();
         scanner.stop();
         filesystemWatcher.stop();
     }
 
+    @Override
     public boolean containsNode(Path path) {
         return nodesTree.containsNode(path);
     }
 
+    @Override
     public TreeFileNode getNodeByPath(Path path) {
         return nodesTree.getPathToTreeMap().get(path);
     }
 
+    @Override
+    public void emitEvent(AbstractObservedFolderEvent event) {
+        eventStream.onNext(event);
+    }
+
+    @Override
     public long getSize() {
         return nodesTree.getSize();
     }
 
+    @Override
     public long getFilesAmount() {
         return nodesTree.getFilesAmount();
     }
 
+    @Override
     public long getBiggestFileSize() {
         return nodesTree.getBiggestFileSize();
     }

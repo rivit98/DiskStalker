@@ -1,7 +1,6 @@
 package org.agh.diskstalker.model.tree;
 
 import javafx.scene.control.TreeItem;
-import org.agh.diskstalker.model.NodeData;
 
 import java.util.Comparator;
 import java.util.Objects;

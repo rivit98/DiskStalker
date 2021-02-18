@@ -5,8 +5,8 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import org.agh.diskstalker.model.FolderList;
-import org.agh.diskstalker.model.NodeData;
-import org.agh.diskstalker.model.ObservedFolder;
+import org.agh.diskstalker.model.interfaces.ILimitableFolder;
+import org.agh.diskstalker.model.tree.NodeData;
 
 public abstract class AbstractLimitButtonListener implements ChangeListener<TreeItem<NodeData>> {
     protected final TextField textField;
@@ -25,5 +25,5 @@ public abstract class AbstractLimitButtonListener implements ChangeListener<Tree
                 });
     }
 
-    protected abstract void handle(ObservedFolder newObservedFolder, TreeItem<NodeData> oldTreeItem);
+    protected abstract void handle(ILimitableFolder newFolder, TreeItem<NodeData> oldTreeItem);
 }
