@@ -40,34 +40,20 @@ import java.util.Optional;
 @FxmlView("/views/MainView.fxml")
 public class MainController {
 
-    @FXML
-    @Getter private TreeTableView<NodeData> treeTableView;
-    @FXML
-    private TreeTableColumn<NodeData, Path> pathColumn;
-    @FXML
-    private TreeTableColumn<NodeData, Number> sizeColumn;
-    @FXML
-    private AbstractTabController filesTypeViewController;
-    @FXML
-    private AbstractTabController fileInfoViewController;
-    @FXML
-    private Button addButton;
-    @FXML
-    private Button stopObserveButton;
-    @FXML
-    private Button setMaxSizeButton;
-    @FXML
-    @Getter private TextField maxSizeField;
-    @FXML
-    private Button deleteFromDiskButton;
-    @FXML
-    @Getter private TextField maxFilesAmountField;
-    @FXML
-    private Button setMaxFilesAmountButton;
-    @FXML
-    @Getter public TextField biggestFileField;
-    @FXML
-    public Button setBiggestFileSizeButton;
+    @FXML @Getter private TreeTableView<NodeData> treeTableView;
+    @FXML private TreeTableColumn<NodeData, Path> pathColumn;
+    @FXML private TreeTableColumn<NodeData, Number> sizeColumn;
+    @FXML private AbstractTabController filesTypeViewController;
+    @FXML private AbstractTabController fileInfoViewController;
+    @FXML private Button addButton;
+    @FXML private Button stopObserveButton;
+    @FXML private Button setMaxSizeButton;
+    @FXML @Getter private TextField maxSizeField;
+    @FXML private Button deleteFromDiskButton;
+    @FXML @Getter private TextField maxFilesAmountField;
+    @FXML private Button setMaxFilesAmountButton;
+    @FXML @Getter public TextField biggestFileField;
+    @FXML public Button setBiggestFileSizeButton;
 
     @Getter private final DatabaseCommandExecutor commandExecutor;
     @Getter private final FolderList folderList;
@@ -172,28 +158,6 @@ public class MainController {
                 }));
     }
 
-    // replace fake folder with real one
-    public void replaceLoadingFolderWithRealOne(IObservedFolder folder, TreeFileNode realRoot) {
-        var searchedPath = folder.getPath();
-        var fakeFolder = (FakeObservedFolder) folderList.stream()
-                .filter(f -> f.getPath().equals(searchedPath))
-                .findFirst()
-                .orElseThrow();
-
-        var indexToReplace = folderList.indexOf(fakeFolder);
-        folderList.set(indexToReplace, fakeFolder.getRealObservedFolder());
-        treeTableView.getRoot().getChildren().remove(fakeFolder.getFakeNode());
-        treeTableView.getRoot().getChildren().add(realRoot);
-        treeTableView.sort();
-        refreshViews();
-    }
-
-    public void addLoadingFolder(ILimitableObservableFolder folder) {
-        var fakeFolder = new FakeObservedFolder(folder);
-        folderList.add(fakeFolder);
-        treeTableView.getRoot().getChildren().add(fakeFolder.getFakeNode());
-        treeTableView.sort();
-    }
 
     public void observeFolderEvents(IObservedFolder folder) {
         folder.getEventStream()
@@ -249,7 +213,6 @@ public class MainController {
     }
 
     public void onExit() {
-        log.info("MainController onExit");
         folderList.forEach(IObservedFolder::destroy);
         commandExecutor.stop();
     }

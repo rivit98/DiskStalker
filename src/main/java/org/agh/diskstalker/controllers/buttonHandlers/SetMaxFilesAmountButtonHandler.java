@@ -25,9 +25,9 @@ public class SetMaxFilesAmountButtonHandler extends AbstractButtonSetLimitHandle
         mainController.getFolderList()
                 .getObservedFolderFromTreePath(path)
                 .ifPresent(observedFolder -> {
+                    mainController.getAlertsFactory().setMaxFilesAmountAlert(path.toString(), maximumAmount);
                     observedFolder.getLimits().setMaxFilesAmount(maximumAmount);
                     mainController.getCommandExecutor().executeCommand(new UpdateObservedFolderCommand(observedFolder));
-                    mainController.getAlertsFactory().setMaxFilesAmountAlert(path.toString(), maximumAmount);
                 });
     }
 }

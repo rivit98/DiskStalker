@@ -25,9 +25,9 @@ public class SetSizeButtonHandler extends AbstractButtonSetLimitHandler {
         mainController.getFolderList()
                 .getObservedFolderFromTreePath(path)
                 .ifPresent(observedFolder -> {
+                    mainController.getAlertsFactory().setMaxSizeAlert(path.toString(), maximumSize);
                     observedFolder.getLimits().setMaxTotalSize(maximumSize);
                     mainController.getCommandExecutor().executeCommand(new UpdateObservedFolderCommand(observedFolder));
-                    mainController.getAlertsFactory().setMaxSizeAlert(path.toString(), maximumSize);
                 });
     }
 }

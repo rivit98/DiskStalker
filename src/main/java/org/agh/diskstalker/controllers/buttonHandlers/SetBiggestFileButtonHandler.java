@@ -26,9 +26,9 @@ public class SetBiggestFileButtonHandler extends AbstractButtonSetLimitHandler {
         mainController.getFolderList()
                 .getObservedFolderFromTreePath(path)
                 .ifPresent(observedFolder -> {
+                    mainController.getAlertsFactory().setBiggestFileAlert(path.toString(), maximumSize);
                     observedFolder.getLimits().setBiggestFileLimit(maximumSize);
                     mainController.getCommandExecutor().executeCommand(new UpdateObservedFolderCommand(observedFolder));
-                    mainController.getAlertsFactory().setBiggestFileAlert(path.toString(), maximumSize);
                 });
     }
 }
