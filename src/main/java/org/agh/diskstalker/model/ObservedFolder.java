@@ -55,7 +55,7 @@ public class ObservedFolder implements ILimitableObservableFolder {
         scanning = true;
         eventStream.onNext(new ObservedFolderScanStartedEvent(this));
 
-        log.info(String.format("Initial scan started %s | %s", path, Thread.currentThread()));
+        log.info("Initial scan started " + path);
 
         var initScanDisposable = filesystemWatcher
                 .initScan()
@@ -66,7 +66,7 @@ public class ObservedFolder implements ILimitableObservableFolder {
     }
 
     private void performFullScan() {
-        log.info(String.format("performFullScan %s | %s", path, Thread.currentThread()));
+        log.info("performFullScan " + path);
 
         var scanDisposable = scanner
                 .scan()
@@ -81,7 +81,7 @@ public class ObservedFolder implements ILimitableObservableFolder {
     }
 
     private void startMonitoring() {
-        log.info(String.format("startMonitoring %s - %s", path, Thread.currentThread()));
+        log.info("startMonitoring " + path);
         scanning = false;
         eventStream.onNext(new ObservedFolderScanFinishedEvent(this, nodesTree.getRoot()));
 
