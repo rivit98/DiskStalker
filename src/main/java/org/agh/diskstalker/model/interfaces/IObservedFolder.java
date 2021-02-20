@@ -4,6 +4,7 @@ import io.reactivex.rxjava3.subjects.PublishSubject;
 import org.agh.diskstalker.events.observedFolderEvents.ObservedFolderEvent;
 import org.agh.diskstalker.model.tree.NodesTree;
 import org.agh.diskstalker.model.tree.TreeFileNode;
+import org.agh.diskstalker.statistics.TypeStatistics;
 
 import java.nio.file.Path;
 
@@ -25,4 +26,6 @@ public interface IObservedFolder {
     String getName();
 
     boolean isScanning();
+
+    TypeStatistics getTypeStatistics();
 }

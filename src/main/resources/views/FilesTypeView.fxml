@@ -32,8 +32,8 @@
                 <Insets bottom="30.0" left="20.0" right="20.0"/>
             </GridPane.margin>
             <columns>
-                <TableColumn fx:id="quantityColumn" editable="false" prefWidth="150.0" resizable="false" sortType="DESCENDING" text="Number of files"/>
                 <TableColumn fx:id="typeColumn" editable="false"  prefWidth="365.0" resizable="false" text="File type"/>
+                <TableColumn fx:id="quantityColumn" editable="false" prefWidth="150.0" resizable="false" sortType="DESCENDING" text="Number of files"/>
             </columns>
         </TableView>
         <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Observed directories" textAlignment="CENTER" wrappingWidth="243.0">

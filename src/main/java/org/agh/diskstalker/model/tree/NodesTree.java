@@ -18,7 +18,7 @@ public class NodesTree {
     @Getter
     private TreeFileNode root;
 
-    public void processNodeData(NodeData nodeData) {
+    public void addNode(NodeData nodeData) {
         var insertedNode = new TreeFileNode(nodeData);
 
         if (root != null) {

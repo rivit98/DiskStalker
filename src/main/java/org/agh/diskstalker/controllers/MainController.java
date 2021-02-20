@@ -19,7 +19,6 @@ import org.agh.diskstalker.controllers.listeners.MaxSizeButtonListener;
 import org.agh.diskstalker.controllers.sortPolicies.MainControllerSortPolicy;
 import org.agh.diskstalker.formatters.StringToIntFormatter;
 import org.agh.diskstalker.graphics.GraphicsFactory;
-import org.agh.diskstalker.model.FakeObservedFolder;
 import org.agh.diskstalker.model.FolderList;
 import org.agh.diskstalker.model.interfaces.ILimitableObservableFolder;
 import org.agh.diskstalker.model.interfaces.IObservedFolder;
@@ -29,10 +28,10 @@ import org.agh.diskstalker.persistence.DatabaseCommandExecutor;
 import org.agh.diskstalker.persistence.command.ConnectToDbCommand;
 import org.agh.diskstalker.persistence.command.DeleteObservedFolderCommand;
 import org.agh.diskstalker.persistence.command.GetAllObservedFolderCommand;
+import org.agh.diskstalker.statistics.TypeRecognizer;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.Optional;
 
 @Slf4j
@@ -79,16 +78,6 @@ public class MainController {
         initializeButtons();
         initializeFields();
         loadSavedFolders();
-        initializeStatisticsLoading();
-    }
-
-    private void initializeStatisticsLoading() {
-        //TODO: refactor whole type recognizing system
-//        tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
-//            if (newTab.getId().equals("filesTypeView")) {
-//                folderList.forEach(folder -> new Thread(folder::createTypeStatistics).start());
-//            }
-//        });
     }
 
     private void createRoot() {
@@ -98,22 +87,10 @@ public class MainController {
 
     private void prepareColumns() {
         pathColumn.setCellFactory(ttc -> new PathColumnCellFactory(this));
+        pathColumn.setCellValueFactory(node -> new SimpleObjectProperty<>(node.getValue().getValue().getPath()));
+
         sizeColumn.setCellFactory(ttc -> new SizeTreeTableColumnCellFactory());
-
-        pathColumn.setCellValueFactory(
-                node -> Optional.ofNullable(node.getValue())
-                        .flatMap(v -> Optional.ofNullable(v.getValue()))
-                        .map(NodeData::getPath)
-                        .map(SimpleObjectProperty::new)
-                        .orElseGet(SimpleObjectProperty::new)
-        );
-
-        sizeColumn.setCellValueFactory(
-                node -> Optional.ofNullable(node.getValue())
-                        .map(TreeItem::getValue)
-                        .map(NodeData::getAccumulatedSizeProperty)
-                        .orElse(null)
-        );
+        sizeColumn.setCellValueFactory(node -> node.getValue().getValue().getAccumulatedSizeProperty());
 
         treeTableView.sortPolicyProperty().set(new MainControllerSortPolicy());
     }
@@ -157,7 +134,6 @@ public class MainController {
                     folders.getFolderList().forEach(IObservedFolder::scan);
                 }));
     }
-
 
     public void observeFolderEvents(IObservedFolder folder) {
         folder.getEventStream()
@@ -214,6 +190,7 @@ public class MainController {
 
     public void onExit() {
         folderList.forEach(IObservedFolder::destroy);
+        TypeRecognizer.getInstance().stop();
         commandExecutor.stop();
     }
 }

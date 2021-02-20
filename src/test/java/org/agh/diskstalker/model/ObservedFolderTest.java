@@ -24,7 +24,7 @@ public class ObservedFolderTest {
     @Test
     public void containsNode() {
         //given
-        folder.getNodesTree().processNodeData(new NodeData(path));
+        folder.getNodesTree().addNode(new NodeData(path));
 
         //when then
         Assertions.assertTrue(folder.containsNode(path));
@@ -53,7 +53,7 @@ public class ObservedFolderTest {
         nodeData.modifyAccumulatedSize(exceededSize);
 
         //when
-        folder.getNodesTree().processNodeData(nodeData);
+        folder.getNodesTree().addNode(nodeData);
 
         //then
         Assertions.assertTrue(folder.getLimits().isTotalSizeExceeded());

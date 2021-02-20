@@ -10,7 +10,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TreeItem;
-import org.agh.diskstalker.controllers.FileInfoController;
+import org.agh.diskstalker.controllers.FilesTopController;
 import org.agh.diskstalker.model.interfaces.IObservedFolder;
 import org.agh.diskstalker.model.tree.NodeData;
 import org.agh.diskstalker.model.tree.TreeFileNode;
@@ -19,18 +19,18 @@ import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
-public class SelectedItemChangeListener implements ChangeListener<IObservedFolder> {
+public class FilesTopSelectedItemChangeListener implements ChangeListener<IObservedFolder> {
     private static final String LOADING_LABEL = "Loading...";
-    private final FileInfoController fileInfoController;
+    private final FilesTopController filesTopController;
     private final TableView<NodeData> dataTableView;
     private final Node originalLabel;
     private final Node loadingLabel;
     private MapChangeListener<Path, TreeFileNode> previousListener;
     private ObservableMap<Path, TreeFileNode> previousMap;
 
-    public SelectedItemChangeListener(FileInfoController fileInfoController) {
-        this.fileInfoController = fileInfoController;
-        this.dataTableView = fileInfoController.getDataTableView();
+    public FilesTopSelectedItemChangeListener(FilesTopController filesTopController) {
+        this.filesTopController = filesTopController;
+        this.dataTableView = filesTopController.getDataTableView();
         this.originalLabel = dataTableView.getPlaceholder();
         this.loadingLabel = new Label(LOADING_LABEL);
     }
@@ -56,7 +56,7 @@ public class SelectedItemChangeListener implements ChangeListener<IObservedFolde
 
         nodesMap.addListener(listener);
         dataTableView.setItems(items);
-        fileInfoController.setSortOrder();
+        filesTopController.setSortOrder();
         previousMap = nodesMap;
         previousListener = listener;
     }

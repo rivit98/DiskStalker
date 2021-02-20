@@ -1,21 +1,16 @@
 package org.agh.diskstalker.events.eventProcessor;
 
+import lombok.AllArgsConstructor;
 import org.agh.diskstalker.events.filesystemEvents.FilesystemEvent;
-import org.agh.diskstalker.model.statisctics.FilesTypeStatistics;
 import org.agh.diskstalker.model.tree.NodeData;
 import org.agh.diskstalker.model.tree.NodesTree;
 import org.agh.diskstalker.model.tree.TreeFileNode;
 
 import java.nio.file.Path;
 
+@AllArgsConstructor
 public class EventProcessor implements IEventProcessor {
     private final NodesTree nodesTree;
-    private final FilesTypeStatistics filesTypeStatistics;
-
-    public EventProcessor(NodesTree nodesTree, FilesTypeStatistics filesTypeStatistics) {
-        this.nodesTree = nodesTree;
-        this.filesTypeStatistics = filesTypeStatistics;
-    }
 
     @Override
     public void processEvent(FilesystemEvent filesystemEvent) {
@@ -50,9 +45,6 @@ public class EventProcessor implements IEventProcessor {
     private void handleDeleteEventCommon(Path resolvedPath) {
         var affectedNode = nodesTree.getPathToTreeMap().get(resolvedPath);
         nodesTree.removeMappedDirs(affectedNode);
-        if(affectedNode.getValue().isFile()) {
-            filesTypeStatistics.decrementTypeCounter(affectedNode.getValue());
-        }
         affectedNode.deleteMe();
     }
 
@@ -68,8 +60,5 @@ public class EventProcessor implements IEventProcessor {
         var nodeData = new NodeData(resolvedPath);
         var newTreeNode = new TreeFileNode(nodeData);
         nodesTree.insertNewNode(newTreeNode);
-        if(nodeData.isFile()) {
-            filesTypeStatistics.addNewNodeType(nodeData);
-        }
     }
 }

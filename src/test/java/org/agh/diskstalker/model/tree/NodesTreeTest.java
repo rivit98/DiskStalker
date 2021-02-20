@@ -26,7 +26,7 @@ public class NodesTreeTest {
     @Test
     public void processNodeData() {
         //when
-        builder.processNodeData(new NodeData(path));
+        builder.addNode(new NodeData(path));
 
         //then
         Assertions.assertTrue(builder.containsNode(path));
@@ -40,7 +40,7 @@ public class NodesTreeTest {
         when(parentPath.toFile()).thenReturn(mock(File.class));
         when(parentPath.getFileName()).thenReturn(mock(Path.class));
         when(path.getParent()).thenReturn(parentPath);
-        builder.processNodeData(new NodeData(parentPath));
+        builder.addNode(new NodeData(parentPath));
 
         //when
         builder.insertNewNode(new TreeFileNode(new NodeData(path)));
@@ -54,7 +54,7 @@ public class NodesTreeTest {
     public void removeMappedDirsRecursively() {
         //given
         var nodeData = new NodeData(path);
-        builder.processNodeData(nodeData);
+        builder.addNode(nodeData);
         //when
         builder.removeMappedDirs(new TreeItem<>(nodeData));
 
@@ -67,7 +67,7 @@ public class NodesTreeTest {
         var subscriber = builder.getRootSubject().test();
         subscriber.assertEmpty();
 
-        builder.processNodeData(new NodeData(path));
+        builder.addNode(new NodeData(path));
 
         subscriber.assertValueCount(1);
         subscriber.assertComplete();

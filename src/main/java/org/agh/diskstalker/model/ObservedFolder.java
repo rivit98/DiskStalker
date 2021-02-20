@@ -4,6 +4,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler;
+import javafx.scene.control.TreeItem;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -15,18 +16,22 @@ import org.agh.diskstalker.filesystem.dirwatcher.DirWatcher;
 import org.agh.diskstalker.filesystem.dirwatcher.IFilesystemWatcher;
 import org.agh.diskstalker.filesystem.scanner.FileTreeScanner;
 import org.agh.diskstalker.model.interfaces.ILimitableObservableFolder;
-import org.agh.diskstalker.model.statisctics.FilesTypeStatistics;
 import org.agh.diskstalker.model.tree.NodesTree;
 import org.agh.diskstalker.model.tree.TreeFileNode;
+import org.agh.diskstalker.statistics.TypeRecognizedEvent;
+import org.agh.diskstalker.statistics.TypeRecognizer;
+import org.agh.diskstalker.statistics.TypeStatistics;
 
 import java.nio.file.Path;
 import java.util.Objects;
 
 @Slf4j
 public class ObservedFolder implements ILimitableObservableFolder {
-    private static final long pollingInterval = 4000; //ms
+    private static final long pollingInterval = 6000; //ms
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private final TypeRecognizer typeRecognizer;
+    @Getter private final TypeStatistics typeStatistics = new TypeStatistics();
     @Getter private final PublishSubject<ObservedFolderEvent> eventStream = PublishSubject.create();
     @Getter private final NodesTree nodesTree = new NodesTree();
 
@@ -34,7 +39,6 @@ public class ObservedFolder implements ILimitableObservableFolder {
     private final IFilesystemWatcher filesystemWatcher;
     private final IEventProcessor eventProcessor;
     private final FileTreeScanner scanner;
-    @Getter private final FilesTypeStatistics filesTypeStatistics;
     @Getter private final String name;
     @Getter @Setter private FolderLimits limits;
     @Getter private boolean scanning = false;
@@ -43,19 +47,18 @@ public class ObservedFolder implements ILimitableObservableFolder {
     public ObservedFolder(Path path) {
         this.path = path;
         this.filesystemWatcher = new DirWatcher(path, pollingInterval);
-        this.filesTypeStatistics = new FilesTypeStatistics(nodesTree.getPathToTreeMap());
-        this.eventProcessor = new EventProcessor(nodesTree, filesTypeStatistics);
+        this.eventProcessor = new EventProcessor(nodesTree);
         this.name = path.getFileName().toString();
         this.scanner = new FileTreeScanner(path);
         this.limits = new FolderLimits(this);
+        this.typeRecognizer = TypeRecognizer.getInstance();
     }
 
     @Override
     public void scan() {
+        log.info("initial scan " + path);
         scanning = true;
         eventStream.onNext(new ObservedFolderScanStartedEvent(this));
-
-        log.info("Initial scan started " + path);
 
         var initScanDisposable = filesystemWatcher
                 .initScan()
@@ -67,23 +70,33 @@ public class ObservedFolder implements ILimitableObservableFolder {
 
     private void performFullScan() {
         log.info("performFullScan " + path);
+        var typeRecognizerDisposable = typeRecognizer
+                .register(this)
+//                .subscribeOn(Schedulers.io())
+                .observeOn(JavaFxScheduler.platform())
+                .subscribe(this::processRecognizedType);
 
         var scanDisposable = scanner
                 .scan()
                 .subscribeOn(Schedulers.io())
                 .doOnComplete(this::startMonitoring)
                 .subscribe(
-                        nodesTree::processNodeData,
+                        nodesTree::addNode,
                         this::errorHandler
                 );
 
-        compositeDisposable.add(scanDisposable);
+        compositeDisposable.addAll(scanDisposable, typeRecognizerDisposable);
     }
 
     private void startMonitoring() {
         log.info("startMonitoring " + path);
         scanning = false;
         eventStream.onNext(new ObservedFolderScanFinishedEvent(this, nodesTree.getRoot()));
+
+        nodesTree.getPathToTreeMap().values()
+                .stream()
+                .map(TreeItem::getValue)
+                .forEach(nodeData -> typeRecognizer.recognize(this, nodeData));
 
         var watchDisposable = filesystemWatcher
                 .start()
@@ -97,9 +110,13 @@ public class ObservedFolder implements ILimitableObservableFolder {
         compositeDisposable.add(watchDisposable);
     }
 
+    private void processRecognizedType(TypeRecognizedEvent event){
+        typeStatistics.add(event.getType());
+    }
+
     private void errorHandler(Throwable t) {
         log.error("ObservedFolder error ", t);
-        eventStream.onNext(new ObservedFolderErrorEvent(this, t.getClass().getCanonicalName()));
+        eventStream.onNext(new ObservedFolderErrorEvent(this, t.getMessage()));
     }
 
     private void processEvent(FilesystemEvent event) {
@@ -114,6 +131,7 @@ public class ObservedFolder implements ILimitableObservableFolder {
         compositeDisposable.dispose();
         scanner.stop();
         filesystemWatcher.stop();
+        typeRecognizer.unregister(this);
     }
 
     @Override
@@ -152,11 +170,5 @@ public class ObservedFolder implements ILimitableObservableFolder {
         if (o == null || getClass() != o.getClass()) return false;
         ObservedFolder that = (ObservedFolder) o;
         return Objects.equals(path, that.path);
-    }
-
-    public void createTypeStatistics() {
-        if (!filesTypeStatistics.isStatisticsSet()) {
-            filesTypeStatistics.setTypeStatistics();
-        }
     }
 }

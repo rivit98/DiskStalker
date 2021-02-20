@@ -10,6 +10,7 @@ import org.agh.diskstalker.model.interfaces.ILimitableObservableFolder;
 import org.agh.diskstalker.model.tree.NodeData;
 import org.agh.diskstalker.model.tree.NodesTree;
 import org.agh.diskstalker.model.tree.TreeFileNode;
+import org.agh.diskstalker.statistics.TypeStatistics;
 
 import java.nio.file.Path;
 import java.util.Objects;
@@ -59,6 +60,16 @@ public class FakeObservedFolder implements ILimitableObservableFolder {
     }
 
     @Override
+    public FolderLimits getLimits() {
+        return realObservedFolder.getLimits();
+    }
+
+    @Override
+    public TypeStatistics getTypeStatistics() {
+        return realObservedFolder.getTypeStatistics();
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -100,11 +111,6 @@ public class FakeObservedFolder implements ILimitableObservableFolder {
     public long getBiggestFileSize() {
         unsupported();
         return 0;
-    }
-
-    @Override
-    public FolderLimits getLimits() {
-        return realObservedFolder.getLimits();
     }
 
     @Override
