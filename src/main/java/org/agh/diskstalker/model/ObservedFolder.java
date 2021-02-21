@@ -18,7 +18,8 @@ import org.agh.diskstalker.filesystem.scanner.FileTreeScanner;
 import org.agh.diskstalker.model.interfaces.ILimitableObservableFolder;
 import org.agh.diskstalker.model.tree.NodesTree;
 import org.agh.diskstalker.model.tree.TreeFileNode;
-import org.agh.diskstalker.statistics.TypeRecognizedEvent;
+import org.agh.diskstalker.statistics.AbstractRecognizeTypeMessage;
+import org.agh.diskstalker.statistics.AddRecognizeTypeMessage;
 import org.agh.diskstalker.statistics.TypeRecognizer;
 import org.agh.diskstalker.statistics.TypeStatistics;
 
@@ -47,7 +48,7 @@ public class ObservedFolder implements ILimitableObservableFolder {
     public ObservedFolder(Path path) {
         this.path = path;
         this.filesystemWatcher = new DirWatcher(path, pollingInterval);
-        this.eventProcessor = new EventProcessor(nodesTree);
+        this.eventProcessor = new EventProcessor(this);
         this.name = path.getFileName().toString();
         this.scanner = new FileTreeScanner(path);
         this.limits = new FolderLimits(this);
@@ -74,7 +75,7 @@ public class ObservedFolder implements ILimitableObservableFolder {
                 .register(this)
 //                .subscribeOn(Schedulers.io())
                 .observeOn(JavaFxScheduler.platform())
-                .subscribe(this::processRecognizedType);
+                .subscribe(AbstractRecognizeTypeMessage::doAction);
 
         var scanDisposable = scanner
                 .scan()
@@ -96,7 +97,7 @@ public class ObservedFolder implements ILimitableObservableFolder {
         nodesTree.getPathToTreeMap().values()
                 .stream()
                 .map(TreeItem::getValue)
-                .forEach(nodeData -> typeRecognizer.recognize(this, nodeData));
+                .forEach(nodeData -> typeRecognizer.recognize(new AddRecognizeTypeMessage(this, nodeData)));
 
         var watchDisposable = filesystemWatcher
                 .start()
@@ -108,10 +109,6 @@ public class ObservedFolder implements ILimitableObservableFolder {
                 );
 
         compositeDisposable.add(watchDisposable);
-    }
-
-    private void processRecognizedType(TypeRecognizedEvent event){
-        typeStatistics.add(event.getType());
     }
 
     private void errorHandler(Throwable t) {

@@ -11,20 +11,32 @@ import java.util.Optional;
 public class TypeStatistics {
     private final ObservableMap<String, StatsEntry> statMap = FXCollections.observableHashMap();
 
-    public void add(String type){
+    public void add(String type) {
         var statEntry = statMap.get(type);
-        if(statEntry == null){
+        if (statEntry == null) {
             statMap.put(type, new StatsEntry(type, 1L));
-        }else{
+        } else {
             statEntry.increment();
         }
     }
 
-    public void remove(String type){
-        Optional.ofNullable(statMap.get(type)).ifPresent(statsEntry -> {
-            if(statsEntry.getValue() == 1){
-                statMap.remove(type);
-            }
-        });
+    public void remove(String type) {
+        Optional.ofNullable(statMap.get(type))
+                .ifPresent(statsEntry -> {
+                    if (statsEntry.getValue() == 1) {
+                        statMap.remove(type);
+                    } else {
+                        statsEntry.decrement();
+                    }
+                });
+    }
+
+    public void update(String oldType, String newType) {
+        if (oldType == null || oldType.equals(newType)) {
+            return;
+        }
+
+        remove(oldType);
+        add(newType);
     }
 }

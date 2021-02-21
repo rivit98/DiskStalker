@@ -29,7 +29,7 @@ public class FilesTypeController extends AbstractTabController {
     }
 
     public void setSortOrder() {
-        dataTableView.getSortOrder().addAll(List.of(quantityColumn, typeColumn));
+        dataTableView.getSortOrder().setAll(List.of(quantityColumn, typeColumn));
     }
 
     protected void prepareDataTableView() {
@@ -37,5 +37,7 @@ public class FilesTypeController extends AbstractTabController {
 
         quantityColumn.setSortType(TableColumn.SortType.DESCENDING);
         quantityColumn.setCellValueFactory(node -> node.getValue().getLongProperty());
+
+        setSortOrder();
     }
 }

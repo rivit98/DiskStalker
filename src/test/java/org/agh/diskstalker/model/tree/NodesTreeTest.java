@@ -61,16 +61,4 @@ public class NodesTreeTest {
         //then
         Assertions.assertFalse(builder.containsNode(path));
     }
-
-    @Test
-    public void rootEmitted(){
-        var subscriber = builder.getRootSubject().test();
-        subscriber.assertEmpty();
-
-        builder.addNode(new NodeData(path));
-
-        subscriber.assertValueCount(1);
-        subscriber.assertComplete();
-        subscriber.assertNoErrors();
-    }
 }

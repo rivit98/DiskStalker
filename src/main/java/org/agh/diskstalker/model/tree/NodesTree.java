@@ -1,21 +1,18 @@
 package org.agh.diskstalker.model.tree;
 
-import io.reactivex.rxjava3.subjects.SingleSubject;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.scene.control.TreeItem;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.nio.file.Path;
 import java.util.Optional;
 
-
+@Slf4j
+@Getter
 public class NodesTree {
-    @Getter
     private final ObservableMap<Path, TreeFileNode> pathToTreeMap = FXCollections.observableHashMap();
-    @Getter
-    private final SingleSubject<TreeFileNode> rootSubject = SingleSubject.create();
-    @Getter
     private TreeFileNode root;
 
     public void addNode(NodeData nodeData) {
@@ -26,7 +23,6 @@ public class NodesTree {
         } else {
             pathToTreeMap.put(nodeData.getPath(), insertedNode);
             root = insertedNode;
-            rootSubject.onSuccess(root);
         }
     }
 
@@ -51,7 +47,10 @@ public class NodesTree {
         Optional.ofNullable(node)
                 .map(TreeItem::getValue)
                 .map(NodeData::getPath)
-                .ifPresent(pathToTreeMap::remove);
+                .ifPresent(path -> {
+                    var removedNode = pathToTreeMap.remove(path);
+                    removedNode.getValue().setRemoved(true); //for TypeRecognizer
+                });
     }
 
     public long getSize() {

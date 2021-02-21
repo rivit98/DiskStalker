@@ -3,7 +3,6 @@ package org.agh.diskstalker.statistics;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import lombok.extern.slf4j.Slf4j;
 import org.agh.diskstalker.model.interfaces.IObservedFolder;
-import org.agh.diskstalker.model.tree.NodeData;
 import org.apache.tika.Tika;
 
 import java.io.IOException;
@@ -19,7 +18,7 @@ public class TypeRecognizer {
 
     private final Tika typeRecognizer = new Tika();
     private final ExecutorService executor = Executors.newFixedThreadPool(THREADS_NUM);
-    private final HashMap<IObservedFolder, PublishSubject<TypeRecognizedEvent>> eventStreams = new HashMap<>();
+    private final HashMap<IObservedFolder, PublishSubject<AbstractRecognizeTypeMessage>> eventStreams = new HashMap<>();
 
     private TypeRecognizer(){
 
@@ -34,38 +33,39 @@ public class TypeRecognizer {
         return INSTANCE;
     }
 
-
-    public void recognize(IObservedFolder folder, NodeData nodeData){
-        if(nodeData.isFile()){
-            executor.submit(recognizeCallable(folder, nodeData));
-        }
+    public void recognize(AbstractRecognizeTypeMessage message){
+        executor.submit(recognizeCallable(message));
     }
 
-    private Runnable recognizeCallable(IObservedFolder folder, NodeData nodeData){
+    private Runnable recognizeCallable(AbstractRecognizeTypeMessage message){
+        var nodeData = message.getNodeData();
+        var folder = message.getFolder();
+        if(nodeData.isRemoved() || nodeData.isDirectory()){
+            return () -> {};
+        }
+
         return () -> {
             var nodePath = nodeData.getPath();
-            var outputEvent = new TypeRecognizedEvent();
             var eventStream = eventStreams.get(folder);
 
             if(eventStream == null){
-                log.error("This folder is not registered!");
-                throw new IllegalStateException("This folder is not registered!");
+                return;
             }
 
             try {
                 var type = typeRecognizer.detect(nodePath.toUri().toURL());
-                outputEvent.setType(type);
+                message.setType(type);
             } catch (IOException exception) {
-                log.warn("Cannot recognize file type " + nodePath);
-                outputEvent.setType(TypeRecognizedEvent.UNKNOWN_TYPE);
+                message.setType(AbstractRecognizeTypeMessage.UNKNOWN_TYPE);
             }
 
-            eventStream.onNext(outputEvent);
+            nodeData.setType(message.getType());
+            eventStream.onNext(message);
         };
     }
 
-    public PublishSubject<TypeRecognizedEvent> register(IObservedFolder folder){
-        var subject = PublishSubject.<TypeRecognizedEvent>create();
+    public PublishSubject<AbstractRecognizeTypeMessage> register(IObservedFolder folder){
+        var subject = PublishSubject.<AbstractRecognizeTypeMessage>create();
         eventStreams.putIfAbsent(folder, subject);
         return subject;
     }

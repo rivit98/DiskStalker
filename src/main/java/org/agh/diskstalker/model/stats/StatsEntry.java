@@ -24,12 +24,20 @@ public class StatsEntry {
         add(1);
     }
 
+    public void decrement() {
+        add(-1);
+    }
+
     public void add(long i){
         longProperty.set(getValue() + i);
     }
 
     public long getValue(){
         return longProperty.longValue();
+    }
+
+    public String getType(){
+        return typeProperty.get();
     }
 
     @Override

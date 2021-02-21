@@ -4,6 +4,7 @@ import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -22,6 +23,8 @@ public class NodeData implements Comparable<NodeData>{
     private final Path path;
     private final boolean isDirectory;
     private long size;
+    @Setter private boolean removed;
+    @Setter private String type;
 
     public NodeData(Path path) {
         this(path, null);

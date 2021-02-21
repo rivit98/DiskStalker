@@ -9,7 +9,7 @@ import java.util.Comparator;
 
 public class MainControllerSortPolicy implements Callback<TreeTableView<NodeData>, Boolean> {
 
-    private final Comparator<TreeItem<NodeData>> comparator =
+    private static final Comparator<TreeItem<NodeData>> comparator =
             Comparator.comparing(
                     (TreeItem<NodeData> treeItem) -> treeItem
                             .getValue()

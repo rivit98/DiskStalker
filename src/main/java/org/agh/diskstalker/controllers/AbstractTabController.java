@@ -49,7 +49,7 @@ public abstract class AbstractTabController {
     public void refreshSelection(){
         var selectionModel = foldersTableView.getSelectionModel();
         var item = selectionModel.getSelectedItem();
-        if(item != null){
+        if(item != null){ //TODO: figure out better solution
             selectionModel.clearSelection();
             selectionModel.select(item);
         }
@@ -58,4 +58,6 @@ public abstract class AbstractTabController {
     protected abstract void configureSelectionModelListener();
 
     protected abstract void prepareDataTableView();
+
+    protected abstract void setSortOrder();
 }

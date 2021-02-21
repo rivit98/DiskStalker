@@ -1,27 +1,25 @@
 package org.agh.diskstalker.controllers.listeners;
 
+import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
-import javafx.scene.Node;
-import javafx.scene.control.Label;
+import javafx.collections.transformation.SortedList;
 import javafx.scene.control.TableView;
 import org.agh.diskstalker.controllers.FilesTypeController;
 import org.agh.diskstalker.model.interfaces.IObservedFolder;
 import org.agh.diskstalker.model.stats.StatsEntry;
 
-//TODO: extract and generify
 public class FilesTypeSelectedItemChangeListener implements ChangeListener<IObservedFolder> {
-    private final FilesTypeController filesTopController;
     private final TableView<StatsEntry> dataTableView;
-    private MapChangeListener<String, StatsEntry>previousListener;
+    private MapChangeListener<String, StatsEntry> previousListener;
     private ObservableMap<String, StatsEntry> previousMap;
+    private SortedList<StatsEntry> prevItems;
 
     public FilesTypeSelectedItemChangeListener(FilesTypeController filesTopController) {
-        this.filesTopController = filesTopController;
         this.dataTableView = filesTopController.getDataTableView();
     }
 
@@ -41,11 +39,13 @@ public class FilesTypeSelectedItemChangeListener implements ChangeListener<IObse
     private void setItems(IObservedFolder selectedFolder) {
         var typeStatisticsMap = selectedFolder.getTypeStatistics().getStatMap();
         var items = createTypeList(typeStatisticsMap);
+        var sortedItems = createSortedTypesList(items);
         var listener = createListener(items);
 
         typeStatisticsMap.addListener(listener);
-        dataTableView.setItems(items);
-        filesTopController.setSortOrder();
+        dataTableView.setItems(sortedItems);
+
+        prevItems = sortedItems;
         previousMap = typeStatisticsMap;
         previousListener = listener;
     }
@@ -53,7 +53,8 @@ public class FilesTypeSelectedItemChangeListener implements ChangeListener<IObse
     private void clearItems() {
         previousListener = null;
         previousMap = null;
-        dataTableView.getItems().clear();
+        prevItems.getSource().clear();
+        prevItems = null;
     }
 
     private MapChangeListener<String, StatsEntry> createListener(ObservableList<StatsEntry> items) {
@@ -67,9 +68,17 @@ public class FilesTypeSelectedItemChangeListener implements ChangeListener<IObse
     }
 
     private ObservableList<StatsEntry> createTypeList(ObservableMap<String, StatsEntry> typeStatistics) {
-        return FXCollections.observableArrayList(
-                typeStatistics.values()
-        );
+        var list = FXCollections.<StatsEntry>observableArrayList(
+                statEntry -> new Observable[] {statEntry.getLongProperty()}
+                );
+        list.setAll(typeStatistics.values());
+        return list;
+    }
+
+    private SortedList<StatsEntry> createSortedTypesList(ObservableList<StatsEntry> items) {
+        var sortedList = new SortedList<>(items);
+        sortedList.comparatorProperty().bind(dataTableView.comparatorProperty());
+        return sortedList;
     }
 
     private void clearOldListeners() {
