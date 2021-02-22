@@ -1,7 +1,7 @@
 package org.agh.diskstalker.builders;
 
-import org.agh.diskstalker.model.FolderLimits;
 import org.agh.diskstalker.model.ObservedFolder;
+import org.agh.diskstalker.model.limits.FolderLimits;
 
 public class FolderLimitsBuilder {
     private long totalSizeLimit = 0;

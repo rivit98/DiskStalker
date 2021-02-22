@@ -1,5 +1,7 @@
 package org.agh.diskstalker.model;
 
+import org.agh.diskstalker.model.limits.FolderLimits;
+import org.agh.diskstalker.model.limits.LimitType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -27,27 +29,36 @@ public class FolderLimitsTest {
     @Test
     public void totalSizeLimit(){
         limits.setMaxTotalSize(folderSize / 2);
-        assertTrue(limits.isTotalSizeExceeded());
+        assertTrue(limits.isLimitExceeded(LimitType.TOTAL_SIZE));
 
         limits.setMaxTotalSize(folderSize * 2);
-        assertFalse(limits.isTotalSizeExceeded());
+        assertFalse(limits.isLimitExceeded(LimitType.TOTAL_SIZE));
     }
 
     @Test
     public void biggestFileLimit(){
         limits.setBiggestFileLimit(folderBiggestFile / 2);
-        assertTrue(limits.isBiggestFileLimitExceeded());
+        assertTrue(limits.isLimitExceeded(LimitType.BIGGEST_FILE));
 
         limits.setBiggestFileLimit(folderBiggestFile * 2);
-        assertFalse(limits.isBiggestFileLimitExceeded());
+        assertFalse(limits.isLimitExceeded(LimitType.BIGGEST_FILE));
     }
 
     @Test
     public void filesAmountLimit(){
         limits.setMaxFilesAmount(folderFilesAmount / 2);
-        assertTrue(limits.isFilesAmountExceeded());
+        assertTrue(limits.isLimitExceeded(LimitType.FILES_AMOUNT));
 
         limits.setMaxFilesAmount(folderFilesAmount * 2);
-        assertFalse(limits.isFilesAmountExceeded());
+        assertFalse(limits.isLimitExceeded(LimitType.FILES_AMOUNT));
+    }
+
+    @Test
+    public void anyLimit(){
+        limits.setMaxFilesAmount(folderFilesAmount / 2);
+        assertTrue(limits.isAnyLimitExceeded());
+
+        limits.setMaxFilesAmount(folderFilesAmount * 2);
+        assertFalse(limits.isAnyLimitExceeded());
     }
 }

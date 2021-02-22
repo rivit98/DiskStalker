@@ -1,23 +1,24 @@
 package org.agh.diskstalker.events.eventProcessor;
 
-import lombok.AllArgsConstructor;
 import org.agh.diskstalker.events.filesystemEvents.FilesystemEvent;
 import org.agh.diskstalker.model.interfaces.IObservedFolder;
 import org.agh.diskstalker.model.tree.NodeData;
 import org.agh.diskstalker.model.tree.NodesTree;
 import org.agh.diskstalker.model.tree.TreeFileNode;
-import org.agh.diskstalker.statistics.TypeRecognizer;
 import org.agh.diskstalker.statistics.messages.AddRecognizeTypeMessage;
 import org.agh.diskstalker.statistics.messages.RemoveRecognizeTypeMessage;
 import org.agh.diskstalker.statistics.messages.UpdateRecognizeTypeMessage;
 
 import java.nio.file.Path;
 
-@AllArgsConstructor
 public class EventProcessor implements IEventProcessor {
     private final IObservedFolder folder;
     private final NodesTree nodesTree;
-    private final TypeRecognizer typeRecognizer;
+
+    public EventProcessor(IObservedFolder folder) {
+        this.folder = folder;
+        this.nodesTree = folder.getNodesTree();
+    }
 
     @Override
     public void processEvent(FilesystemEvent filesystemEvent) {
@@ -43,7 +44,7 @@ public class EventProcessor implements IEventProcessor {
         }
 
         modifiedNode.updateMe();
-        typeRecognizer.recognize(new UpdateRecognizeTypeMessage(folder, modifiedNode.getValue()));
+        folder.getTypeRecognizer().recognize(new UpdateRecognizeTypeMessage(folder, modifiedNode.getValue()));
     }
 
     private void handleDeleteEventFile(Path resolvedPath) {
@@ -77,6 +78,6 @@ public class EventProcessor implements IEventProcessor {
         var nodeData = new NodeData(resolvedPath);
         var newTreeNode = new TreeFileNode(nodeData);
         nodesTree.insertNewNode(newTreeNode);
-        typeRecognizer.recognize(new AddRecognizeTypeMessage(folder, newTreeNode.getValue()));
+        folder.getTypeRecognizer().recognize(new AddRecognizeTypeMessage(folder, newTreeNode.getValue()));
     }
 }

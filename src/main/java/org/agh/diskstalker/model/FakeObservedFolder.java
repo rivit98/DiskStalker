@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.agh.diskstalker.events.observedFolderEvents.AbstractObservedFolderEvent;
 import org.agh.diskstalker.events.observedFolderEvents.ObservedFolderEvent;
 import org.agh.diskstalker.model.interfaces.ILimitableObservableFolder;
+import org.agh.diskstalker.model.limits.FolderLimits;
 import org.agh.diskstalker.model.tree.NodeData;
 import org.agh.diskstalker.model.tree.NodesTree;
 import org.agh.diskstalker.model.tree.TreeFileNode;
@@ -73,6 +74,11 @@ public class FakeObservedFolder implements ILimitableObservableFolder {
     @Override
     public void setTypeRecognizer(TypeRecognizer typeRecognizer) {
         realObservedFolder.setTypeRecognizer(typeRecognizer);
+    }
+
+    @Override
+    public TypeRecognizer getTypeRecognizer() {
+        return realObservedFolder.getTypeRecognizer();
     }
 
     @Override

@@ -5,6 +5,7 @@ import org.agh.diskstalker.builders.FolderLimitsBuilder;
 import org.agh.diskstalker.model.ObservedFolder;
 import org.agh.diskstalker.model.interfaces.ILimitableObservableFolder;
 import org.agh.diskstalker.model.interfaces.IObservedFolder;
+import org.agh.diskstalker.model.limits.LimitType;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Files;
@@ -41,9 +42,9 @@ public class ObservedFolderDao implements IObservedFolderDao {
         var limits = observedFolder.getLimits();
         var updateDB = "UPDATE observedFolders SET max_size_limit = (?), total_files_limit = (?), biggest_file_limit = (?) WHERE path = (?);";
         Object[] args = {
-                String.valueOf(limits.getTotalSizeLimit()),
-                String.valueOf(limits.getFilesAmountLimit()),
-                String.valueOf(limits.getBiggestFileLimit()),
+                String.valueOf(limits.get(LimitType.TOTAL_SIZE)),
+                String.valueOf(limits.get(LimitType.FILES_AMOUNT)),
+                String.valueOf(limits.get(LimitType.BIGGEST_FILE)),
                 path
         };
 

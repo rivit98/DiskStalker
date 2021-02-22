@@ -1,26 +1,13 @@
 package org.agh.diskstalker.events.observedFolderEvents;
 
-import org.agh.diskstalker.controllers.MainController;
+import lombok.extern.slf4j.Slf4j;
 import org.agh.diskstalker.model.ObservedFolder;
+import org.agh.diskstalker.model.limits.LimitType;
 
-public class ObservedFolderSizeChangedEvent extends AbstractObservedFolderEvent {
+@Slf4j
+public class ObservedFolderSizeChangedEvent extends AbstractObservedFolderLimitEvent {
     public ObservedFolderSizeChangedEvent(ObservedFolder folder) {
         super(folder);
-    }
-
-    @Override
-    public void dispatch(MainController mainController) {
-        var limits = folder.getLimits();
-        if (limits.isTotalSizeExceeded()) {
-            if(!limits.isTotalSizeFlagShown()) {
-                mainController.getAlertsFactory().sizeExceededAlert(folder.getPath().toString(), limits.getTotalSizeLimit());
-                limits.setTotalSizeFlagShown(true);
-                mainController.refreshViews();
-            }
-        }
-        else {
-            limits.setTotalSizeFlagShown(false);
-            mainController.refreshViews();
-        }
+        limitType = LimitType.FILES_AMOUNT;
     }
 }

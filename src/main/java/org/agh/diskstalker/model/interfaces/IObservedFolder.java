@@ -31,4 +31,6 @@ public interface IObservedFolder {
     TypeStatistics getTypeStatistics();
 
     void setTypeRecognizer(TypeRecognizer typeRecognizer);
+
+    TypeRecognizer getTypeRecognizer();
 }
