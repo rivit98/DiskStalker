@@ -3,7 +3,9 @@ package org.agh.diskstalker.statistics;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import lombok.extern.slf4j.Slf4j;
 import org.agh.diskstalker.model.interfaces.IObservedFolder;
+import org.agh.diskstalker.statistics.messages.AbstractRecognizeTypeMessage;
 import org.apache.tika.Tika;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -12,26 +14,14 @@ import java.util.concurrent.Executors;
 
 
 @Slf4j
+@Service
 public class TypeRecognizer {
     private static final int THREADS_NUM = 2;
-    private static TypeRecognizer INSTANCE;
 
     private final Tika typeRecognizer = new Tika();
     private final ExecutorService executor = Executors.newFixedThreadPool(THREADS_NUM);
     private final HashMap<IObservedFolder, PublishSubject<AbstractRecognizeTypeMessage>> eventStreams = new HashMap<>();
 
-    private TypeRecognizer(){
-
-    }
-
-    public static TypeRecognizer getInstance(){ //TODO: refactor this, spring Service
-        if(INSTANCE == null){
-            log.info("Started TypeRecognizer");
-            INSTANCE = new TypeRecognizer();
-        }
-
-        return INSTANCE;
-    }
 
     public void recognize(AbstractRecognizeTypeMessage message){
         executor.submit(recognizeCallable(message));

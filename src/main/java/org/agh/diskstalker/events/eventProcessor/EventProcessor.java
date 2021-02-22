@@ -6,24 +6,18 @@ import org.agh.diskstalker.model.interfaces.IObservedFolder;
 import org.agh.diskstalker.model.tree.NodeData;
 import org.agh.diskstalker.model.tree.NodesTree;
 import org.agh.diskstalker.model.tree.TreeFileNode;
-import org.agh.diskstalker.statistics.AddRecognizeTypeMessage;
-import org.agh.diskstalker.statistics.RemoveRecognizeTypeMessage;
 import org.agh.diskstalker.statistics.TypeRecognizer;
-import org.agh.diskstalker.statistics.UpdateRecognizeTypeMessage;
+import org.agh.diskstalker.statistics.messages.AddRecognizeTypeMessage;
+import org.agh.diskstalker.statistics.messages.RemoveRecognizeTypeMessage;
+import org.agh.diskstalker.statistics.messages.UpdateRecognizeTypeMessage;
 
 import java.nio.file.Path;
 
 @AllArgsConstructor
 public class EventProcessor implements IEventProcessor {
+    private final IObservedFolder folder;
     private final NodesTree nodesTree;
     private final TypeRecognizer typeRecognizer;
-    private final IObservedFolder folder;
-
-    public EventProcessor(IObservedFolder folder) {
-        this.folder = folder;
-        this.nodesTree = folder.getNodesTree();
-        this.typeRecognizer = TypeRecognizer.getInstance();
-    }
 
     @Override
     public void processEvent(FilesystemEvent filesystemEvent) {

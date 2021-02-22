@@ -18,10 +18,10 @@ import org.agh.diskstalker.filesystem.scanner.FileTreeScanner;
 import org.agh.diskstalker.model.interfaces.ILimitableObservableFolder;
 import org.agh.diskstalker.model.tree.NodesTree;
 import org.agh.diskstalker.model.tree.TreeFileNode;
-import org.agh.diskstalker.statistics.AbstractRecognizeTypeMessage;
-import org.agh.diskstalker.statistics.AddRecognizeTypeMessage;
 import org.agh.diskstalker.statistics.TypeRecognizer;
 import org.agh.diskstalker.statistics.TypeStatistics;
+import org.agh.diskstalker.statistics.messages.AbstractRecognizeTypeMessage;
+import org.agh.diskstalker.statistics.messages.AddRecognizeTypeMessage;
 
 import java.nio.file.Path;
 import java.util.Objects;
@@ -31,7 +31,6 @@ public class ObservedFolder implements ILimitableObservableFolder {
     private static final long pollingInterval = 6000; //ms
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
-    private final TypeRecognizer typeRecognizer;
     @Getter private final TypeStatistics typeStatistics = new TypeStatistics();
     @Getter private final PublishSubject<ObservedFolderEvent> eventStream = PublishSubject.create();
     @Getter private final NodesTree nodesTree = new NodesTree();
@@ -43,16 +42,16 @@ public class ObservedFolder implements ILimitableObservableFolder {
     @Getter private final String name;
     @Getter @Setter private FolderLimits limits;
     @Getter private boolean scanning = false;
+    @Setter private TypeRecognizer typeRecognizer;
 
 
     public ObservedFolder(Path path) {
         this.path = path;
         this.filesystemWatcher = new DirWatcher(path, pollingInterval);
-        this.eventProcessor = new EventProcessor(this);
+        this.eventProcessor = new EventProcessor(this, nodesTree, typeRecognizer);
         this.name = path.getFileName().toString();
         this.scanner = new FileTreeScanner(path);
         this.limits = new FolderLimits(this);
-        this.typeRecognizer = TypeRecognizer.getInstance();
     }
 
     @Override

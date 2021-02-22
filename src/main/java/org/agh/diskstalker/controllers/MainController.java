@@ -58,15 +58,18 @@ public class MainController {
     @Getter private final FolderList folderList;
     @Getter private final GraphicsFactory graphicsFactory;
     @Getter private final AlertsFactory alertsFactory;
+    @Getter private final TypeRecognizer typeRecognizer;
 
     public MainController(DatabaseCommandExecutor commandExecutor,
                           FolderList folderList,
                           GraphicsFactory graphicsFactory,
-                          AlertsFactory alertsFactory) {
+                          AlertsFactory alertsFactory,
+                          TypeRecognizer typeRecognizer) {
         this.commandExecutor = commandExecutor;
         this.folderList = folderList;
         this.graphicsFactory = graphicsFactory;
         this.alertsFactory = alertsFactory;
+        this.typeRecognizer = typeRecognizer;
     }
 
     @FXML
@@ -130,12 +133,14 @@ public class MainController {
     private void loadSavedFolders() {
         commandExecutor.executeCommand(new GetAllObservedFolderCommand())
                 .thenAccept(folders -> Platform.runLater(() -> {
-                    folders.getFolderList().forEach(this::observeFolderEvents);
-                    folders.getFolderList().forEach(IObservedFolder::scan);
+                    var folderList = folders.getFolderList();
+                    folderList.forEach(this::observeFolderEvents);
+                    folderList.forEach(IObservedFolder::scan);
                 }));
     }
 
     public void observeFolderEvents(IObservedFolder folder) {
+        folder.setTypeRecognizer(typeRecognizer);
         folder.getEventStream()
                 .observeOn(JavaFxScheduler.platform())
                 .subscribe(
@@ -190,7 +195,7 @@ public class MainController {
 
     public void onExit() {
         folderList.forEach(IObservedFolder::destroy);
-        TypeRecognizer.getInstance().stop();
+        typeRecognizer.stop();
         commandExecutor.stop();
     }
 }

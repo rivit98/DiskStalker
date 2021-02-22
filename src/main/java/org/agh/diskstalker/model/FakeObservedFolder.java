@@ -10,6 +10,7 @@ import org.agh.diskstalker.model.interfaces.ILimitableObservableFolder;
 import org.agh.diskstalker.model.tree.NodeData;
 import org.agh.diskstalker.model.tree.NodesTree;
 import org.agh.diskstalker.model.tree.TreeFileNode;
+import org.agh.diskstalker.statistics.TypeRecognizer;
 import org.agh.diskstalker.statistics.TypeStatistics;
 
 import java.nio.file.Path;
@@ -67,6 +68,11 @@ public class FakeObservedFolder implements ILimitableObservableFolder {
     @Override
     public TypeStatistics getTypeStatistics() {
         return realObservedFolder.getTypeStatistics();
+    }
+
+    @Override
+    public void setTypeRecognizer(TypeRecognizer typeRecognizer) {
+        realObservedFolder.setTypeRecognizer(typeRecognizer);
     }
 
     @Override

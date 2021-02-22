@@ -1,4 +1,4 @@
-package org.agh.diskstalker.statistics;
+package org.agh.diskstalker.statistics.messages;
 
 import lombok.Data;
 import org.agh.diskstalker.model.interfaces.IObservedFolder;

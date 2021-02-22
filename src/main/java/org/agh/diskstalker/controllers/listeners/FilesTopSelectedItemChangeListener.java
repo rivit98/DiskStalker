@@ -67,8 +67,6 @@ public class FilesTopSelectedItemChangeListener implements ChangeListener<IObser
         dataTableView.getItems().clear();
     }
 
-    //TODO: same as in type selector
-
     private MapChangeListener<Path, TreeFileNode> createListener(ObservableList<NodeData> items) {
         return c -> {
             if (c.wasAdded()) {

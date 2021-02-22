@@ -1,4 +1,4 @@
-package org.agh.diskstalker.statistics;
+package org.agh.diskstalker.statistics.messages;
 
 import org.agh.diskstalker.model.interfaces.IObservedFolder;
 import org.agh.diskstalker.model.tree.NodeData;
