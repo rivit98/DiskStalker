@@ -1,4 +1,4 @@
-package org.agh.diskstalker.model;
+package org.agh.diskstalker.model.folders;
 
 import com.sun.javafx.collections.ObservableListWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -14,10 +14,7 @@ import java.util.Optional;
 @Component
 public class FolderList extends ObservableListWrapper<ILimitableObservableFolder> {
     public FolderList() {
-        super(
-                new ArrayList<>(),
-                folder -> folder.getLimits().getAllFlags().toArray(new SimpleBooleanProperty[0])
-        );
+        super(new ArrayList<>());
     }
 
     public Optional<ILimitableObservableFolder> getObservedFolderFromTreePath(Path searchedPath) {

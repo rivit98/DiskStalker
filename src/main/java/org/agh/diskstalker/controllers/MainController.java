@@ -19,7 +19,7 @@ import org.agh.diskstalker.controllers.listeners.MaxSizeButtonListener;
 import org.agh.diskstalker.controllers.sortPolicies.MainControllerSortPolicy;
 import org.agh.diskstalker.formatters.StringToIntFormatter;
 import org.agh.diskstalker.graphics.GraphicsFactory;
-import org.agh.diskstalker.model.FolderList;
+import org.agh.diskstalker.model.folders.FolderList;
 import org.agh.diskstalker.model.interfaces.ILimitableObservableFolder;
 import org.agh.diskstalker.model.interfaces.IObservedFolder;
 import org.agh.diskstalker.model.tree.NodeData;

@@ -1,4 +1,4 @@
-package org.agh.diskstalker.model;
+package org.agh.diskstalker.model.folders;
 
 
 import io.reactivex.rxjava3.subjects.PublishSubject;
@@ -103,7 +103,7 @@ public class FakeObservedFolder implements ILimitableObservableFolder {
     }
 
     @Override
-    public void emitEvent(AbstractObservedFolderEvent event) {
+    public void emitEvent(ObservedFolderEvent event) {
         unsupported();
     }
 

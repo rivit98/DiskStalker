@@ -1,5 +1,6 @@
 package org.agh.diskstalker.model;
 
+import org.agh.diskstalker.model.folders.ObservedFolder;
 import org.agh.diskstalker.model.limits.FolderLimits;
 import org.agh.diskstalker.model.limits.LimitType;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,37 +29,37 @@ public class FolderLimitsTest {
 
     @Test
     public void totalSizeLimit(){
-        limits.setMaxTotalSize(folderSize / 2);
+        limits.setLimit(LimitType.TOTAL_SIZE, folderSize / 2);
         assertTrue(limits.isLimitExceeded(LimitType.TOTAL_SIZE));
 
-        limits.setMaxTotalSize(folderSize * 2);
+        limits.setLimit(LimitType.TOTAL_SIZE,folderSize * 2);
         assertFalse(limits.isLimitExceeded(LimitType.TOTAL_SIZE));
     }
 
     @Test
     public void biggestFileLimit(){
-        limits.setBiggestFileLimit(folderBiggestFile / 2);
+        limits.setLimit(LimitType.BIGGEST_FILE,folderBiggestFile / 2);
         assertTrue(limits.isLimitExceeded(LimitType.BIGGEST_FILE));
 
-        limits.setBiggestFileLimit(folderBiggestFile * 2);
+        limits.setLimit(LimitType.BIGGEST_FILE,folderBiggestFile * 2);
         assertFalse(limits.isLimitExceeded(LimitType.BIGGEST_FILE));
     }
 
     @Test
     public void filesAmountLimit(){
-        limits.setMaxFilesAmount(folderFilesAmount / 2);
+        limits.setLimit(LimitType.FILES_AMOUNT, folderFilesAmount / 2);
         assertTrue(limits.isLimitExceeded(LimitType.FILES_AMOUNT));
 
-        limits.setMaxFilesAmount(folderFilesAmount * 2);
+        limits.setLimit(LimitType.FILES_AMOUNT,folderFilesAmount * 2);
         assertFalse(limits.isLimitExceeded(LimitType.FILES_AMOUNT));
     }
 
     @Test
     public void anyLimit(){
-        limits.setMaxFilesAmount(folderFilesAmount / 2);
+        limits.setLimit(LimitType.FILES_AMOUNT,folderFilesAmount / 2);
         assertTrue(limits.isAnyLimitExceeded());
 
-        limits.setMaxFilesAmount(folderFilesAmount * 2);
+        limits.setLimit(LimitType.FILES_AMOUNT,folderFilesAmount * 2);
         assertFalse(limits.isAnyLimitExceeded());
     }
 }

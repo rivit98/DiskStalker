@@ -1,7 +1,7 @@
 package org.agh.diskstalker.events.observedFolderEvents;
 
 import org.agh.diskstalker.controllers.MainController;
-import org.agh.diskstalker.model.FakeObservedFolder;
+import org.agh.diskstalker.model.folders.FakeObservedFolder;
 import org.agh.diskstalker.model.interfaces.ILimitableObservableFolder;
 
 public class ObservedFolderScanStartedEvent extends AbstractObservedFolderEvent{
@@ -11,10 +11,10 @@ public class ObservedFolderScanStartedEvent extends AbstractObservedFolderEvent{
 
     @Override
     public void dispatch(MainController mainController) {
-        addLoadingFolder(mainController, folder);
+        addLoadingFolder(mainController);
     }
 
-    private void addLoadingFolder(MainController mainController, ILimitableObservableFolder folder) {
+    private void addLoadingFolder(MainController mainController) {
         var folderList = mainController.getFolderList();
         var treeTableView = mainController.getTreeTableView();
 

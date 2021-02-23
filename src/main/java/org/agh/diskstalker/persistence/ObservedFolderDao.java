@@ -2,7 +2,7 @@ package org.agh.diskstalker.persistence;
 
 import lombok.extern.slf4j.Slf4j;
 import org.agh.diskstalker.builders.FolderLimitsBuilder;
-import org.agh.diskstalker.model.ObservedFolder;
+import org.agh.diskstalker.model.folders.ObservedFolder;
 import org.agh.diskstalker.model.interfaces.ILimitableObservableFolder;
 import org.agh.diskstalker.model.interfaces.IObservedFolder;
 import org.agh.diskstalker.model.limits.LimitType;

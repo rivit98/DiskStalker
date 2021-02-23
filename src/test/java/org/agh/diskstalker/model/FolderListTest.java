@@ -1,6 +1,8 @@
 package org.agh.diskstalker.model;
 
 import javafx.scene.control.TreeItem;
+import org.agh.diskstalker.model.folders.FolderList;
+import org.agh.diskstalker.model.folders.ObservedFolder;
 import org.agh.diskstalker.model.interfaces.ILimitableObservableFolder;
 import org.agh.diskstalker.model.tree.NodeData;
 import org.junit.jupiter.api.Assertions;

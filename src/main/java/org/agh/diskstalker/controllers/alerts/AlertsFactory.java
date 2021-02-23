@@ -3,6 +3,7 @@ package org.agh.diskstalker.controllers.alerts;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
+import org.agh.diskstalker.model.limits.LimitType;
 import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Service;
 
@@ -16,42 +17,21 @@ public class AlertsFactory {
         ).showAndWait();
     }
 
-    public void setMaxSizeAlert(String path, Long size) {
+    public void setLimit(String path, LimitType limitType, Long value){
+        var valueLabel = switch (limitType){
+            case FILES_AMOUNT -> value.toString();
+            default -> FileUtils.byteCountToDisplaySize(value);
+        };
+
         createAlert(
-                "Max size for folder:\n" + path + "\nset to:\n" + FileUtils.byteCountToDisplaySize(size),
+                String.format("Folder:\n%s\nset %s limit to:\n%s", path, limitType.getLabel(), valueLabel),
                 AlertType.INFORMATION
         ).showAndWait();
     }
 
-    public void setMaxFilesAmountAlert(String path, Long amount) {
+    public void limitExceededAlert(String path, LimitType limitType, Long size) {
         createAlert(
-                "Max files amount for folder:\n" + path + "\nset to:\n" + amount,
-                AlertType.INFORMATION
-        ).showAndWait();
-    }
-
-    public void setBiggestFileAlert(String path, Long size) {
-        createAlert(
-                "Max size of file for folder:\n" + path + "\nset to:\n" + FileUtils.byteCountToDisplaySize(size),
-                AlertType.INFORMATION
-        ).showAndWait();
-    }
-
-    public void sizeExceededAlert(String path, Long size) {
-        createAlert(
-                "Folder:\n" + path + "\nexceeded size:\n" + FileUtils.byteCountToDisplaySize(size)
-        ).showAndWait();
-    }
-
-    public void filesAmountExceededAlert(String path, Long amount) {
-        createAlert(
-                "Folder:\n" + path + "\nexceeded files amount:\n" + amount
-        ).showAndWait();
-    }
-
-    public void biggestFileExceededAlert(String path, Long size) {
-        createAlert(
-                "Folder:\n" + path + "\nexceeded biggest file limit:\n" + FileUtils.byteCountToDisplaySize(size)
+                String.format("Folder:\n%s\nexceeded %s limit:\n%s", path, limitType.getLabel(), FileUtils.byteCountToDisplaySize(size))
         ).showAndWait();
     }
 

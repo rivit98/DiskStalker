@@ -44,6 +44,8 @@ public class FilesTopController extends AbstractTabController {
         sizeColumn.setSortType(TableColumn.SortType.DESCENDING);
         sizeColumn.setCellValueFactory(node -> node.getValue().getAccumulatedSizeProperty());
 
-        fileNameColumn.setCellValueFactory(node -> node.getValue().getFilename());
+        fileNameColumn.setCellValueFactory(node -> node.getValue().getFilenameProperty());
+
+        setSortOrder();
     }
 }

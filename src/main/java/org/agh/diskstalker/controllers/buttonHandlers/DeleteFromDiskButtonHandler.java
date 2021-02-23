@@ -10,8 +10,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 @Slf4j
-public class DeleteFromDiskButtonHandler extends AbstractButtonSetLimitHandler {
-
+public class DeleteFromDiskButtonHandler extends AbstractButtonHandler {
     public DeleteFromDiskButtonHandler(MainController mainController) {
         super(mainController);
     }
@@ -38,7 +37,7 @@ public class DeleteFromDiskButtonHandler extends AbstractButtonSetLimitHandler {
                     }
 
                 } catch (IOException | IllegalArgumentException e) {
-                    mainController.getAlertsFactory().genericErrorAlert(searchedPath, "Cannot delete file");
+                    alertsFactory.genericErrorAlert(searchedPath, "Cannot delete file");
                     log.error("Cannot delete: " + searchedPath, e);
                 }
             }).start();
@@ -46,7 +45,7 @@ public class DeleteFromDiskButtonHandler extends AbstractButtonSetLimitHandler {
     }
 
     private boolean askIfDelete(Path toDeletePath) {
-        var buttonType = mainController.getAlertsFactory().yesNoDeleteAlert(toDeletePath);
+        var buttonType = alertsFactory.yesNoDeleteAlert(toDeletePath);
         return buttonType.equals(ButtonType.YES);
     }
 }

@@ -4,7 +4,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
-import org.agh.diskstalker.model.FolderList;
+import org.agh.diskstalker.model.folders.FolderList;
 import org.agh.diskstalker.model.interfaces.ILimitableFolder;
 import org.agh.diskstalker.model.tree.NodeData;
 

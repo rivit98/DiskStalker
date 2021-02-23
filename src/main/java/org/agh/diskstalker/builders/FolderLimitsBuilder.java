@@ -1,7 +1,8 @@
 package org.agh.diskstalker.builders;
 
-import org.agh.diskstalker.model.ObservedFolder;
+import org.agh.diskstalker.model.folders.ObservedFolder;
 import org.agh.diskstalker.model.limits.FolderLimits;
+import org.agh.diskstalker.model.limits.LimitType;
 
 public class FolderLimitsBuilder {
     private long totalSizeLimit = 0;
@@ -31,9 +32,9 @@ public class FolderLimitsBuilder {
 
     public FolderLimits build(){
         var limits = new FolderLimits(observedFolder);
-        limits.setMaxTotalSize(totalSizeLimit);
-        limits.setMaxFilesAmount(filesAmountLimit);
-        limits.setBiggestFileLimit(biggestFileLimit);
+        limits.setLimit(LimitType.TOTAL_SIZE, totalSizeLimit);
+        limits.setLimit(LimitType.FILES_AMOUNT, filesAmountLimit);
+        limits.setLimit(LimitType.BIGGEST_FILE, biggestFileLimit);
 
         return limits;
     }

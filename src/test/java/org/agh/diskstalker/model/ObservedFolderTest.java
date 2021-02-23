@@ -1,5 +1,6 @@
 package org.agh.diskstalker.model;
 
+import org.agh.diskstalker.model.folders.ObservedFolder;
 import org.agh.diskstalker.model.limits.LimitType;
 import org.agh.diskstalker.model.tree.NodeData;
 import org.junit.jupiter.api.Assertions;
@@ -38,7 +39,7 @@ public class ObservedFolderTest {
         var maxSize = 15L;
 
         //when
-        folder.getLimits().setMaxTotalSize(maxSize);
+        folder.getLimits().setLimit(LimitType.TOTAL_SIZE, maxSize);
 
         //then
         Assertions.assertEquals(folder.getLimits().get(LimitType.TOTAL_SIZE), maxSize);
@@ -49,7 +50,7 @@ public class ObservedFolderTest {
         //given
         var maxSize = 2L;
         var exceededSize = 5L;
-        folder.getLimits().setMaxTotalSize(maxSize);
+        folder.getLimits().setLimit(LimitType.TOTAL_SIZE, maxSize);
         NodeData nodeData = new NodeData(path);
         nodeData.modifyAccumulatedSize(exceededSize);
 

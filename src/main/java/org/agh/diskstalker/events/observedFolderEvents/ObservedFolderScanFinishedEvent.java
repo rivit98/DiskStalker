@@ -2,27 +2,28 @@ package org.agh.diskstalker.events.observedFolderEvents;
 
 import lombok.extern.slf4j.Slf4j;
 import org.agh.diskstalker.controllers.MainController;
-import org.agh.diskstalker.model.FakeObservedFolder;
-import org.agh.diskstalker.model.ObservedFolder;
+import org.agh.diskstalker.model.folders.FakeObservedFolder;
+import org.agh.diskstalker.model.folders.ObservedFolder;
+import org.agh.diskstalker.model.interfaces.ILimitableObservableFolder;
 import org.agh.diskstalker.model.interfaces.IObservedFolder;
 import org.agh.diskstalker.model.tree.TreeFileNode;
 
+import java.util.Objects;
+
 @Slf4j
 public class ObservedFolderScanFinishedEvent extends AbstractObservedFolderEvent{
-    private final TreeFileNode nodeDataTreeItem;
 
-    public ObservedFolderScanFinishedEvent(ObservedFolder folder, TreeFileNode treeItem) {
+    public ObservedFolderScanFinishedEvent(ILimitableObservableFolder folder) {
         super(folder);
-        nodeDataTreeItem = treeItem;
     }
 
     @Override
     public void dispatch(MainController mainController) {
-        replaceLoadingFolderWithRealOne(mainController, folder, nodeDataTreeItem);
+        replaceLoadingFolderWithRealOne(mainController);
     }
 
     // replace fake folder with real one
-    private void replaceLoadingFolderWithRealOne(MainController mainController, IObservedFolder folder, TreeFileNode realRoot) {
+    private void replaceLoadingFolderWithRealOne(MainController mainController) {
         var folderList = mainController.getFolderList();
         var treeTableView = mainController.getTreeTableView();
 
@@ -33,9 +34,11 @@ public class ObservedFolderScanFinishedEvent extends AbstractObservedFolderEvent
                 .orElseThrow();
 
         var indexToReplace = folderList.indexOf(fakeFolder);
-        folderList.set(indexToReplace, fakeFolder.getRealObservedFolder());
+        folderList.set(indexToReplace, folder);
         treeTableView.getRoot().getChildren().remove(fakeFolder.getFakeNode());
-        treeTableView.getRoot().getChildren().add(realRoot);
+        treeTableView.getRoot().getChildren().add(folder.getNodesTree().getRoot());
+
+        folder.getLimits().checkLimits();
         treeTableView.sort();
         mainController.refreshViews();
     }

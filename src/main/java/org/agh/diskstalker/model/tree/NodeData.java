@@ -18,7 +18,7 @@ public class NodeData implements Comparable<NodeData>{
     private static final int MILLIS_IN_SECOND = 1000;
 
     private final SimpleLongProperty accumulatedSizeProperty = new SimpleLongProperty();
-    private final SimpleStringProperty filename = new SimpleStringProperty();
+    private final SimpleStringProperty filenameProperty = new SimpleStringProperty();
     private final SimpleObjectProperty<FileTime> modificationDateProperty = new SimpleObjectProperty<>();
     private final Path path;
     private final boolean isDirectory;
@@ -44,7 +44,7 @@ public class NodeData implements Comparable<NodeData>{
                     FileTime.from(file.lastModified()  / MILLIS_IN_SECOND, TimeUnit.SECONDS)
             );
         }
-        this.filename.set(path.getFileName().toString());
+        this.filenameProperty.set(path.getFileName().toString());
         this.size = accumulatedSizeProperty.get();
     }
 
@@ -71,6 +71,14 @@ public class NodeData implements Comparable<NodeData>{
         return accumulatedSizeProperty.get();
     }
 
+    public FileTime getModificationTime(){
+        return modificationDateProperty.get();
+    }
+
+    public String getFileName(){
+        return filenameProperty.get();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -85,8 +93,9 @@ public class NodeData implements Comparable<NodeData>{
         var isFile2 = other.isFile() ? 1 : 0;
 
         if((isFile1 ^ isFile2) == 0){ // both files or both directories
-            return Comparator.comparingLong(NodeData::getAccumulatedSize).reversed()
-                    .thenComparing(nodeData -> nodeData.getFilename().get())
+            return Comparator
+                    .comparingLong(NodeData::getAccumulatedSize).reversed()
+                    .thenComparing(NodeData::getFileName)
                     .compare(this, other);
         }
 

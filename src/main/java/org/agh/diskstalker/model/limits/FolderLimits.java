@@ -3,9 +3,8 @@ package org.agh.diskstalker.model.limits;
 import javafx.beans.property.SimpleBooleanProperty;
 import org.agh.diskstalker.events.filesystemEvents.FilesystemEvent;
 import org.agh.diskstalker.events.filesystemEvents.FilesystemEventType;
-import org.agh.diskstalker.events.observedFolderEvents.AbstractObservedFolderEvent;
-import org.agh.diskstalker.events.observedFolderEvents.ObservedFolderSizeChangedEvent;
-import org.agh.diskstalker.model.ObservedFolder;
+import org.agh.diskstalker.events.observedFolderEvents.*;
+import org.agh.diskstalker.model.folders.ObservedFolder;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -19,6 +18,7 @@ public class FolderLimits {
     private final HashMap<LimitType, SimpleBooleanProperty> flags = new HashMap<>();
     private final HashMap<LimitType, Long> limits = new HashMap<>();
     private final HashMap<LimitType, Supplier<Long>> consumers = new HashMap<>();
+    private final HashMap<LimitType, Runnable> updaters = new HashMap<>();
 
     public FolderLimits(ObservedFolder folder) {
         this.folder = folder;
@@ -30,13 +30,13 @@ public class FolderLimits {
         consumers.put(LimitType.TOTAL_SIZE, folder::getSize);
         consumers.put(LimitType.FILES_AMOUNT, folder::getFilesAmount);
         consumers.put(LimitType.BIGGEST_FILE, folder::getBiggestFileSize);
+
+        updaters.put(LimitType.TOTAL_SIZE, this::sendSizeChangedEvent);
+        updaters.put(LimitType.FILES_AMOUNT, this::sendFileAmountChangedEvent);
+        updaters.put(LimitType.BIGGEST_FILE, this::sendBiggestFileChangedEvent);
     }
 
-    public Collection<SimpleBooleanProperty> getAllFlags() {
-        return flags.values();
-    }
-
-    private void sendEvent(AbstractObservedFolderEvent event) {
+    private void sendEvent(ObservedFolderEvent event) {
         folder.emitEvent(event);
     }
 
@@ -45,11 +45,11 @@ public class FolderLimits {
     }
 
     private void sendFileAmountChangedEvent() {
-//        sendEvent(new ObservedFolderFilesAmountChangedEvent(folder));
+        sendEvent(new ObservedFolderFilesAmountChangedEvent(folder));
     }
 
     private void sendBiggestFileChangedEvent() {
-//        sendEvent(new ObservedBiggestFileChangedEvent(folder));
+        sendEvent(new ObservedBiggestFileChangedEvent(folder));
     }
 
     public void updateIfNecessary(FilesystemEvent event) {
@@ -64,19 +64,13 @@ public class FolderLimits {
         }
     }
 
-    public void setMaxTotalSize(long limit) {
-        limits.put(LimitType.TOTAL_SIZE, limit);
-        sendSizeChangedEvent();
+    public void checkLimits(){
+        Arrays.stream(LimitType.values()).filter(this::isLimitExceeded).forEach(this::setShown);
     }
 
-    public void setMaxFilesAmount(long limit) {
-        limits.put(LimitType.FILES_AMOUNT, limit);
-        sendFileAmountChangedEvent();
-    }
-
-    public void setBiggestFileLimit(long limit) {
-        limits.put(LimitType.BIGGEST_FILE, limit);
-        sendBiggestFileChangedEvent();
+    public void setLimit(LimitType limitType, long value){
+        limits.put(limitType, value);
+        updaters.get(limitType).run();
     }
 
     public boolean isLimitExceeded(LimitType type){

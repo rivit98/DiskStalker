@@ -1,17 +1,20 @@
 package org.agh.diskstalker.controllers.listeners;
 
+import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
+import javafx.collections.transformation.SortedList;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TreeItem;
 import org.agh.diskstalker.controllers.FilesTopController;
 import org.agh.diskstalker.model.interfaces.IObservedFolder;
+import org.agh.diskstalker.model.stats.StatsEntry;
 import org.agh.diskstalker.model.tree.NodeData;
 import org.agh.diskstalker.model.tree.TreeFileNode;
 
@@ -21,16 +24,23 @@ import java.util.stream.Collectors;
 
 public class FilesTopSelectedItemChangeListener implements ChangeListener<IObservedFolder> {
     private static final String LOADING_LABEL = "Loading...";
-    private final FilesTopController filesTopController;
-    private final TableView<NodeData> dataTableView;
     private final Node originalLabel;
     private final Node loadingLabel;
+
+    private final TableView<NodeData> dataTableView;
     private MapChangeListener<Path, TreeFileNode> previousListener;
     private ObservableMap<Path, TreeFileNode> previousMap;
+    private SortedList<NodeData> prevItems;
 
-    public FilesTopSelectedItemChangeListener(FilesTopController filesTopController) {
-        this.filesTopController = filesTopController;
-        this.dataTableView = filesTopController.getDataTableView();
+    private static final Comparator<NodeData> comparator =
+            (o1, o2) -> Comparator
+                    .comparingLong(NodeData::getSize).reversed()
+                    .thenComparing(NodeData::getModificationTime)
+                    .thenComparing(NodeData::getFileName)
+                    .compare(o1, o2);
+
+    public FilesTopSelectedItemChangeListener(FilesTopController controller) {
+        this.dataTableView = controller.getDataTableView();
         this.originalLabel = dataTableView.getPlaceholder();
         this.loadingLabel = new Label(LOADING_LABEL);
     }
@@ -52,11 +62,13 @@ public class FilesTopSelectedItemChangeListener implements ChangeListener<IObser
     private void setItems(IObservedFolder selectedFolder) {
         var nodesMap = selectedFolder.getNodesTree().getPathToTreeMap();
         var items = createFileList(nodesMap);
+        var sortedItems = createSortedNodeList(items);
         var listener = createListener(items);
 
         nodesMap.addListener(listener);
-        dataTableView.setItems(items);
-        filesTopController.setSortOrder();
+        dataTableView.setItems(sortedItems);
+
+        prevItems = sortedItems;
         previousMap = nodesMap;
         previousListener = listener;
     }
@@ -64,7 +76,10 @@ public class FilesTopSelectedItemChangeListener implements ChangeListener<IObser
     private void clearItems() {
         previousListener = null;
         previousMap = null;
-        dataTableView.getItems().clear();
+        if(prevItems != null){
+            prevItems.getSource().clear();
+            prevItems = null;
+        }
     }
 
     private MapChangeListener<Path, TreeFileNode> createListener(ObservableList<NodeData> items) {
@@ -78,14 +93,30 @@ public class FilesTopSelectedItemChangeListener implements ChangeListener<IObser
     }
 
     private ObservableList<NodeData> createFileList(ObservableMap<Path, TreeFileNode> nodesMap) {
-        return FXCollections.observableArrayList(
-                nodesMap.values().stream()
-                        .map(TreeItem::getValue)
-                        .filter(NodeData::isFile)
-                        .sorted((o1, o2) -> Comparator.comparingLong(NodeData::getSize).reversed().compare(o1, o2))
-                        .limit(100)
-                        .collect(Collectors.toList())
+        var list = FXCollections.<NodeData>observableArrayList(
+                node -> new Observable[] {
+                        node.getFilenameProperty(),
+                        node.getAccumulatedSizeProperty(),
+                        node.getModificationDateProperty()
+                }
         );
+
+        list.setAll(
+                nodesMap.values().stream()
+                .map(TreeItem::getValue)
+                .filter(NodeData::isFile)
+                .sorted(comparator)
+                .limit(100)
+                .collect(Collectors.toList())
+        );
+
+        return list;
+    }
+
+    private SortedList<NodeData> createSortedNodeList(ObservableList<NodeData> items) {
+        var sortedList = new SortedList<>(items);
+        sortedList.comparatorProperty().bind(dataTableView.comparatorProperty());
+        return sortedList;
     }
 
     private void clearOldListeners() {

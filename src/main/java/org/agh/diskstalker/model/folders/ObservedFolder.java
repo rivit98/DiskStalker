@@ -1,4 +1,4 @@
-package org.agh.diskstalker.model;
+package org.agh.diskstalker.model.folders;
 
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -92,7 +92,7 @@ public class ObservedFolder implements ILimitableObservableFolder {
     private void startMonitoring() {
         log.info("startMonitoring " + path);
         scanning = false;
-        eventStream.onNext(new ObservedFolderScanFinishedEvent(this, nodesTree.getRoot()));
+        eventStream.onNext(new ObservedFolderScanFinishedEvent(this));
 
         nodesTree.getPathToTreeMap().values()
                 .stream()
@@ -142,7 +142,7 @@ public class ObservedFolder implements ILimitableObservableFolder {
     }
 
     @Override
-    public void emitEvent(AbstractObservedFolderEvent event) {
+    public void emitEvent(ObservedFolderEvent event) {
         eventStream.onNext(event);
     }
 

@@ -3,7 +3,7 @@ package org.agh.diskstalker.controllers.listeners;
 import javafx.application.Platform;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
-import org.agh.diskstalker.model.FolderList;
+import org.agh.diskstalker.model.folders.FolderList;
 import org.agh.diskstalker.model.interfaces.ILimitableFolder;
 import org.agh.diskstalker.model.limits.LimitType;
 import org.agh.diskstalker.model.tree.NodeData;

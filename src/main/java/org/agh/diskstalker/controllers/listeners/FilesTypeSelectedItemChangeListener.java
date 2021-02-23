@@ -9,6 +9,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.collections.transformation.SortedList;
 import javafx.scene.control.TableView;
+import org.agh.diskstalker.controllers.AbstractTabController;
 import org.agh.diskstalker.controllers.FilesTypeController;
 import org.agh.diskstalker.model.interfaces.IObservedFolder;
 import org.agh.diskstalker.model.stats.StatsEntry;
@@ -19,8 +20,8 @@ public class FilesTypeSelectedItemChangeListener implements ChangeListener<IObse
     private ObservableMap<String, StatsEntry> previousMap;
     private SortedList<StatsEntry> prevItems;
 
-    public FilesTypeSelectedItemChangeListener(FilesTypeController filesTopController) {
-        this.dataTableView = filesTopController.getDataTableView();
+    public FilesTypeSelectedItemChangeListener(FilesTypeController controller) {
+        this.dataTableView = controller.getDataTableView();
     }
 
     @Override
@@ -53,8 +54,10 @@ public class FilesTypeSelectedItemChangeListener implements ChangeListener<IObse
     private void clearItems() {
         previousListener = null;
         previousMap = null;
-        prevItems.getSource().clear();
-        prevItems = null;
+        if(prevItems != null){
+            prevItems.getSource().clear();
+            prevItems = null;
+        }
     }
 
     private MapChangeListener<String, StatsEntry> createListener(ObservableList<StatsEntry> items) {
