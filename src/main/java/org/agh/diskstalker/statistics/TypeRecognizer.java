@@ -23,22 +23,22 @@ public class TypeRecognizer {
     private final HashMap<IObservedFolder, PublishSubject<AbstractRecognizeTypeMessage>> eventStreams = new HashMap<>();
 
 
-    public void recognize(AbstractRecognizeTypeMessage message){
+    public void recognize(AbstractRecognizeTypeMessage message) {
         executor.submit(recognizeCallable(message));
     }
 
-    private Runnable recognizeCallable(AbstractRecognizeTypeMessage message){
+    private Runnable recognizeCallable(AbstractRecognizeTypeMessage message) {
         var nodeData = message.getNodeData();
         var folder = message.getFolder();
-        if(nodeData.isRemoved() || nodeData.isDirectory()){
-            return () -> {};
+        if (nodeData.isRemoved() || nodeData.isDirectory()) {
+            return () -> { };
         }
 
         return () -> {
             var nodePath = nodeData.getPath();
             var eventStream = eventStreams.get(folder);
 
-            if(eventStream == null){
+            if (eventStream == null) {
                 return;
             }
 
@@ -54,20 +54,20 @@ public class TypeRecognizer {
         };
     }
 
-    public PublishSubject<AbstractRecognizeTypeMessage> register(IObservedFolder folder){
+    public PublishSubject<AbstractRecognizeTypeMessage> register(IObservedFolder folder) {
         var subject = PublishSubject.<AbstractRecognizeTypeMessage>create();
         eventStreams.putIfAbsent(folder, subject);
         return subject;
     }
 
-    public void unregister(IObservedFolder folder){
+    public void unregister(IObservedFolder folder) {
         var e = eventStreams.remove(folder);
-        if(e != null){
+        if (e != null) {
             e.onComplete();
         }
     }
 
-    public void stop(){
+    public void stop() {
         log.info("Stopping TypeRecognizer");
         executor.shutdownNow();
     }

@@ -65,7 +65,7 @@ public class NodesTree {
                 .count();
     }
 
-    public long getLargestFileSize(){
+    public long getLargestFileSize() {
         return pathToTreeMap.values().stream()
                 .map(TreeItem::getValue)
                 .filter(NodeData::isFile)

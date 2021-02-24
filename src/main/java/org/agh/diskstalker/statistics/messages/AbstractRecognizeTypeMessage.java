@@ -7,11 +7,10 @@ import org.agh.diskstalker.model.tree.NodeData;
 @Data
 public abstract class AbstractRecognizeTypeMessage {
     public static final String UNKNOWN_TYPE = "unknown";
-
-    protected String type;
-    protected String oldType;
     protected final IObservedFolder folder;
     protected final NodeData nodeData;
+    protected String type;
+    protected String oldType;
 
     public AbstractRecognizeTypeMessage(IObservedFolder folder, NodeData nodeData) {
         this.folder = folder;

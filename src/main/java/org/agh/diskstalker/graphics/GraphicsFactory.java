@@ -22,11 +22,11 @@ public final class GraphicsFactory {
             new Image(GraphicsFactory.class.getResource("/images/folder-red-16.png").toString());
 
     public ImageView getGraphic(boolean isDirectory, boolean sizeExceeded) {
-        if(isDirectory && sizeExceeded) return new ImageView(FOLDER_IMAGE_RED);
+        if (isDirectory && sizeExceeded) return new ImageView(FOLDER_IMAGE_RED);
         return isDirectory ? new ImageView(FOLDER_IMAGE) : new ImageView(FILE_IMAGE);
     }
 
-    public Image getApplicationIcon(){
+    public Image getApplicationIcon() {
         return APPLICATION_ICON;
     }
 

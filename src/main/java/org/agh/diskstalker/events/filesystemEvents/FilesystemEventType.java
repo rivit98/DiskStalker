@@ -10,23 +10,23 @@ public enum FilesystemEventType {
     FILE_DELETED,
     DIR_DELETED;
 
-    public boolean isDeleteEvent(){
+    public boolean isDeleteEvent() {
         return this == FILE_DELETED || this == DIR_DELETED;
     }
 
-    public boolean isCreateEvent(){
+    public boolean isCreateEvent() {
         return this == FILE_CREATED || this == DIR_CREATED;
     }
 
-    public boolean isModifyEvent(){
+    public boolean isModifyEvent() {
         return this == FILE_MODIFIED || this == DIR_MODIFIED;
     }
 
-    public boolean isFileEvent(){
+    public boolean isFileEvent() {
         return this == FILE_CREATED || this == FILE_DELETED || this == FILE_MODIFIED;
     }
 
-    public boolean isDirEvent(){
+    public boolean isDirEvent() {
         return this == DIR_CREATED || this == DIR_DELETED || this == DIR_MODIFIED;
     }
 }

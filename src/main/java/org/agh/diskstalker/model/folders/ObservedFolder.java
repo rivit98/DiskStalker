@@ -38,13 +38,12 @@ public class ObservedFolder implements ILimitableObservableFolder {
     @Getter private final TypeStatistics typeStatistics = new TypeStatistics();
     @Getter private final PublishSubject<ObservedFolderEvent> eventStream = PublishSubject.create();
     @Getter private final NodesTree nodesTree = new NodesTree();
-    @Getter @Setter private TypeRecognizer typeRecognizer;
-
     @Getter private final Path path;
     private final IFilesystemWatcher filesystemWatcher;
     private final IEventProcessor eventProcessor;
     private final FileTreeScanner scanner;
     @Getter private final String name;
+    @Getter @Setter private TypeRecognizer typeRecognizer;
     @Getter @Setter private FolderLimits limits;
     @Getter private boolean scanning = false;
 

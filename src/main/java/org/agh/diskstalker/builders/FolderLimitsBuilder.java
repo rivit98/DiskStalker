@@ -10,27 +10,27 @@ public class FolderLimitsBuilder {
     private long largestFileLimit = 0;
     private ObservedFolder observedFolder;
 
-    public FolderLimitsBuilder withFolder(ObservedFolder folder){
+    public FolderLimitsBuilder withFolder(ObservedFolder folder) {
         observedFolder = folder;
         return this;
     }
 
-    public FolderLimitsBuilder withTotalSize(long limit){
+    public FolderLimitsBuilder withTotalSize(long limit) {
         totalSizeLimit = limit;
         return this;
     }
 
-    public FolderLimitsBuilder withFileAmount(long limit){
+    public FolderLimitsBuilder withFileAmount(long limit) {
         filesAmountLimit = limit;
         return this;
     }
 
-    public FolderLimitsBuilder withLargestFileSize(long limit){
+    public FolderLimitsBuilder withLargestFileSize(long limit) {
         largestFileLimit = limit;
         return this;
     }
 
-    public FolderLimits build(){
+    public FolderLimits build() {
         var limits = new FolderLimits(observedFolder);
         limits.setLimit(LimitType.TOTAL_SIZE, totalSizeLimit);
         limits.setLimit(LimitType.FILES_AMOUNT, filesAmountLimit);

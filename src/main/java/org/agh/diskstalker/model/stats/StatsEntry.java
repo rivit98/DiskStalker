@@ -20,7 +20,7 @@ public class StatsEntry {
         this.longProperty.set(value);
     }
 
-    public void increment(){
+    public void increment() {
         add(1);
     }
 
@@ -28,15 +28,15 @@ public class StatsEntry {
         add(-1);
     }
 
-    public void add(long i){
+    public void add(long i) {
         longProperty.set(getValue() + i);
     }
 
-    public long getValue(){
+    public long getValue() {
         return longProperty.longValue();
     }
 
-    public String getType(){
+    public String getType() {
         return typeProperty.get();
     }
 

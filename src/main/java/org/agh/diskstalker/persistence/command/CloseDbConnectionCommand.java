@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.sql.SQLException;
 
 @Slf4j
-public class CloseDbConnectionCommand extends AbstractObservedFolderCommand{
+public class CloseDbConnectionCommand extends AbstractObservedFolderCommand {
     @Override
     public CommandResult get() {
         try {

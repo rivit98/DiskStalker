@@ -30,7 +30,7 @@ public class DatabaseCommandExecutor {
         return CompletableFuture.supplyAsync(command, executor);
     }
 
-    public void stop(){
+    public void stop() {
         executeCommand(new CloseDbConnectionCommand());
         executor.shutdown();
     }

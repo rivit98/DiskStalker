@@ -6,7 +6,7 @@ import org.agh.diskstalker.model.folders.FakeObservedFolder;
 import org.agh.diskstalker.model.interfaces.ILimitableObservableFolder;
 
 @Slf4j
-public class ObservedFolderScanFinishedEvent extends AbstractObservedFolderEvent{
+public class ObservedFolderScanFinishedEvent extends AbstractObservedFolderEvent {
 
     public ObservedFolderScanFinishedEvent(ILimitableObservableFolder folder) {
         super(folder);

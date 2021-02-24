@@ -21,8 +21,8 @@ public class FilesTypeSelectedItemChangeListener implements ChangeListener<IObse
 
     public FilesTypeSelectedItemChangeListener(FilesTypeController controller) {
         this.dataTableView = controller.getDataTableView();
-        this.currentItems = FXCollections.<StatsEntry>observableArrayList(
-                statEntry -> new Observable[] {statEntry.getLongProperty()}
+        this.currentItems = FXCollections.observableArrayList(
+                statEntry -> new Observable[]{statEntry.getLongProperty()}
         );
     }
 
@@ -80,7 +80,7 @@ public class FilesTypeSelectedItemChangeListener implements ChangeListener<IObse
     }
 
     private void clearOldListeners() {
-        if(previousMap != null){
+        if (previousMap != null) {
             previousMap.removeListener(previousListener);
         }
     }

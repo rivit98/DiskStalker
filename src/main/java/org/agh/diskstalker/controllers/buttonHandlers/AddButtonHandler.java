@@ -44,7 +44,7 @@ public class AddButtonHandler implements EventHandler<ActionEvent> {
         }
     }
 
-    private boolean checkIfFolderAlreadyExists(Path path){
+    private boolean checkIfFolderAlreadyExists(Path path) {
         return Optional.ofNullable(mainController.getTreeTableView().getRoot())
                 .map(TreeItem::getChildren)
                 .map(Collection::stream)

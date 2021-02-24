@@ -8,7 +8,7 @@ import org.agh.diskstalker.persistence.command.UpdateObservedFolderCommand;
 
 import java.nio.file.Path;
 
-public abstract class AbstractButtonSetLimitHandler extends AbstractButtonHandler{
+public abstract class AbstractButtonSetLimitHandler extends AbstractButtonHandler {
     private final TextField textField;
     private final LimitType limitType;
 
@@ -28,11 +28,11 @@ public abstract class AbstractButtonSetLimitHandler extends AbstractButtonHandle
                 ));
     }
 
-    protected long getValue(long value){
+    protected long getValue(long value) {
         return value;
     }
 
-    private void set(Path path, long value){
+    private void set(Path path, long value) {
         mainController.getFolderList()
                 .getObservedFolderFromTreePath(path)
                 .ifPresent(observedFolder -> {

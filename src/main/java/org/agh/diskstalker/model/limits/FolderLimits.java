@@ -66,16 +66,16 @@ public class FolderLimits {
         }
     }
 
-    public void checkLimits(){
+    public void checkLimits() {
         Arrays.stream(LimitType.values()).filter(this::isLimitExceeded).forEach(this::setShown);
     }
 
-    public void setLimit(LimitType limitType, long value){
+    public void setLimit(LimitType limitType, long value) {
         limits.put(limitType, value);
         updaters.get(limitType).run();
     }
 
-    public boolean isLimitExceeded(LimitType type){
+    public boolean isLimitExceeded(LimitType type) {
         var limit = limits.get(type);
         var consumer = consumers.get(type);
         return limit > 0 && consumer.get() > limit;

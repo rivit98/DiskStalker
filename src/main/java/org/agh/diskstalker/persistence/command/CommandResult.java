@@ -11,7 +11,7 @@ import java.util.List;
 public class CommandResult {
     private List<IObservedFolder> folderList;
 
-    public static CommandResult empty(){
+    public static CommandResult empty() {
         return new CommandResult();
     }
 }

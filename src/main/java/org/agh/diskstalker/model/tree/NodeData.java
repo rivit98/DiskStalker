@@ -14,7 +14,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Getter
-public class NodeData implements Comparable<NodeData>{
+public class NodeData implements Comparable<NodeData> {
     private static final int MILLIS_IN_SECOND = 1000;
 
     private final SimpleLongProperty accumulatedSizeProperty = new SimpleLongProperty();
@@ -30,18 +30,18 @@ public class NodeData implements Comparable<NodeData>{
         this(path, null);
     }
 
-    public NodeData(Path path, BasicFileAttributes attributes){
+    public NodeData(Path path, BasicFileAttributes attributes) {
         this.path = path;
-        if(attributes != null){
+        if (attributes != null) {
             this.isDirectory = attributes.isDirectory();
             this.accumulatedSizeProperty.set(isFile() ? attributes.size() : 0);
             this.modificationDateProperty.set(attributes.lastModifiedTime());
-        }else{
+        } else {
             var file = path.toFile();
             this.isDirectory = file.isDirectory();
             this.accumulatedSizeProperty.set(isFile() ? file.length() : 0);
             this.modificationDateProperty.set(
-                    FileTime.from(file.lastModified()  / MILLIS_IN_SECOND, TimeUnit.SECONDS)
+                    FileTime.from(file.lastModified() / MILLIS_IN_SECOND, TimeUnit.SECONDS)
             );
         }
         this.filenameProperty.set(path.getFileName().toString());
@@ -53,7 +53,7 @@ public class NodeData implements Comparable<NodeData>{
     }
 
     public void updateFileData() {
-        if(isFile()){ //because folders are not displayed in additional tabs
+        if (isFile()) { //because folders are not displayed in additional tabs
             var file = path.toFile();
             modificationDateProperty.set(
                     FileTime.from(file.lastModified() / MILLIS_IN_SECOND, TimeUnit.SECONDS)
@@ -71,11 +71,11 @@ public class NodeData implements Comparable<NodeData>{
         return accumulatedSizeProperty.get();
     }
 
-    public FileTime getModificationTime(){
+    public FileTime getModificationTime() {
         return modificationDateProperty.get();
     }
 
-    public String getFileName(){
+    public String getFileName() {
         return filenameProperty.get();
     }
 
@@ -92,7 +92,7 @@ public class NodeData implements Comparable<NodeData>{
         var isFile1 = isFile() ? 1 : 0;
         var isFile2 = other.isFile() ? 1 : 0;
 
-        if((isFile1 ^ isFile2) == 0){ // both files or both directories
+        if ((isFile1 ^ isFile2) == 0) { // both files or both directories
             return Comparator
                     .comparingLong(NodeData::getAccumulatedSize).reversed()
                     .thenComparing(NodeData::getFileName)

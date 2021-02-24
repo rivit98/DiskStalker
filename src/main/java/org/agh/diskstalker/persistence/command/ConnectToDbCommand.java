@@ -1,6 +1,6 @@
 package org.agh.diskstalker.persistence.command;
 
-public class ConnectToDbCommand extends AbstractObservedFolderCommand{
+public class ConnectToDbCommand extends AbstractObservedFolderCommand {
     @Override
     public CommandResult get() {
         queryExecutor.getConnectionProvider().init();

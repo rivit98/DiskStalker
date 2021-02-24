@@ -19,7 +19,7 @@ public class QueryExecutor {
         this.connectionProvider = connectionProvider;
     }
 
-    public void createTables(){
+    public void createTables() {
         try {
             create("CREATE TABLE IF NOT EXISTS observedFolders (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +

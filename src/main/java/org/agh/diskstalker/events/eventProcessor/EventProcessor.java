@@ -39,7 +39,7 @@ public class EventProcessor implements IEventProcessor {
 
     private void handleModifyEventFile(Path resolvedPath) {
         var modifiedNode = nodesTree.getPathToTreeMap().get(resolvedPath);
-        if(modifiedNode == null){
+        if (modifiedNode == null) {
             return;
         }
 
@@ -57,7 +57,7 @@ public class EventProcessor implements IEventProcessor {
 
     private void handleDeleteEventCommon(Path resolvedPath) {
         var affectedNode = nodesTree.getPathToTreeMap().get(resolvedPath);
-        if(affectedNode == null){
+        if (affectedNode == null) {
             return;
         }
 

@@ -60,7 +60,7 @@ public class ObservedFolderDao implements IObservedFolderDao {
         deletePath(IObservedFolder.getPath());
     }
 
-    private void deletePath(Path path){
+    private void deletePath(Path path) {
         var deleteObservedFolder = "DELETE FROM observedFolders WHERE path = (?);";
         Object[] args = {path.toString()};
 

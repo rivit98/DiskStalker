@@ -14,16 +14,16 @@ public class FolderColumnCellFactory extends ListCell<ILimitableObservableFolder
     @Override
     protected void updateItem(ILimitableObservableFolder folder, boolean empty) {
         super.updateItem(folder, empty);
-        if(empty) {
+        if (empty) {
             setText(null);
             setGraphic(null);
             return;
         }
 
         setText(folder.getPath().getFileName().toString());
-        if(folder.isScanning()){
+        if (folder.isScanning()) {
             setGraphic(graphicsFactory.getLoadingGraphics());
-        }else{
+        } else {
             setGraphic(graphicsFactory.getGraphic(true, folder.getLimits().isAnyLimitExceeded()));
         }
     }

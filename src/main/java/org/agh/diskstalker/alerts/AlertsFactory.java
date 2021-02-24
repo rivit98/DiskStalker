@@ -17,8 +17,8 @@ public class AlertsFactory {
         ).showAndWait();
     }
 
-    public void setLimit(String path, LimitType limitType, Long value){
-        var valueLabel = switch (limitType){
+    public void setLimit(String path, LimitType limitType, Long value) {
+        var valueLabel = switch (limitType) {
             case FILES_AMOUNT -> value.toString();
             default -> FileUtils.byteCountToDisplaySize(value);
         };

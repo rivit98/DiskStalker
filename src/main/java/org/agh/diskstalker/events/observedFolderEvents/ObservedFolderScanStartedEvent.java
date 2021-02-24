@@ -4,7 +4,7 @@ import org.agh.diskstalker.controllers.MainController;
 import org.agh.diskstalker.model.folders.FakeObservedFolder;
 import org.agh.diskstalker.model.interfaces.ILimitableObservableFolder;
 
-public class ObservedFolderScanStartedEvent extends AbstractObservedFolderEvent{
+public class ObservedFolderScanStartedEvent extends AbstractObservedFolderEvent {
     public ObservedFolderScanStartedEvent(ILimitableObservableFolder folder) {
         super(folder);
     }

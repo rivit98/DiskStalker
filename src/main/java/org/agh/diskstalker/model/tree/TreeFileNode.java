@@ -26,7 +26,7 @@ public class TreeFileNode extends TreeItem<NodeData> {
                 .ifPresent(parent -> updateParentSizeWorker(parent, deltaSize));
     }
 
-    private void updateParentSizeWorker(TreeItem<NodeData> parent, long deltaSize){
+    private void updateParentSizeWorker(TreeItem<NodeData> parent, long deltaSize) {
         Optional.ofNullable(parent.getValue())
                 .ifPresent(value -> {
                     value.modifyAccumulatedSize(deltaSize);

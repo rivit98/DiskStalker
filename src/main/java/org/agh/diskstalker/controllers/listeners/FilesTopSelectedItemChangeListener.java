@@ -34,8 +34,8 @@ public class FilesTopSelectedItemChangeListener implements ChangeListener<IObser
         this.dataTableView = controller.getDataTableView();
         this.originalLabel = dataTableView.getPlaceholder();
         this.loadingLabel = new Label(LOADING_LABEL);
-        this.currentItems = FXCollections.<NodeData>observableArrayList(
-                node -> new Observable[] {
+        this.currentItems = FXCollections.observableArrayList(
+                node -> new Observable[]{
                         node.getFilenameProperty(),
                         node.getAccumulatedSizeProperty(),
                         node.getModificationDateProperty()
@@ -90,9 +90,9 @@ public class FilesTopSelectedItemChangeListener implements ChangeListener<IObser
     private void createFileList(ObservableMap<Path, TreeFileNode> nodesMap) {
         currentItems.setAll(
                 nodesMap.values().stream()
-                .map(TreeItem::getValue)
-                .filter(NodeData::isFile)
-                .collect(Collectors.toList())
+                        .map(TreeItem::getValue)
+                        .filter(NodeData::isFile)
+                        .collect(Collectors.toList())
         );
     }
 
@@ -103,7 +103,7 @@ public class FilesTopSelectedItemChangeListener implements ChangeListener<IObser
     }
 
     private void clearOldListeners() {
-        if(previousMap != null){
+        if (previousMap != null) {
             previousMap.removeListener(previousListener);
         }
     }

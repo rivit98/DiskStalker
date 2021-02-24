@@ -14,7 +14,7 @@ public class MaxSizeButtonListener extends AbstractLimitButtonListener {
         super(textField, folderList);
     }
 
-    protected void handle(ILimitableFolder newFolder, TreeItem<NodeData> oldTreeItem){
+    protected void handle(ILimitableFolder newFolder, TreeItem<NodeData> oldTreeItem) {
         var oldFolder = folderList.getObservedFolderFromTreeItem(oldTreeItem);
         if (oldFolder.isEmpty() || !oldFolder.get().equals(newFolder)) {
             Platform.runLater(() ->

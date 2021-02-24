@@ -71,13 +71,13 @@ public class FakeObservedFolder implements ILimitableObservableFolder {
     }
 
     @Override
-    public void setTypeRecognizer(TypeRecognizer typeRecognizer) {
-        realObservedFolder.setTypeRecognizer(typeRecognizer);
+    public TypeRecognizer getTypeRecognizer() {
+        return realObservedFolder.getTypeRecognizer();
     }
 
     @Override
-    public TypeRecognizer getTypeRecognizer() {
-        return realObservedFolder.getTypeRecognizer();
+    public void setTypeRecognizer(TypeRecognizer typeRecognizer) {
+        realObservedFolder.setTypeRecognizer(typeRecognizer);
     }
 
     @Override
@@ -88,12 +88,14 @@ public class FakeObservedFolder implements ILimitableObservableFolder {
         return Objects.equals(realObservedFolder, that.getRealObservedFolder());
     }
 
-
-
-
-    private void unsupported() throws UnsupportedOperationException{
+    private void unsupported() throws UnsupportedOperationException {
         log.warn("Not supported in FakeFolder");
         throw new UnsupportedOperationException("Not supported in FakeFolder");
+    }
+
+    @Override
+    public void setLimits(FolderLimits limits) {
+        unsupported();
     }
 
     @Override
@@ -122,11 +124,6 @@ public class FakeObservedFolder implements ILimitableObservableFolder {
     public long getLargestFileSize() {
         unsupported();
         return 0;
-    }
-
-    @Override
-    public void setLimits(FolderLimits limits) {
-        unsupported();
     }
 
     @Override
