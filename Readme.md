@@ -10,33 +10,36 @@ App also shows stats about type of files inside selected folder and presents top
 
 
 ## Usage
+Visit [Releases](https://github.com/rivit98/DiskStalker/releases) and download .jar. Then run:
+```
+java -jar nameOfTheJarFile.jar
+```
+
+## Importing
 ```
 git clone https://github.com/rivit98/DiskStalker.git
-cd DiskStalker
 ```
-Windows:
-```
-gradlew.bat bootRun
-```
-Linux
-```
-./gradlew bootRun
-```
+and import as Gradle project
 
 
 ## Used technologies and libraries
-* Java
+* Java 15
 * JavaFX
-* RxJava
+* RxJava3
 * Spring (for dependency injection)
 * SQLite
 * Apache commons IO
 * Apache Tika
 * Mockito
-* JUnit
+* JUnit5
 
 ## Authors
-* [Kamil Wnęk](https://github.com/wnekus)
-* [Kamil Koczera](https://github.com/kuczi55)
-* [Albert Gierlach](https://github.com/rivit98)
 
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/wnekus"><br /><sub><b>Kamil Wnęk</b></sub></a><br />
+    </td>
+    <td align="center"><a href="https://github.com/kuczi55"><br /><sub><b>Kamil Koczera</b></sub></a><br /></td>
+    <td align="center"><a href="https://github.com/rivit98"><br /><sub><b>Albert Gierlach</b></sub></a><br /></td>
+  </tr>
+</table>
