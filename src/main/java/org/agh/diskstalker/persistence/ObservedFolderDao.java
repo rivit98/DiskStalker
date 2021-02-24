@@ -40,11 +40,11 @@ public class ObservedFolderDao implements IObservedFolderDao {
     public void update(ILimitableObservableFolder observedFolder) {
         var path = observedFolder.getPath().toString();
         var limits = observedFolder.getLimits();
-        var updateDB = "UPDATE observedFolders SET max_size_limit = (?), total_files_limit = (?), biggest_file_limit = (?) WHERE path = (?);";
+        var updateDB = "UPDATE observedFolders SET max_size_limit = (?), total_files_limit = (?), largest_file_limit = (?) WHERE path = (?);";
         Object[] args = {
                 String.valueOf(limits.get(LimitType.TOTAL_SIZE)),
                 String.valueOf(limits.get(LimitType.FILES_AMOUNT)),
-                String.valueOf(limits.get(LimitType.BIGGEST_FILE)),
+                String.valueOf(limits.get(LimitType.LARGEST_FILE)),
                 path
         };
 
@@ -86,7 +86,7 @@ public class ObservedFolderDao implements IObservedFolderDao {
                             .withFolder(folder)
                             .withTotalSize(Long.parseLong(rs.getString("max_size_limit")))
                             .withFileAmount(Long.parseLong(rs.getString("total_files_limit")))
-                            .withBiggestFileSize(Long.parseLong(rs.getString("biggest_file_limit")))
+                            .withLargestFileSize(Long.parseLong(rs.getString("largest_file_limit")))
                             .build();
 
                     folder.setLimits(limits);

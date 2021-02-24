@@ -55,7 +55,7 @@
                         <TreeTableColumn fx:id="sizeColumn" editable="false" prefWidth="194.5" resizable="false" sortable="false" reorderable="false" text="Size" />
                     </columns>
                 </TreeTableView>
-                <Button fx:id="addButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="125.0" text="Start observing" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="1">
+                <Button fx:id="addButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="125.0" text="Add folder" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="1">
                     <GridPane.margin>
                         <Insets left="35.0" />
                     </GridPane.margin>
@@ -80,7 +80,7 @@
                         <Insets left="10.0" />
                     </GridPane.margin>
                 </Button>
-                <Button fx:id="setBiggestFileSizeButton" mnemonicParsing="false" prefWidth="50.0" text="Set" GridPane.columnIndex="2" GridPane.rowIndex="12">
+                <Button fx:id="setLargestFileSizeButton" mnemonicParsing="false" prefWidth="50.0" text="Set" GridPane.columnIndex="2" GridPane.rowIndex="12">
                     <GridPane.margin>
                         <Insets left="10.0" />
                     </GridPane.margin>
@@ -103,14 +103,14 @@
                   <Insets left="5.0" />
                </GridPane.margin>
             </TextField>
-            <TextField fx:id="biggestFileField" prefHeight="25.0" prefWidth="125.0" GridPane.columnIndex="1" GridPane.rowIndex="12">
+            <TextField fx:id="largestFileField" prefHeight="25.0" prefWidth="125.0" GridPane.columnIndex="1" GridPane.rowIndex="12">
                <GridPane.margin>
                   <Insets left="5.0" />
                </GridPane.margin>
             </TextField>
             <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Total size limit (MB)" textAlignment="CENTER" wrappingWidth="193.5" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
             <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Number of files limit" textAlignment="CENTER" wrappingWidth="193.5" GridPane.columnIndex="1" GridPane.rowIndex="8" />
-            <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Biggest file size limit (MB)" textAlignment="CENTER" wrappingWidth="194.0" GridPane.columnIndex="1" GridPane.rowIndex="11" />
+            <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Largest file size limit (MB)" textAlignment="CENTER" wrappingWidth="194.0" GridPane.columnIndex="1" GridPane.rowIndex="11" />
             </GridPane>
         </Tab>
         <fx:include fx:id="filesTypeView" source="FilesTypeView.fxml" />

@@ -4,9 +4,10 @@ import org.agh.diskstalker.controllers.MainController;
 import org.agh.diskstalker.model.limits.LimitType;
 import org.apache.commons.io.FileUtils;
 
-public class SetSizeButtonHandler extends AbstractButtonSetLimitHandler {
-    public SetSizeButtonHandler(MainController mainController) {
-        super(mainController, mainController.getMaxSizeField(), LimitType.TOTAL_SIZE);
+public class SetLargestFileButtonHandler extends AbstractButtonSetLimitHandler {
+
+    public SetLargestFileButtonHandler(MainController mainController) {
+        super(mainController, mainController.getLargestFileField(), LimitType.LARGEST_FILE);
     }
 
     @Override

@@ -3,7 +3,6 @@ package org.agh.diskstalker.controllers;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
-import javafx.scene.control.TableView;
 import org.agh.diskstalker.controllers.cellFactories.FolderColumnCellFactory;
 import org.agh.diskstalker.graphics.GraphicsFactory;
 import org.agh.diskstalker.model.folders.FolderList;
@@ -44,16 +43,6 @@ public abstract class AbstractTabController {
 
     public void refresh(){
         foldersTableView.refresh();
-        refreshSelection();
-    }
-
-    public void refreshSelection(){
-        var selectionModel = foldersTableView.getSelectionModel();
-        var item = selectionModel.getSelectedItem();
-        if(item != null){
-            selectionModel.clearSelection();
-            selectionModel.select(item);
-        }
     }
 
     protected abstract void configureSelectionModelListener();

@@ -14,12 +14,10 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TreeItem;
 import org.agh.diskstalker.controllers.FilesTopController;
 import org.agh.diskstalker.model.interfaces.IObservedFolder;
-import org.agh.diskstalker.model.stats.StatsEntry;
 import org.agh.diskstalker.model.tree.NodeData;
 import org.agh.diskstalker.model.tree.TreeFileNode;
 
 import java.nio.file.Path;
-import java.util.Comparator;
 import java.util.stream.Collectors;
 
 public class FilesTopSelectedItemChangeListener implements ChangeListener<IObservedFolder> {
@@ -28,21 +26,21 @@ public class FilesTopSelectedItemChangeListener implements ChangeListener<IObser
     private final Node loadingLabel;
 
     private final TableView<NodeData> dataTableView;
+    private final ObservableList<NodeData> currentItems;
     private MapChangeListener<Path, TreeFileNode> previousListener;
     private ObservableMap<Path, TreeFileNode> previousMap;
-    private SortedList<NodeData> prevItems;
-
-    private static final Comparator<NodeData> comparator =
-            (o1, o2) -> Comparator
-                    .comparingLong(NodeData::getSize).reversed()
-                    .thenComparing(NodeData::getModificationTime)
-                    .thenComparing(NodeData::getFileName)
-                    .compare(o1, o2);
 
     public FilesTopSelectedItemChangeListener(FilesTopController controller) {
         this.dataTableView = controller.getDataTableView();
         this.originalLabel = dataTableView.getPlaceholder();
         this.loadingLabel = new Label(LOADING_LABEL);
+        this.currentItems = FXCollections.<NodeData>observableArrayList(
+                node -> new Observable[] {
+                        node.getFilenameProperty(),
+                        node.getAccumulatedSizeProperty(),
+                        node.getModificationDateProperty()
+                }
+        );
     }
 
     @Override
@@ -61,14 +59,14 @@ public class FilesTopSelectedItemChangeListener implements ChangeListener<IObser
 
     private void setItems(IObservedFolder selectedFolder) {
         var nodesMap = selectedFolder.getNodesTree().getPathToTreeMap();
-        var items = createFileList(nodesMap);
-        var sortedItems = createSortedNodeList(items);
-        var listener = createListener(items);
+        createFileList(nodesMap);
+        var sortedItems = createSortedNodeList(currentItems);
+        var listener = createListener(currentItems);
 
         nodesMap.addListener(listener);
         dataTableView.setItems(sortedItems);
+        dataTableView.scrollTo(0);
 
-        prevItems = sortedItems;
         previousMap = nodesMap;
         previousListener = listener;
     }
@@ -76,10 +74,7 @@ public class FilesTopSelectedItemChangeListener implements ChangeListener<IObser
     private void clearItems() {
         previousListener = null;
         previousMap = null;
-        if(prevItems != null){
-            prevItems.getSource().clear();
-            prevItems = null;
-        }
+        currentItems.clear();
     }
 
     private MapChangeListener<Path, TreeFileNode> createListener(ObservableList<NodeData> items) {
@@ -92,25 +87,13 @@ public class FilesTopSelectedItemChangeListener implements ChangeListener<IObser
         };
     }
 
-    private ObservableList<NodeData> createFileList(ObservableMap<Path, TreeFileNode> nodesMap) {
-        var list = FXCollections.<NodeData>observableArrayList(
-                node -> new Observable[] {
-                        node.getFilenameProperty(),
-                        node.getAccumulatedSizeProperty(),
-                        node.getModificationDateProperty()
-                }
-        );
-
-        list.setAll(
+    private void createFileList(ObservableMap<Path, TreeFileNode> nodesMap) {
+        currentItems.setAll(
                 nodesMap.values().stream()
                 .map(TreeItem::getValue)
                 .filter(NodeData::isFile)
-                .sorted(comparator)
-                .limit(100)
                 .collect(Collectors.toList())
         );
-
-        return list;
     }
 
     private SortedList<NodeData> createSortedNodeList(ObservableList<NodeData> items) {

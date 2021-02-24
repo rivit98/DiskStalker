@@ -1,6 +1,5 @@
 package org.agh.diskstalker.model.interfaces;
 
-import org.agh.diskstalker.events.observedFolderEvents.AbstractObservedFolderEvent;
 import org.agh.diskstalker.events.observedFolderEvents.ObservedFolderEvent;
 import org.agh.diskstalker.model.limits.FolderLimits;
 
@@ -13,7 +12,7 @@ public interface ILimitableFolder {
 
     long getFilesAmount();
 
-    long getBiggestFileSize();
+    long getLargestFileSize();
 
     FolderLimits getLimits();
 

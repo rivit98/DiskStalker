@@ -42,7 +42,7 @@
                 <Font name="Times New Roman Bold" size="25.0"/>
             </font>
         </Text>
-        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Top 100 largest files" textAlignment="CENTER" wrappingWidth="557.0" GridPane.columnIndex="1">
+        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Largest files" textAlignment="CENTER" wrappingWidth="557.0" GridPane.columnIndex="1">
             <font>
                 <Font name="Times New Roman Bold" size="25.0"/>
             </font>

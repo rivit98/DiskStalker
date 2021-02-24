@@ -1,7 +1,6 @@
 package org.agh.diskstalker.model.folders;
 
 import com.sun.javafx.collections.ObservableListWrapper;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.TreeItem;
 import org.agh.diskstalker.model.interfaces.ILimitableObservableFolder;
 import org.agh.diskstalker.model.tree.NodeData;

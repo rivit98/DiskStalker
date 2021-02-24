@@ -26,7 +26,7 @@ public class QueryExecutor {
                     "path VARCHAR(1024) NOT NULL," +
                     "max_size_limit VARCHAR(128) NOT NULL DEFAULT '0'," +
                     "total_files_limit VARCHAR(128) NOT NULL DEFAULT '0'," +
-                    "biggest_file_limit VARCHAR(128) NOT NULL DEFAULT '0'" +
+                    "largest_file_limit VARCHAR(128) NOT NULL DEFAULT '0'" +
                     ");");
 
         } catch (SQLException e) {

@@ -3,11 +3,13 @@ package org.agh.diskstalker.model.limits;
 import javafx.beans.property.SimpleBooleanProperty;
 import org.agh.diskstalker.events.filesystemEvents.FilesystemEvent;
 import org.agh.diskstalker.events.filesystemEvents.FilesystemEventType;
-import org.agh.diskstalker.events.observedFolderEvents.*;
+import org.agh.diskstalker.events.observedFolderEvents.ObservedFolderEvent;
+import org.agh.diskstalker.events.observedFolderEvents.ObservedFolderFilesAmountChangedEvent;
+import org.agh.diskstalker.events.observedFolderEvents.ObservedFolderSizeChangedEvent;
+import org.agh.diskstalker.events.observedFolderEvents.ObservedLargestFileChangedEvent;
 import org.agh.diskstalker.model.folders.ObservedFolder;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -29,11 +31,11 @@ public class FolderLimits {
         });
         consumers.put(LimitType.TOTAL_SIZE, folder::getSize);
         consumers.put(LimitType.FILES_AMOUNT, folder::getFilesAmount);
-        consumers.put(LimitType.BIGGEST_FILE, folder::getBiggestFileSize);
+        consumers.put(LimitType.LARGEST_FILE, folder::getLargestFileSize);
 
         updaters.put(LimitType.TOTAL_SIZE, this::sendSizeChangedEvent);
         updaters.put(LimitType.FILES_AMOUNT, this::sendFileAmountChangedEvent);
-        updaters.put(LimitType.BIGGEST_FILE, this::sendBiggestFileChangedEvent);
+        updaters.put(LimitType.LARGEST_FILE, this::sendLargestFileChangedEvent);
     }
 
     private void sendEvent(ObservedFolderEvent event) {
@@ -48,14 +50,14 @@ public class FolderLimits {
         sendEvent(new ObservedFolderFilesAmountChangedEvent(folder));
     }
 
-    private void sendBiggestFileChangedEvent() {
-        sendEvent(new ObservedBiggestFileChangedEvent(folder));
+    private void sendLargestFileChangedEvent() {
+        sendEvent(new ObservedLargestFileChangedEvent(folder));
     }
 
     public void updateIfNecessary(FilesystemEvent event) {
         var eventType = event.getType();
         if (eventType.isFileEvent()) {
-            sendBiggestFileChangedEvent(); //biggest size could change on every file event
+            sendLargestFileChangedEvent(); //largest size could change on every file event
             sendSizeChangedEvent(); //size could change on every file event
 
             if (eventType != FilesystemEventType.FILE_MODIFIED) { //create or delete

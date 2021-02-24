@@ -8,12 +8,12 @@ import javafx.scene.control.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.rgielen.fxweaver.core.FxmlView;
-import org.agh.diskstalker.controllers.alerts.AlertsFactory;
+import org.agh.diskstalker.alerts.AlertsFactory;
 import org.agh.diskstalker.controllers.bindings.*;
 import org.agh.diskstalker.controllers.buttonHandlers.*;
 import org.agh.diskstalker.controllers.cellFactories.PathColumnCellFactory;
 import org.agh.diskstalker.controllers.cellFactories.SizeTreeTableColumnCellFactory;
-import org.agh.diskstalker.controllers.listeners.BiggestFileListener;
+import org.agh.diskstalker.controllers.listeners.LargestFileListener;
 import org.agh.diskstalker.controllers.listeners.MaxFilesAmountListener;
 import org.agh.diskstalker.controllers.listeners.MaxSizeButtonListener;
 import org.agh.diskstalker.controllers.sortPolicies.MainControllerSortPolicy;
@@ -51,8 +51,8 @@ public class MainController {
     @FXML private Button deleteFromDiskButton;
     @FXML @Getter private TextField maxFilesAmountField;
     @FXML private Button setMaxFilesAmountButton;
-    @FXML @Getter public TextField biggestFileField;
-    @FXML public Button setBiggestFileSizeButton;
+    @FXML @Getter public TextField largestFileField;
+    @FXML public Button setLargestFileSizeButton;
 
     @Getter private final DatabaseCommandExecutor commandExecutor;
     @Getter private final FolderList folderList;
@@ -109,25 +109,25 @@ public class MainController {
         deleteFromDiskButton.setOnAction(new DeleteFromDiskButtonHandler(this)); //if folder is big then removing time is really long
         setMaxSizeButton.setOnAction(new SetSizeButtonHandler(this));
         setMaxFilesAmountButton.setOnAction(new SetMaxFilesAmountButtonHandler(this));
-        setBiggestFileSizeButton.setOnAction(new SetBiggestFileButtonHandler(this));
+        setLargestFileSizeButton.setOnAction(new SetLargestFileButtonHandler(this));
 
         var selectionModel = treeTableView.getSelectionModel();
         deleteFromDiskButton.disableProperty().bind(new DeleteFromDiskButtonBinding(selectionModel));
         stopObserveButton.disableProperty().bind(new StopObserveButtonBinding(this, selectionModel));
         setMaxSizeButton.disableProperty().bind(new SetMaxSizeButtonBinding(this, selectionModel));
         setMaxFilesAmountButton.disableProperty().bind(new SetMaxFilesAmountButtonBinding(this, selectionModel));
-        setBiggestFileSizeButton.disableProperty().bind(new SetBiggestFileButtonBinding(this, selectionModel));
+        setLargestFileSizeButton.disableProperty().bind(new SetLargestFileButtonBinding(this, selectionModel));
     }
 
     private void initializeFields() {
         maxSizeField.setTextFormatter(new StringToIntFormatter());
         maxFilesAmountField.setTextFormatter(new StringToIntFormatter());
-        biggestFileField.setTextFormatter(new StringToIntFormatter());
+        largestFileField.setTextFormatter(new StringToIntFormatter());
 
         var selectedItemProperty = treeTableView.getSelectionModel().selectedItemProperty();
         selectedItemProperty.addListener(new MaxSizeButtonListener(maxSizeField, folderList));
         selectedItemProperty.addListener(new MaxFilesAmountListener(maxFilesAmountField, folderList));
-        selectedItemProperty.addListener(new BiggestFileListener(biggestFileField, folderList));
+        selectedItemProperty.addListener(new LargestFileListener(largestFileField, folderList));
     }
 
     private void loadSavedFolders() {

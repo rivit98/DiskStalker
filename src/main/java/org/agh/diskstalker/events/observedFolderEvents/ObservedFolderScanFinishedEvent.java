@@ -3,12 +3,7 @@ package org.agh.diskstalker.events.observedFolderEvents;
 import lombok.extern.slf4j.Slf4j;
 import org.agh.diskstalker.controllers.MainController;
 import org.agh.diskstalker.model.folders.FakeObservedFolder;
-import org.agh.diskstalker.model.folders.ObservedFolder;
 import org.agh.diskstalker.model.interfaces.ILimitableObservableFolder;
-import org.agh.diskstalker.model.interfaces.IObservedFolder;
-import org.agh.diskstalker.model.tree.TreeFileNode;
-
-import java.util.Objects;
 
 @Slf4j
 public class ObservedFolderScanFinishedEvent extends AbstractObservedFolderEvent{
@@ -33,10 +28,10 @@ public class ObservedFolderScanFinishedEvent extends AbstractObservedFolderEvent
                 .findFirst()
                 .orElseThrow();
 
-        var indexToReplace = folderList.indexOf(fakeFolder);
-        folderList.set(indexToReplace, folder);
-        treeTableView.getRoot().getChildren().remove(fakeFolder.getFakeNode());
-        treeTableView.getRoot().getChildren().add(folder.getNodesTree().getRoot());
+
+        folderList.set(folderList.indexOf(fakeFolder), folder);
+        var indexToReplace = treeTableView.getRoot().getChildren().indexOf(fakeFolder.getFakeNode());
+        treeTableView.getRoot().getChildren().set(indexToReplace, folder.getNodesTree().getRoot());
 
         folder.getLimits().checkLimits();
         treeTableView.sort();

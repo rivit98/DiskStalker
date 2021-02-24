@@ -5,7 +5,7 @@ import lombok.Getter;
 public enum LimitType {
     TOTAL_SIZE("total size"),
     FILES_AMOUNT("files amount"),
-    BIGGEST_FILE("biggest file");
+    LARGEST_FILE("largest file");
 
     @Getter private final String label;
 

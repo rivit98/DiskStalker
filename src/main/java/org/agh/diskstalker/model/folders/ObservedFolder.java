@@ -11,7 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.agh.diskstalker.events.eventProcessor.EventProcessor;
 import org.agh.diskstalker.events.eventProcessor.IEventProcessor;
 import org.agh.diskstalker.events.filesystemEvents.FilesystemEvent;
-import org.agh.diskstalker.events.observedFolderEvents.*;
+import org.agh.diskstalker.events.observedFolderEvents.ObservedFolderErrorEvent;
+import org.agh.diskstalker.events.observedFolderEvents.ObservedFolderEvent;
+import org.agh.diskstalker.events.observedFolderEvents.ObservedFolderScanFinishedEvent;
+import org.agh.diskstalker.events.observedFolderEvents.ObservedFolderScanStartedEvent;
 import org.agh.diskstalker.filesystem.dirwatcher.DirWatcher;
 import org.agh.diskstalker.filesystem.dirwatcher.IFilesystemWatcher;
 import org.agh.diskstalker.filesystem.scanner.FileTreeScanner;
@@ -157,8 +160,8 @@ public class ObservedFolder implements ILimitableObservableFolder {
     }
 
     @Override
-    public long getBiggestFileSize() {
-        return nodesTree.getBiggestFileSize();
+    public long getLargestFileSize() {
+        return nodesTree.getLargestFileSize();
     }
 
     @Override

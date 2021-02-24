@@ -17,7 +17,7 @@ public class StopObserveButtonHandler implements EventHandler<ActionEvent> {
             if(mainController.removeTreeItem(item)){
                 mainController.getMaxSizeField().clear();
                 mainController.getMaxFilesAmountField().clear();
-                mainController.getBiggestFileField().clear();
+                mainController.getLargestFileField().clear();
             }
         });
     }

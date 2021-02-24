@@ -13,7 +13,7 @@ import static org.mockito.Mockito.when;
 
 public class FolderLimitsTest {
     private static final long folderSize = 1024L;
-    private static final long folderBiggestFile = 512L;
+    private static final long folderLargestFile = 512L;
     private static final long folderFilesAmount = 3L;
 
     private FolderLimits limits;
@@ -22,7 +22,7 @@ public class FolderLimitsTest {
     public void setUp() {
         var folder = mock(ObservedFolder.class);
         when(folder.getSize()).thenReturn(folderSize);
-        when(folder.getBiggestFileSize()).thenReturn(folderBiggestFile);
+        when(folder.getLargestFileSize()).thenReturn(folderLargestFile);
         when(folder.getFilesAmount()).thenReturn(folderFilesAmount);
         limits = new FolderLimits(folder);
     }
@@ -37,12 +37,12 @@ public class FolderLimitsTest {
     }
 
     @Test
-    public void biggestFileLimit(){
-        limits.setLimit(LimitType.BIGGEST_FILE,folderBiggestFile / 2);
-        assertTrue(limits.isLimitExceeded(LimitType.BIGGEST_FILE));
+    public void largestFileLimit(){
+        limits.setLimit(LimitType.LARGEST_FILE, folderLargestFile / 2);
+        assertTrue(limits.isLimitExceeded(LimitType.LARGEST_FILE));
 
-        limits.setLimit(LimitType.BIGGEST_FILE,folderBiggestFile * 2);
-        assertFalse(limits.isLimitExceeded(LimitType.BIGGEST_FILE));
+        limits.setLimit(LimitType.LARGEST_FILE, folderLargestFile * 2);
+        assertFalse(limits.isLimitExceeded(LimitType.LARGEST_FILE));
     }
 
     @Test

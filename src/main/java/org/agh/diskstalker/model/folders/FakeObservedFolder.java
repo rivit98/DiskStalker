@@ -4,7 +4,6 @@ package org.agh.diskstalker.model.folders;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.agh.diskstalker.events.observedFolderEvents.AbstractObservedFolderEvent;
 import org.agh.diskstalker.events.observedFolderEvents.ObservedFolderEvent;
 import org.agh.diskstalker.model.interfaces.ILimitableObservableFolder;
 import org.agh.diskstalker.model.limits.FolderLimits;
@@ -120,7 +119,7 @@ public class FakeObservedFolder implements ILimitableObservableFolder {
     }
 
     @Override
-    public long getBiggestFileSize() {
+    public long getLargestFileSize() {
         unsupported();
         return 0;
     }

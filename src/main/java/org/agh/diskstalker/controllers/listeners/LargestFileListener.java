@@ -9,8 +9,8 @@ import org.agh.diskstalker.model.limits.LimitType;
 import org.agh.diskstalker.model.tree.NodeData;
 import org.apache.commons.io.FileUtils;
 
-public class BiggestFileListener extends AbstractLimitButtonListener {
-    public BiggestFileListener(TextField textField, FolderList folderList) {
+public class LargestFileListener extends AbstractLimitButtonListener {
+    public LargestFileListener(TextField textField, FolderList folderList) {
         super(textField, folderList);
     }
 
@@ -18,7 +18,7 @@ public class BiggestFileListener extends AbstractLimitButtonListener {
         var oldFolder = folderList.getObservedFolderFromTreeItem(oldTreeItem);
         if (oldFolder.isEmpty() || !oldFolder.get().equals(newFolder)) {
             Platform.runLater(() ->
-                    textField.setText(String.valueOf(newFolder.getLimits().get(LimitType.BIGGEST_FILE) / FileUtils.ONE_MB))
+                    textField.setText(String.valueOf(newFolder.getLimits().get(LimitType.LARGEST_FILE) / FileUtils.ONE_MB))
             );
         }
     }

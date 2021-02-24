@@ -2,7 +2,6 @@ package org.agh.diskstalker.events.observedFolderEvents;
 
 import org.agh.diskstalker.controllers.MainController;
 import org.agh.diskstalker.model.interfaces.ILimitableFolder;
-import org.agh.diskstalker.model.interfaces.ILimitableObservableFolder;
 import org.agh.diskstalker.model.limits.LimitType;
 
 public abstract class AbstractObservedFolderLimitEvent implements ObservedFolderEvent {

@@ -1,4 +1,4 @@
-package org.agh.diskstalker.controllers.alerts;
+package org.agh.diskstalker.alerts;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
