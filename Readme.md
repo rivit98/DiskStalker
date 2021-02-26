@@ -6,8 +6,36 @@ It provides the ability to set notifications about three types of statistics:
 * number of files inside folder
 * size of largest file
 
-App also shows stats about type of files inside selected folder and presents top 100 largest files.
+App also shows stats about type of files inside selected folder and presents list of largest files.
 
+DiskStalker is using polling method for tracking changes in directory. Better approach is to use [WatchService API](https://docs.oracle.com/javase/7/docs/api/java/nio/file/WatchService.html) but it does not work well on Windows (it blocks the files, so you are not able to delete files from observed folder, see [StackOverflow](https://stackoverflow.com/questions/56847367/can-you-prevent-watchservice-from-locking-files-on-windows)).
+
+## Screenshots
+
+| ![1](./img/1.png) |
+|:--:|
+| *Main View* |
+<br /><br />
+
+| ![2](./img/2.png) |
+|:--:|
+| *Files type view* |
+<br /><br />
+
+| ![3](./img/3.png) |
+|:--:|
+| *Largest files view* |
+<br /><br />
+
+| ![4](./img/4.png) |
+|:--:|
+| *Total folder limit set* |
+<br /><br />
+
+| ![5](./img/5.png) |
+|:--:|
+| *Total folder limit exceeded* |
+<br /><br />
 
 ## Usage
 Visit [Releases](https://github.com/rivit98/DiskStalker/releases) and download .jar. Then run:
