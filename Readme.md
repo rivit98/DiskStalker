@@ -15,27 +15,28 @@ DiskStalker is using polling method for tracking changes in directory. Better ap
 | ![1](./img/1.png) |
 |:--:|
 | *Main View* |
-<br /><br />
+___
+
 
 | ![2](./img/2.png) |
 |:--:|
 | *Files type view* |
-<br /><br />
+___
 
 | ![3](./img/3.png) |
 |:--:|
 | *Largest files view* |
-<br /><br />
+___
 
 | ![4](./img/4.png) |
 |:--:|
 | *Total folder limit set* |
-<br /><br />
+___
 
 | ![5](./img/5.png) |
 |:--:|
 | *Total folder limit exceeded* |
-<br /><br />
+___
 
 ## Usage
 Visit [Releases](https://github.com/rivit98/DiskStalker/releases) and download .jar. Then run:
