@@ -13,15 +13,13 @@ import java.nio.file.Path;
 public class AlertsFactory {
     public void tryingToAddSameFolderToObservedAlert() {
         createAlert(
-                "You already observe this directory!"
+                "You already observe this directory!",
+                AlertType.WARNING
         ).showAndWait();
     }
 
     public void setLimit(String path, LimitType limitType, Long value) {
-        var valueLabel = switch (limitType) {
-            case FILES_AMOUNT -> value.toString();
-            default -> FileUtils.byteCountToDisplaySize(value);
-        };
+        var valueLabel = formatLimitValue(limitType, value);
 
         createAlert(
                 String.format("Folder:\n%s\nset %s limit to:\n%s", path, limitType.getLabel(), valueLabel),
@@ -29,10 +27,20 @@ public class AlertsFactory {
         ).showAndWait();
     }
 
-    public void limitExceededAlert(String path, LimitType limitType, Long size) {
+    public void limitExceededAlert(String path, LimitType limitType, Long value) {
+        var valueLabel = formatLimitValue(limitType, value);
+
         createAlert(
-                String.format("Folder:\n%s\nexceeded %s limit:\n%s", path, limitType.getLabel(), FileUtils.byteCountToDisplaySize(size))
+                String.format("Folder:\n%s\nexceeded %s limit:\n%s", path, limitType.getLabel(), valueLabel),
+                AlertType.WARNING
         ).showAndWait();
+    }
+
+    private String formatLimitValue(LimitType limitType, Long value){
+        return switch (limitType) {
+            case FILES_AMOUNT -> value.toString();
+            default -> FileUtils.byteCountToDisplaySize(value);
+        };
     }
 
     public void genericErrorAlert(Path path, String message) {
@@ -50,10 +58,6 @@ public class AlertsFactory {
         )
                 .showAndWait()
                 .orElse(ButtonType.NO);
-    }
-
-    private Alert createAlert(String information) {
-        return createAlert(information, AlertType.WARNING);
     }
 
     private Alert createAlert(String information, AlertType type) {

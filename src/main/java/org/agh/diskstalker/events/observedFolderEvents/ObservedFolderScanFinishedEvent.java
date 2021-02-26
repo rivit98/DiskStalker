@@ -30,8 +30,8 @@ public class ObservedFolderScanFinishedEvent extends AbstractObservedFolderEvent
 
 
         folderList.set(folderList.indexOf(fakeFolder), folder);
-        var indexToReplace = treeTableView.getRoot().getChildren().indexOf(fakeFolder.getFakeNode());
-        treeTableView.getRoot().getChildren().set(indexToReplace, folder.getNodesTree().getRoot());
+        treeTableView.getRoot().getChildren().remove(fakeFolder.getFakeNode());
+        treeTableView.getRoot().getChildren().add(folder.getNodesTree().getRoot());
 
         folder.getLimits().checkLimits();
         treeTableView.sort();
