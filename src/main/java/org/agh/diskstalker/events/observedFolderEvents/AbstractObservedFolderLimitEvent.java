@@ -19,13 +19,13 @@ public abstract class AbstractObservedFolderLimitEvent implements ObservedFolder
         var wasShown = limits.wasShown(limitType);
         if (limits.isLimitExceeded(limitType)) {
             if (!wasShown) {
+                mainController.refreshViews();
                 mainController.getAlertsFactory().limitExceededAlert(
                         folder.getPath().toString(),
                         limitType,
                         limits.get(limitType)
                 );
                 limits.setShown(limitType);
-                mainController.refreshViews();
             }
         } else if (wasShown) {
             limits.clearShown(limitType);
