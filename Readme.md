@@ -10,6 +10,7 @@ App also shows stats about type of files inside selected folder and presents lis
 
 DiskStalker is using polling method for tracking changes in directory. Better approach is to use [WatchService API](https://docs.oracle.com/javase/7/docs/api/java/nio/file/WatchService.html) but it does not work well on Windows (it blocks the files, so you are not able to delete files from observed folder, see [StackOverflow](https://stackoverflow.com/questions/56847367/can-you-prevent-watchservice-from-locking-files-on-windows)).
 
+Presentation: [YouTube](https://youtu.be/nOFRaL8o1tU)
 ## Screenshots
 
 | ![1](./img/1.png) |
@@ -60,6 +61,12 @@ and import as Gradle project
 * Mockito
 * JUnit5
 
+
+## Known issues and possible improvements
+* something is wrong with TypeRecognizer and 'unknown' file types
+* removing huge folders (~30k files) taking quite long time
+* usage of observable buffering might be significant improve of removing times
+
 ## Authors
 
 <table>
@@ -70,3 +77,4 @@ and import as Gradle project
     <td align="center"><a href="https://github.com/rivit98"><br /><sub><b>Albert Gierlach</b></sub></a><br /></td>
   </tr>
 </table>
+
