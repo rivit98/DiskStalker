@@ -69,12 +69,21 @@ and import as Gradle project
 
 ## Authors
 
-<table>
-  <tr>
-    <td align="center"><a href="https://github.com/wnekus"><br /><sub><b>Kamil Wnęk</b></sub></a><br />
-    </td>
-    <td align="center"><a href="https://github.com/kuczi55"><br /><sub><b>Kamil Koczera</b></sub></a><br /></td>
-    <td align="center"><a href="https://github.com/rivit98"><br /><sub><b>Albert Gierlach</b></sub></a><br /></td>
-  </tr>
-</table>
+<table align="center">
+<tr>
+<th align="center">
+    <img src="https://avatars.githubusercontent.com/u/70373402?v=4" width="100"><br> 
+    <a href="https://github.com/wnekus">Kamil Wnęk</a>
+</th>
 
+<th align="center">
+    <img src="https://avatars.githubusercontent.com/u/44415389?v=4" width="100"><br> 
+    <a href="https://github.com/kuczi55">Kamil Koczera</a>
+</th>
+
+<th align="center">
+    <img src="https://avatars.githubusercontent.com/u/19514368?v=4" width="100"><br> 
+    <a href="https://github.com/rivit98">Albert Gierlach</a>
+</th>
+</tr>
+</table>
